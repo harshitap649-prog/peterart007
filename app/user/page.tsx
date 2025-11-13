@@ -49,9 +49,6 @@ export default function UserPage() {
   return (
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-end mb-4">
-          <LogoutButton />
-        </div>
         <Suspense fallback={
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>

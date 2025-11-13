@@ -1,20 +1,5 @@
 [
   {
-    "id": "1763037813492",
-    "title": "fcngv",
-    "description": "ughy",
-    "price": 500,
-    "category": "",
-    "images": [
-      "/artworks/1763037813492_0_0183b1d0-7a28-4187-ba8a-f0c6438a70b6.jpg"
-    ],
-    "createdAt": "2025-11-13T12:43:33.496Z",
-    "updatedAt": "2025-11-13T12:43:33.496Z",
-    "likes": 0,
-    "comments": [],
-    "likedBy": []
-  },
-  {
     "id": "1763037843416",
     "title": "tfgy",
     "description": "fchy",
@@ -30,5 +15,35 @@
     "likedBy": [
       "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1"
     ]
+  },
+  {
+    "id": "1763059037951",
+    "title": "hbdc",
+    "description": "jnskf",
+    "price": 7765,
+    "category": "56",
+    "images": [
+      "/artworks/1763059037951_0_0183b1d0-7a28-4187-ba8a-f0c6438a70b6.jpg"
+    ],
+    "createdAt": "2025-11-13T18:37:17.955Z",
+    "updatedAt": "2025-11-13T18:37:17.955Z",
+    "likes": 0,
+    "comments": [],
+    "likedBy": []
+  },
+  {
+    "id": "1763059054298",
+    "title": "hdsm",
+    "description": "cbm",
+    "price": 25,
+    "category": "26te",
+    "images": [
+      "/artworks/1763059054298_0_0183b1d0-7a28-4187-ba8a-f0c6438a70b6.jpg"
+    ],
+    "createdAt": "2025-11-13T18:37:34.299Z",
+    "updatedAt": "2025-11-13T18:37:34.299Z",
+    "likes": 0,
+    "comments": [],
+    "likedBy": []
   }
 ]

@@ -9,21 +9,21 @@ module.exports = {
     extend: {
       colors: {
         neon: {
-          pink: '#ff00ff',
+          pink: '#FF7BA3',
           purple: '#9d00ff',
           orange: '#ff6b00',
-          blue: '#00d4ff',
+          blue: '#5B9FFF',
         },
         dark: {
-          bg: '#0a0a0a',
-          card: '#1a1a1a',
+          bg: '#000000',
+          card: '#000000',
           border: '#2a2a2a',
         }
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(135deg, #ff6b00, #ff00ff)',
-        'gradient-secondary': 'linear-gradient(135deg, #ff00ff, #9d00ff)',
-        'gradient-hover': 'linear-gradient(135deg, #ff8c00, #ff00ff, #9d00ff)',
+        'gradient-primary': 'linear-gradient(135deg, #ff6b00, #FF7BA3, #5B9FFF)',
+        'gradient-secondary': 'linear-gradient(135deg, #FF7BA3, #9d00ff)',
+        'gradient-hover': 'linear-gradient(135deg, #ff8c00, #FF7BA3, #5B9FFF, #9d00ff)',
       },
     },
   },

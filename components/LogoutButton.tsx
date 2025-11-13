@@ -28,10 +28,10 @@ export default function LogoutButton({ className = '' }: LogoutButtonProps) {
     <>
       <button
         onClick={() => setShowConfirm(true)}
-        className={`flex items-center gap-2 btn-secondary ${className}`}
+        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-[#ff6b00] via-[#FF7BA3] to-[#5B9FFF] text-white hover:from-[#ff8c00] hover:via-[#FF7BA3] hover:to-[#5B9FFF] hover:shadow-lg hover:shadow-[#ff6b00]/50 ${className}`}
       >
-        <FiLogOut />
-        <span>Logout</span>
+        <FiLogOut className="text-base" />
+        <span className="hidden sm:inline">Logout</span>
       </button>
 
       {showConfirm && (

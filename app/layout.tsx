@@ -22,11 +22,11 @@ export default function RootLayout({
             style: {
               background: '#1a1a1a',
               color: '#fff',
-              border: '1px solid rgba(255, 0, 255, 0.3)',
+              border: '1px solid rgba(255, 123, 163, 0.3)',
             },
             success: {
               iconTheme: {
-                primary: '#ff00ff',
+                primary: '#FF7BA3',
                 secondary: '#fff',
               },
             },

@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle } from 'react-icons/fi'
 import { FaHeart } from 'react-icons/fa'
 import HelpSupport from './HelpSupport'
+import LogoutButton from './LogoutButton'
 
 export default function UserDashboard({ user }: { user: any }) {
   const router = useRouter()
@@ -141,26 +142,36 @@ export default function UserDashboard({ user }: { user: any }) {
 
   return (
     <div>
-      {/* Logo */}
-      <div className="text-center mb-8">
-        <div className="relative w-32 h-32 mx-auto mb-4">
-          <img
-            src="https://png.pngtree.com/png-clipart/20240310/original/pngtree-3d-colorful-beauty-girl-logo-white-background-png-image_14551483.png"
-            alt="Logo"
-            className="w-full h-full object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none'
-            }}
-          />
+      {/* Logo - Only show on artworks tab */}
+      {activeTab === 'artworks' && (
+        <div className="text-center mb-6 relative">
+          <div className="flex justify-end mb-2">
+            <LogoutButton />
+          </div>
+          <div className="relative w-48 h-48 md:w-40 md:h-40 mx-auto mb-3 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
+            <img
+              src="https://png.pngtree.com/png-vector/20240627/ourmid/pngtree-vector-art-of-a-woman-wearing-neon-headphones-png-image_12855446.png"
+              alt="Logo"
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none'
+              }}
+            />
+            <div 
+              className="absolute inset-0 border-2 border-black pointer-events-none"
+              style={{ borderRadius: '0 0 50% 50%' }}
+            ></div>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold gradient-text">Fall in love with art</h1>
+          <p className="text-gray-300 text-sm md:text-base italic mt-2">Turn Empty Walls into Expressions</p>
         </div>
-        <h1 className="text-4xl font-bold gradient-text">Peter Art</h1>
-      </div>
+      )}
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-1.5 md:gap-2 mb-4 overflow-x-auto pb-2">
         <button
           onClick={() => setActiveTab('artworks')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'artworks' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
@@ -168,7 +179,7 @@ export default function UserDashboard({ user }: { user: any }) {
         </button>
         <button
           onClick={() => setActiveTab('wishlist')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'wishlist' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
@@ -176,7 +187,7 @@ export default function UserDashboard({ user }: { user: any }) {
         </button>
         <button
           onClick={() => setActiveTab('orders')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
@@ -184,26 +195,26 @@ export default function UserDashboard({ user }: { user: any }) {
         </button>
         <button
           onClick={() => setActiveTab('support')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'support' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
-          <FiHelpCircle className="inline mr-2" />
+          <FiHelpCircle className="inline mr-1 text-xs md:text-sm" />
           Help & Support
         </button>
       </div>
 
       {/* Search Bar - Only show on artworks tab */}
       {activeTab === 'artworks' && (
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="relative">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search artworks..."
-              className="input-field pl-12"
+              className="input-field pl-9 text-sm py-2"
             />
           </div>
         </div>
@@ -218,11 +229,11 @@ export default function UserDashboard({ user }: { user: any }) {
               <p className="text-gray-400">Loading artworks...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
               {filteredArtworks.map((artwork: any) => (
-                <div key={artwork.id} className="card p-4">
+                <div key={artwork.id} className="card p-3">
                   {artwork.images && artwork.images[0] && (
-                    <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
+                    <div className="relative w-full h-40 md:h-48 mb-3 rounded-lg overflow-hidden">
                       <img
                         src={artwork.images[0]}
                         alt={artwork.title}
@@ -230,46 +241,46 @@ export default function UserDashboard({ user }: { user: any }) {
                       />
                     </div>
                   )}
-                  <h3 className="font-bold text-lg mb-2">{artwork.title}</h3>
-                  <p className="text-gray-400 text-sm mb-3 line-clamp-2">{artwork.description}</p>
-                  <p className="text-neon-pink font-bold text-xl mb-4">${artwork.price}</p>
+                  <h3 className="font-bold text-base md:text-lg mb-1.5">{artwork.title}</h3>
+                  <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{artwork.description}</p>
+                  <p className="text-neon-pink font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
                   
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-1.5 mb-3">
                     <button
                       onClick={() => handleLike(artwork.id)}
-                      className="flex items-center gap-1 text-gray-400 hover:text-neon-pink transition-colors"
+                      className="flex items-center gap-0.5 text-gray-400 hover:text-neon-pink transition-colors text-xs"
                     >
                       <FiThumbsUp className={artwork.likedBy?.includes(user?.uid) ? 'text-neon-pink' : ''} />
-                      <span>{artwork.likes || 0}</span>
+                      <span className="text-xs">{artwork.likes || 0}</span>
                     </button>
                     <button
                       onClick={() => setShowComments(showComments === artwork.id ? null : artwork.id)}
-                      className="flex items-center gap-1 text-gray-400 hover:text-neon-pink transition-colors"
+                      className="flex items-center gap-0.5 text-gray-400 hover:text-neon-pink transition-colors text-xs"
                     >
-                      <FiMessageCircle />
-                      <span>{artwork.comments?.length || 0}</span>
+                      <FiMessageCircle className="text-xs" />
+                      <span className="text-xs">{artwork.comments?.length || 0}</span>
                     </button>
                     <button
                       onClick={() => handleShare(artwork)}
-                      className="flex items-center gap-1 text-gray-400 hover:text-neon-pink transition-colors"
+                      className="flex items-center gap-0.5 text-gray-400 hover:text-neon-pink transition-colors text-xs"
                     >
-                      <FiShare2 />
+                      <FiShare2 className="text-xs" />
                     </button>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     <button
                       onClick={() => handleWishlist(artwork.id)}
-                      className={`flex-1 flex items-center justify-center gap-2 btn-secondary ${
+                      className={`flex-1 flex items-center justify-center gap-1 btn-secondary text-xs py-1.5 ${
                         wishlist.includes(artwork.id) ? 'text-red-400' : ''
                       }`}
                     >
-                      {wishlist.includes(artwork.id) ? <FaHeart /> : <FiHeart />}
-                      Wishlist
+                      {wishlist.includes(artwork.id) ? <FaHeart className="text-xs" /> : <FiHeart className="text-xs" />}
+                      <span className="text-xs">Wishlist</span>
                     </button>
                     <button
                       onClick={() => router.push(`/artwork/${artwork.id}`)}
-                      className="flex-1 btn-primary"
+                      className="flex-1 btn-primary text-xs py-1.5"
                     >
                       Buy Now
                     </button>
@@ -324,13 +335,13 @@ export default function UserDashboard({ user }: { user: any }) {
               <p className="text-gray-400">Your wishlist is empty</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
               {artworks
                 .filter((artwork: any) => wishlist.includes(artwork.id))
                 .map((artwork: any) => (
-                  <div key={artwork.id} className="card p-4">
+                  <div key={artwork.id} className="card p-3">
                     {artwork.images && artwork.images[0] && (
-                      <div className="relative w-full h-64 mb-4 rounded-lg overflow-hidden">
+                      <div className="relative w-full h-40 md:h-48 mb-3 rounded-lg overflow-hidden">
                         <img
                           src={artwork.images[0]}
                           alt={artwork.title}
@@ -338,12 +349,12 @@ export default function UserDashboard({ user }: { user: any }) {
                         />
                       </div>
                     )}
-                    <h3 className="font-bold text-lg mb-2">{artwork.title}</h3>
-                    <p className="text-gray-400 text-sm mb-3">{artwork.description}</p>
-                    <p className="text-neon-pink font-bold text-xl mb-4">${artwork.price}</p>
+                    <h3 className="font-bold text-base md:text-lg mb-1.5">{artwork.title}</h3>
+                    <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{artwork.description}</p>
+                    <p className="text-neon-pink font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
                     <button
                       onClick={() => router.push(`/artwork/${artwork.id}`)}
-                      className="btn-primary w-full"
+                      className="btn-primary w-full text-xs py-1.5"
                     >
                       Buy Now
                     </button>
@@ -363,12 +374,12 @@ export default function UserDashboard({ user }: { user: any }) {
               <p className="text-gray-400">You have no orders yet</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {orders.map((order: any) => (
-                <div key={order.id} className="card p-4">
-                  <div className="flex flex-col md:flex-row gap-4">
+                <div key={order.id} className="card p-3">
+                  <div className="flex flex-col md:flex-row gap-3">
                     {order.artworkImage && (
-                      <div className="relative w-full md:w-32 h-32 rounded-lg overflow-hidden">
+                      <div className="relative w-full md:w-24 h-24 rounded-lg overflow-hidden">
                         <img
                           src={order.artworkImage}
                           alt={order.artworkTitle}
@@ -377,25 +388,25 @@ export default function UserDashboard({ user }: { user: any }) {
                       </div>
                     )}
                     <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-2">{order.artworkTitle}</h3>
-                      <div className="flex items-center gap-4 mb-2">
-                        <p className="text-gray-400 text-sm">
+                      <h3 className="font-bold text-base md:text-lg mb-1.5">{order.artworkTitle}</h3>
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <p className="text-gray-400 text-xs">
                           Quantity: <span className="text-white font-medium">{order.quantity || 1}</span>
                         </p>
-                        <p className="text-gray-400 text-sm">
-                          Unit Price: <span className="text-white font-medium">${order.unitPrice || order.total}</span>
+                        <p className="text-gray-400 text-xs">
+                          Unit: <span className="text-white font-medium">₹{order.unitPrice || order.total}</span>
                         </p>
                       </div>
-                      <p className="text-neon-pink font-bold text-xl mb-2">Total: ${order.total}</p>
-                      <p className="text-gray-400 text-sm mb-1">
+                      <p className="text-neon-pink font-bold text-lg md:text-xl mb-1.5">Total: ₹{order.total}</p>
+                      <p className="text-gray-400 text-xs mb-1">
                         Payment: {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
                       </p>
                       {order.paymentMethod === 'cod' && order.address1 && (
-                        <div className="mt-2 p-2 bg-dark-card rounded text-xs">
+                        <div className="mt-1.5 p-1.5 bg-dark-card rounded text-xs">
                           <p className="text-gray-400">Delivery to: {order.address1}, {order.city}, {order.pincode}</p>
                         </div>
                       )}
-                      <p className="text-gray-400 text-sm mb-1 mt-2">
+                      <p className="text-gray-400 text-xs mb-1 mt-1.5">
                         Status: <span className={`font-medium ${
                           order.status === 'delivered' ? 'text-green-400' :
                           order.status === 'pending' ? 'text-yellow-400' :

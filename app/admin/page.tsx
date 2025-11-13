@@ -51,10 +51,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-3 md:p-4">
       <div className="container mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold gradient-text">Admin Panel</h1>
+        <div className="flex justify-end items-center mb-4 md:mb-6">
           <LogoutButton />
         </div>
         <AdminDashboard />

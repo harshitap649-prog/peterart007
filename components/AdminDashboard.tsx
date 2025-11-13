@@ -18,6 +18,8 @@ export default function AdminDashboard() {
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const [adminResponse, setAdminResponse] = useState('')
   const [showArtworkForm, setShowArtworkForm] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [artworkToDelete, setArtworkToDelete] = useState<string | null>(null)
   const [editingArtwork, setEditingArtwork] = useState<any>(null)
   const [formData, setFormData] = useState({
     title: '',
@@ -122,11 +124,18 @@ export default function AdminDashboard() {
     setShowArtworkForm(true)
   }
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this artwork?')) {
+  const handleDelete = (id: string) => {
+    setArtworkToDelete(id)
+    setShowDeleteConfirm(true)
+  }
+
+  const confirmDelete = async () => {
+    if (artworkToDelete) {
       try {
-        await deleteArtwork(id)
+        await deleteArtwork(artworkToDelete)
         toast.success('Artwork deleted successfully')
+        setShowDeleteConfirm(false)
+        setArtworkToDelete(null)
         loadData()
       } catch (error) {
         toast.error('Failed to delete artwork')
@@ -151,53 +160,53 @@ export default function AdminDashboard() {
   return (
     <div>
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-1.5 md:gap-2 mb-4 md:mb-6 overflow-x-auto pb-2">
         <button
           onClick={() => setActiveTab('home')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'home' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
-          <FiHome className="inline mr-2" />
+          <FiHome className="inline mr-1 md:mr-2 text-xs md:text-sm" />
           Home
         </button>
         <button
           onClick={() => setActiveTab('artworks')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'artworks' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
-          <FiShoppingBag className="inline mr-2" />
+          <FiShoppingBag className="inline mr-1 md:mr-2 text-xs md:text-sm" />
           All Artworks
         </button>
         <button
           onClick={() => setActiveTab('orders')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
-          <FiPackage className="inline mr-2" />
+          <FiPackage className="inline mr-1 md:mr-2 text-xs md:text-sm" />
           All Orders
         </button>
         <button
           onClick={() => setActiveTab('users')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'users' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
-          <FiUsers className="inline mr-2" />
+          <FiUsers className="inline mr-1 md:mr-2 text-xs md:text-sm" />
           Users
         </button>
         <button
           onClick={() => setActiveTab('support')}
-          className={`px-4 py-2 rounded-lg font-medium transition-all ${
+          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
             activeTab === 'support' ? 'btn-primary' : 'btn-secondary'
           }`}
         >
-          <FiMessageSquare className="inline mr-2" />
+          <FiMessageSquare className="inline mr-1 md:mr-2 text-xs md:text-sm" />
           Support Messages
           {supportMessages.filter((m: any) => m.status === 'pending').length > 0 && (
-            <span className="ml-2 px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+            <span className="ml-1.5 md:ml-2 px-1.5 md:px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
               {supportMessages.filter((m: any) => m.status === 'pending').length}
             </span>
           )}
@@ -207,26 +216,44 @@ export default function AdminDashboard() {
       {/* Home Tab */}
       {activeTab === 'home' && (
         <div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            <div className="card p-6">
-              <h3 className="text-gray-400 mb-2">Total Artworks</h3>
-              <p className="text-3xl font-bold gradient-text">{artworks.length}</p>
+          {/* Logo at top */}
+          <div className="text-center mb-6 md:mb-8">
+            <div className="relative w-32 h-32 md:w-44 md:h-44 mx-auto mb-3 md:mb-4 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
+              <img
+                src="https://png.pngtree.com/png-vector/20240627/ourmid/pngtree-vector-art-of-a-woman-wearing-neon-headphones-png-image_12855446.png"
+                alt="Logo"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none'
+                }}
+              />
+              <div 
+                className="absolute inset-0 border-2 border-black pointer-events-none"
+                style={{ borderRadius: '0 0 50% 50%' }}
+              ></div>
             </div>
-            <div className="card p-6">
-              <h3 className="text-gray-400 mb-2">Pending Orders</h3>
-              <p className="text-3xl font-bold text-yellow-400">{pendingOrders.length}</p>
+            <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Admin Panel</h1>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="card p-3 md:p-4">
+              <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Total Artworks</h3>
+              <p className="text-2xl md:text-3xl font-bold gradient-text">{artworks.length}</p>
             </div>
-            <div className="card p-6">
-              <h3 className="text-gray-400 mb-2">Delivered</h3>
-              <p className="text-3xl font-bold text-green-400">{deliveredOrders.length}</p>
+            <div className="card p-3 md:p-4">
+              <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Pending Orders</h3>
+              <p className="text-2xl md:text-3xl font-bold text-yellow-400">{pendingOrders.length}</p>
             </div>
-            <div className="card p-6">
-              <h3 className="text-gray-400 mb-2">Left Orders</h3>
-              <p className="text-3xl font-bold text-red-400">{leftOrders.length}</p>
+            <div className="card p-3 md:p-4">
+              <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Delivered</h3>
+              <p className="text-2xl md:text-3xl font-bold text-green-400">{deliveredOrders.length}</p>
             </div>
-            <div className="card p-6">
-              <h3 className="text-gray-400 mb-2">Support Messages</h3>
-              <p className="text-3xl font-bold text-neon-pink">
+            <div className="card p-3 md:p-4">
+              <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Left Orders</h3>
+              <p className="text-2xl md:text-3xl font-bold text-red-400">{leftOrders.length}</p>
+            </div>
+            <div className="card p-3 md:p-4">
+              <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Support Messages</h3>
+              <p className="text-2xl md:text-3xl font-bold text-neon-pink">
                 {supportMessages.filter((m: any) => m.status === 'pending').length}
               </p>
               <p className="text-xs text-gray-500 mt-1">Pending</p>
@@ -238,8 +265,8 @@ export default function AdminDashboard() {
       {/* Artworks Tab */}
       {activeTab === 'artworks' && (
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">All Artworks</h2>
+          <div className="flex justify-between items-center mb-3 md:mb-4">
+            <h2 className="text-xl md:text-2xl font-bold">All Artworks</h2>
             <button
               onClick={() => {
                 setEditingArtwork(null)
@@ -247,10 +274,11 @@ export default function AdminDashboard() {
                 setImagePreviews([])
                 setShowArtworkForm(true)
               }}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-1.5 md:py-2 px-3 md:px-4"
             >
-              <FiPlus />
-              Add New Artwork
+              <FiPlus className="text-xs md:text-sm" />
+              <span className="hidden sm:inline">Add New Artwork</span>
+              <span className="sm:hidden">Add</span>
             </button>
           </div>
 
@@ -260,33 +288,33 @@ export default function AdminDashboard() {
               <p className="text-gray-400">Loading artworks...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
               {artworks.map((artwork: any) => (
-                <div key={artwork.id} className="card p-4">
+                <div key={artwork.id} className="card p-2 md:p-3 lg:p-4">
                   {artwork.images && artwork.images[0] && (
                     <img
                       src={artwork.images[0]}
                       alt={artwork.title}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
+                      className="w-full h-28 sm:h-36 md:h-48 object-cover rounded-lg mb-2 md:mb-3"
                     />
                   )}
-                  <h3 className="font-bold text-lg mb-2">{artwork.title}</h3>
-                  <p className="text-gray-400 text-sm mb-2 line-clamp-2">{artwork.description}</p>
-                  <p className="text-neon-pink font-bold mb-4">${artwork.price}</p>
-                  <div className="flex gap-2">
+                  <h3 className="font-bold text-xs md:text-base lg:text-lg mb-1 md:mb-1.5 line-clamp-1">{artwork.title}</h3>
+                  <p className="text-gray-400 text-xs mb-1 md:mb-2 line-clamp-2 hidden sm:block">{artwork.description}</p>
+                  <p className="text-neon-pink font-bold text-sm md:text-base lg:text-lg mb-2 md:mb-3">₹{artwork.price}</p>
+                  <div className="flex gap-1 md:gap-1.5 lg:gap-2">
                     <button
                       onClick={() => handleEdit(artwork)}
-                      className="btn-secondary flex-1 flex items-center justify-center gap-2"
+                      className="btn-secondary flex-1 flex items-center justify-center gap-0.5 md:gap-1 lg:gap-2 text-xs md:text-sm py-1 md:py-1.5"
                     >
-                      <FiEdit />
-                      Edit
+                      <FiEdit className="text-xs" />
+                      <span className="text-xs md:text-sm">Edit</span>
                     </button>
                     <button
                       onClick={() => handleDelete(artwork.id)}
-                      className="btn-secondary flex-1 flex items-center justify-center gap-2 text-red-400"
+                      className="btn-secondary flex-1 flex items-center justify-center gap-0.5 md:gap-1 lg:gap-2 text-red-400 text-xs md:text-sm py-1 md:py-1.5"
                     >
-                      <FiTrash2 />
-                      Delete
+                      <FiTrash2 className="text-xs" />
+                      <span className="text-xs md:text-sm">Delete</span>
                     </button>
                   </div>
                 </div>
@@ -299,7 +327,7 @@ export default function AdminDashboard() {
       {/* Orders Tab */}
       {activeTab === 'orders' && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">All Orders</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">All Orders</h2>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -308,16 +336,16 @@ export default function AdminDashboard() {
           ) : (
             <div className="space-y-4">
               {orders.map((order: any) => (
-                <div key={order.id} className="card p-4">
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div key={order.id} className="card p-3 md:p-4">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-start justify-between mb-2 md:mb-3">
                         <div>
-                          <p className="font-bold text-lg">Order #{order.id.slice(0, 8)}</p>
-                          <p className="text-gray-400 text-sm">{order.userEmail}</p>
-                          <p className="text-gray-400 text-sm">User: {order.userName || 'N/A'}</p>
+                          <p className="font-bold text-base md:text-lg">Order #{order.id.slice(0, 8)}</p>
+                          <p className="text-gray-400 text-xs md:text-sm">{order.userEmail}</p>
+                          <p className="text-gray-400 text-xs md:text-sm">User: {order.userName || 'N/A'}</p>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        <span className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium ${
                           order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
                           order.status === 'delivered' ? 'bg-green-500/20 text-green-400' :
                           'bg-red-500/20 text-red-400'
@@ -326,35 +354,35 @@ export default function AdminDashboard() {
                         </span>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-3 md:mb-4">
                         <div>
-                          <p className="text-gray-400 text-sm mb-1">Artwork</p>
-                          <p className="font-medium">{order.artworkTitle}</p>
+                          <p className="text-gray-400 text-xs mb-0.5">Artwork</p>
+                          <p className="font-medium text-xs md:text-sm">{order.artworkTitle}</p>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-sm mb-1">Quantity</p>
-                          <p className="font-medium">{order.quantity || 1}</p>
+                          <p className="text-gray-400 text-xs mb-0.5">Quantity</p>
+                          <p className="font-medium text-xs md:text-sm">{order.quantity || 1}</p>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-sm mb-1">Unit Price</p>
-                          <p className="font-medium">${order.unitPrice || order.total}</p>
+                          <p className="text-gray-400 text-xs mb-0.5">Unit Price</p>
+                          <p className="font-medium text-xs md:text-sm">₹{order.unitPrice || order.total}</p>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-sm mb-1">Total Price</p>
-                          <p className="text-neon-pink font-bold text-xl">${order.total}</p>
+                          <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
+                          <p className="text-neon-pink font-bold text-base md:text-xl">₹{order.total}</p>
                         </div>
                         <div>
-                          <p className="text-gray-400 text-sm mb-1">Payment Method</p>
-                          <p className="font-medium">
-                            {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
+                          <p className="text-gray-400 text-xs mb-0.5">Payment</p>
+                          <p className="font-medium text-xs md:text-sm">
+                            {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
                           </p>
                         </div>
                       </div>
 
                       {order.paymentMethod === 'cod' && (
-                        <div className="mt-4 p-4 bg-dark-card rounded-lg border border-neon-pink/20">
-                          <p className="text-neon-pink font-medium mb-3">Delivery Address:</p>
-                          <div className="space-y-1 text-sm">
+                        <div className="mt-3 md:mt-4 p-2 md:p-3 bg-dark-card rounded-lg border border-neon-pink/20">
+                          <p className="text-neon-pink font-medium mb-2 text-xs md:text-sm">Delivery Address:</p>
+                          <div className="space-y-0.5 md:space-y-1 text-xs md:text-sm">
                             <p><span className="text-gray-400">Name:</span> <span className="text-white">{order.fullName || 'N/A'}</span></p>
                             <p><span className="text-gray-400">Phone:</span> <span className="text-white">{order.phone || 'N/A'}</span></p>
                             <p><span className="text-gray-400">Email:</span> <span className="text-white">{order.email || order.userEmail}</span></p>
@@ -374,7 +402,7 @@ export default function AdminDashboard() {
                         </div>
                       )}
                       
-                      <p className="text-gray-500 text-xs mt-3">
+                      <p className="text-gray-500 text-xs mt-2 md:mt-3">
                         Ordered on: {new Date(order.createdAt).toLocaleString()}
                       </p>
                     </div>
@@ -382,7 +410,7 @@ export default function AdminDashboard() {
                       <select
                         value={order.status}
                         onChange={(e) => handleOrderStatusChange(order.id, e.target.value)}
-                        className="input-field text-sm"
+                        className="input-field text-xs md:text-sm py-1.5"
                       >
                         <option value="pending">Pending</option>
                         <option value="delivered">Delivered</option>
@@ -400,19 +428,19 @@ export default function AdminDashboard() {
       {/* Users Tab */}
       {activeTab === 'users' && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">All Users</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">All Users</h2>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading users...</p>
             </div>
           ) : (
-            <div className="card p-4">
-              <div className="space-y-2">
+            <div className="card p-3 md:p-4">
+              <div className="space-y-1.5 md:space-y-2">
                 {users.map((user: any) => (
-                  <div key={user.id} className="p-3 border-b border-dark-border last:border-0">
-                    <p className="font-medium">{user.email}</p>
-                    <p className="text-gray-400 text-sm">
+                  <div key={user.id} className="p-2 md:p-3 border-b border-dark-border last:border-0">
+                    <p className="font-medium text-sm md:text-base">{user.email}</p>
+                    <p className="text-gray-400 text-xs md:text-sm">
                       Joined: {new Date(user.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -426,7 +454,7 @@ export default function AdminDashboard() {
       {/* Support Messages Tab */}
       {activeTab === 'support' && (
         <div>
-          <h2 className="text-2xl font-bold mb-4">Support Messages</h2>
+          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Support Messages</h2>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -438,18 +466,18 @@ export default function AdminDashboard() {
               <p className="text-gray-400">No support messages yet</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {supportMessages.map((message: any) => (
-                <div key={message.id} className="card p-4">
-                  <div className="flex flex-col md:flex-row md:items-start gap-4">
+                <div key={message.id} className="card p-3 md:p-4">
+                  <div className="flex flex-col md:flex-row md:items-start gap-3 md:gap-4">
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h3 className="font-bold text-lg mb-1">{message.subject}</h3>
-                          <p className="text-gray-400 text-sm mb-2">
+                          <h3 className="font-bold text-base md:text-lg mb-1">{message.subject}</h3>
+                          <p className="text-gray-400 text-xs md:text-sm mb-1.5">
                             From: {message.userName} ({message.userEmail})
                           </p>
-                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium mb-2 ${
+                          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium mb-1.5 ${
                             message.type === 'order' ? 'bg-blue-500/20 text-blue-400' :
                             message.type === 'website' ? 'bg-purple-500/20 text-purple-400' :
                             message.type === 'other' ? 'bg-gray-500/20 text-gray-400' :
@@ -458,12 +486,12 @@ export default function AdminDashboard() {
                             {message.type.charAt(0).toUpperCase() + message.type.slice(1)}
                           </span>
                           {message.orderId && (
-                            <p className="text-gray-400 text-sm mb-2">
+                            <p className="text-gray-400 text-xs md:text-sm mb-1.5">
                               Related Order: #{message.orderId.slice(0, 8)}
                             </p>
                           )}
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        <span className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium ${
                           message.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
                           message.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400' :
                           message.status === 'resolved' ? 'bg-green-500/20 text-green-400' :
@@ -472,18 +500,18 @@ export default function AdminDashboard() {
                           {message.status.charAt(0).toUpperCase() + message.status.slice(1).replace('-', ' ')}
                         </span>
                       </div>
-                      <p className="text-gray-300 mb-3 whitespace-pre-wrap">{message.message}</p>
+                      <p className="text-gray-300 text-xs md:text-sm mb-2 md:mb-3 whitespace-pre-wrap">{message.message}</p>
                       {message.adminResponse && (
-                        <div className="mt-3 p-3 bg-dark-card rounded-lg border border-neon-pink/20">
-                          <p className="text-neon-pink font-medium mb-1">Admin Response:</p>
-                          <p className="text-gray-300 whitespace-pre-wrap">{message.adminResponse}</p>
+                        <div className="mt-2 md:mt-3 p-2 md:p-3 bg-dark-card rounded-lg border border-neon-pink/20">
+                          <p className="text-neon-pink font-medium mb-1 text-xs md:text-sm">Admin Response:</p>
+                          <p className="text-gray-300 text-xs md:text-sm whitespace-pre-wrap">{message.adminResponse}</p>
                         </div>
                       )}
                       <p className="text-gray-500 text-xs mt-2">
                         {new Date(message.createdAt).toLocaleString()}
                       </p>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1.5 md:gap-2">
                       <select
                         value={message.status}
                         onChange={async (e) => {
@@ -495,7 +523,7 @@ export default function AdminDashboard() {
                             toast.error('Failed to update status')
                           }
                         }}
-                        className="input-field text-sm"
+                        className="input-field text-xs md:text-sm py-1.5"
                       >
                         <option value="pending">Pending</option>
                         <option value="in-progress">In Progress</option>
@@ -507,7 +535,7 @@ export default function AdminDashboard() {
                           setSelectedMessage(message)
                           setAdminResponse(message.adminResponse || '')
                         }}
-                        className="btn-secondary text-sm"
+                        className="btn-secondary text-xs md:text-sm py-1.5 px-3"
                       >
                         {message.adminResponse ? 'Edit Response' : 'Add Response'}
                       </button>
@@ -523,9 +551,9 @@ export default function AdminDashboard() {
                             }
                           }
                         }}
-                        className="btn-secondary text-sm text-red-400"
+                        className="btn-secondary text-xs md:text-sm py-1.5 px-3 text-red-400"
                       >
-                        <FiX className="inline mr-1" />
+                        <FiX className="inline mr-1 text-xs" />
                         Delete
                       </button>
                     </div>
@@ -594,55 +622,55 @@ export default function AdminDashboard() {
       {/* Artwork Form Modal */}
       {showArtworkForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="card p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold mb-4 gradient-text">
+          <div className="card p-4 md:p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 gradient-text">
               {editingArtwork ? 'Edit Artwork' : 'Add New Artwork'}
             </h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Title</label>
+                <label className="block text-xs md:text-sm font-medium mb-1.5">Title</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="input-field"
+                  className="input-field text-sm py-2"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
+                <label className="block text-xs md:text-sm font-medium mb-1.5">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="input-field"
-                  rows={4}
+                  className="input-field text-sm py-2"
+                  rows={3}
                   required
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Price ($)</label>
+                  <label className="block text-xs md:text-sm font-medium mb-1.5">Price (₹)</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="input-field"
+                    className="input-field text-sm py-2"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
+                  <label className="block text-xs md:text-sm font-medium mb-1.5">Category</label>
                   <input
                     type="text"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="input-field"
+                    className="input-field text-sm py-2"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-xs md:text-sm font-medium mb-1.5">
                   Images (up to 3) *
                 </label>
                 <input
@@ -650,25 +678,25 @@ export default function AdminDashboard() {
                   accept="image/*"
                   multiple
                   onChange={handleImageChange}
-                  className="input-field"
+                  className="input-field text-xs md:text-sm py-2"
                   required={!editingArtwork}
                 />
                 {formData.images.length > 0 && (
-                  <p className="text-sm text-gray-400 mt-2">
+                  <p className="text-xs md:text-sm text-gray-400 mt-1.5">
                     {formData.images.length} image(s) selected
                   </p>
                 )}
                 {(imagePreviews.length > 0 || (editingArtwork && editingArtwork.images?.length > 0)) && (
-                  <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div className="grid grid-cols-3 gap-2 md:gap-4 mt-3">
                     {(imagePreviews.length > 0 ? imagePreviews : editingArtwork?.images || []).map((preview: string, index: number) => (
                       <div key={index} className="relative">
                         <img
                           src={preview}
                           alt={`Preview ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-lg border-2 border-neon-pink/30"
+                          className="w-full h-24 md:h-32 object-cover rounded-lg border-2 border-neon-pink/30"
                         />
                         {editingArtwork && !formData.images.length && (
-                          <span className="absolute top-2 right-2 bg-dark-card px-2 py-1 rounded text-xs">
+                          <span className="absolute top-1 right-1 bg-dark-card px-1.5 py-0.5 rounded text-xs">
                             Current
                           </span>
                         )}
@@ -676,12 +704,12 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 mt-1.5">
                   * Images will be visible on the user page after adding the artwork
                 </p>
               </div>
-              <div className="flex gap-4">
-                <button type="submit" className="btn-primary flex-1">
+              <div className="flex gap-3 md:gap-4">
+                <button type="submit" className="btn-primary flex-1 text-sm md:text-base py-2">
                   {editingArtwork ? 'Update' : 'Add'} Artwork
                 </button>
                 <button
@@ -692,12 +720,39 @@ export default function AdminDashboard() {
                     setFormData({ title: '', description: '', price: '', category: '', images: [] })
                     setImagePreviews([])
                   }}
-                  className="btn-secondary flex-1"
+                  className="btn-secondary flex-1 text-sm md:text-base py-2"
                 >
                   Cancel
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="card p-4 md:p-6 max-w-md w-full">
+            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 gradient-text">Confirm Delete</h3>
+            <p className="text-gray-300 mb-4 md:mb-6 text-sm md:text-base">Are you sure you want to delete this artwork?</p>
+            <div className="flex gap-3 md:gap-4">
+              <button
+                onClick={confirmDelete}
+                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-gradient-to-r from-[#ff6b00] via-[#FF7BA3] to-[#5B9FFF] text-white hover:from-[#ff8c00] hover:via-[#FF7BA3] hover:to-[#5B9FFF] hover:shadow-lg hover:shadow-[#ff6b00]/50"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false)
+                  setArtworkToDelete(null)
+                }}
+                className="btn-secondary flex-1 text-sm md:text-base py-2"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

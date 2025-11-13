@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['firebasestorage.googleapis.com', 'png.pngtree.com'],
+    domains: ['firebasestorage.googleapis.com', 'png.pngtree.com', 'icon2.cleanpng.com', 'static.vecteezy.com'],
   },
   webpack: (config, { isServer, webpack }) => {
     // Fix for undici package parsing issue

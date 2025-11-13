@@ -115,7 +115,7 @@ export default function HelpSupport({ user }: { user: any }) {
                 <option value="">Select an order</option>
                 {userOrders.map((order: any) => (
                   <option key={order.id} value={order.id}>
-                    Order #{order.id.slice(0, 8)} - {order.artworkTitle} - ${order.total}
+                    Order #{order.id.slice(0, 8)} - {order.artworkTitle} - ₹{order.total}
                   </option>
                 ))}
               </select>
