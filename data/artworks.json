@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1763037813492",
+    "title": "fcngv",
+    "description": "ughy",
+    "price": 500,
+    "category": "",
+    "images": [
+      "/artworks/1763037813492_0_0183b1d0-7a28-4187-ba8a-f0c6438a70b6.jpg"
+    ],
+    "createdAt": "2025-11-13T12:43:33.496Z",
+    "updatedAt": "2025-11-13T12:43:33.496Z",
+    "likes": 0,
+    "comments": [],
+    "likedBy": []
+  },
+  {
+    "id": "1763037843416",
+    "title": "tfgy",
+    "description": "fchy",
+    "price": 342,
+    "category": "art",
+    "images": [
+      "/artworks/1763037843416_0_0183b1d0-7a28-4187-ba8a-f0c6438a70b6.jpg"
+    ],
+    "createdAt": "2025-11-13T12:44:03.418Z",
+    "updatedAt": "2025-11-13T12:44:03.418Z",
+    "likes": 1,
+    "comments": [],
+    "likedBy": [
+      "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1"
+    ]
+  }
+]
