@@ -26,57 +26,34 @@ export default function BannerAd() {
       }
 
       try {
-        // Create a unique container ID for this ad instance
-        const adContainerId = 'at-' + Math.random().toString(36).substr(2, 9)
-        if (containerRef.current) {
-          containerRef.current.id = adContainerId
-        }
-
-        // Load Adsterra ad configuration - must be in global scope
+        // Load Adsterra ad configuration - EXACT format from Adsterra
         const script1 = document.createElement('script')
         script1.type = 'text/javascript'
         script1.innerHTML = `
-          (function() {
-            var atOptions = {
-              'key' : '0fbc6e323c9390d9ca4f10e36841673e',
-              'format' : 'iframe',
-              'height' : 50,
-              'width' : 320,
-              'params' : {}
-            };
-            if (typeof window !== 'undefined') {
-              window.atOptions = atOptions;
-            }
-          })();
+          atOptions = {
+            'key' : '0fbc6e323c9390d9ca4f10e36841673e',
+            'format' : 'iframe',
+            'height' : 50,
+            'width' : 320,
+            'params' : {}
+          };
         `
         script1.id = 'ad-config-banner'
         document.head.appendChild(script1)
         
         // Wait a bit for config to be set, then load invoke script
         setTimeout(() => {
-          // Load Adsterra ad invoke script
+          // Load Adsterra ad invoke script - using protocol-relative URL
           const script2 = document.createElement('script')
           script2.type = 'text/javascript'
-          script2.src = 'https://www.highperformanceformat.com/0fbc6e323c9390d9ca4f10e36841673e/invoke.js'
+          script2.src = '//www.highperformanceformat.com/0fbc6e323c9390d9ca4f10e36841673e/invoke.js'
           script2.id = 'ad-script-banner'
           script2.async = true
-          script2.defer = true
           
           // Handle script load
           script2.onload = () => {
             adLoadedRef.current = true
             console.log('Banner ad script loaded successfully')
-            
-            // Try to manually trigger ad injection if script doesn't auto-inject
-            setTimeout(() => {
-              if (containerRef.current && (window as any).atOptions) {
-                // Some Adsterra scripts auto-inject, but if not, we can try manual injection
-                const container = containerRef.current
-                if (container && container.children.length === 0) {
-                  console.log('Banner ad container ready, waiting for ad to load...')
-                }
-              }
-            }, 2000)
           }
           
           script2.onerror = () => {
@@ -85,7 +62,7 @@ export default function BannerAd() {
           }
           
           document.body.appendChild(script2)
-        }, 200)
+        }, 100)
         
         return true
       } catch (error) {
@@ -96,10 +73,10 @@ export default function BannerAd() {
 
     // Initialize ad when DOM is ready
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-      setTimeout(() => initAd(), 800)
+      setTimeout(() => initAd(), 500)
     } else {
       window.addEventListener('load', () => {
-        setTimeout(() => initAd(), 800)
+        setTimeout(() => initAd(), 500)
       })
     }
 
@@ -108,7 +85,7 @@ export default function BannerAd() {
       if (!adLoadedRef.current) {
         initAd()
       }
-    }, 2000)
+    }, 1500)
     
     return () => {
       clearTimeout(timer)

@@ -28,13 +28,12 @@ export function loadPopunderAd(action: 'logout' | 'order' = 'order') {
     existingScript.remove()
   }
 
-  // Create and load the popunder ad script
+  // Create and load the popunder ad script - using protocol-relative URL (EXACT format from Adsterra)
   const script = document.createElement('script')
   script.type = 'text/javascript'
-  script.src = 'https://pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
+  script.src = '//pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
   script.id = 'popunder-ad-script'
   script.async = true
-  script.defer = true
   
   // Handle script load
   script.onload = () => {
