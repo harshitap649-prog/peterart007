@@ -6,11 +6,13 @@ import { getAllOrders, updateOrderStatus, getOrdersByStatus } from '@/lib/orders
 import { getAllUsers } from '@/lib/users'
 import { getAllSupportMessages, updateSupportMessage, deleteSupportMessage } from '@/lib/support'
 import toast from 'react-hot-toast'
-import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiPackage, FiMessageSquare, FiCheck, FiX } from 'react-icons/fi'
+import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch } from 'react-icons/fi'
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('home')
   const [artworks, setArtworks] = useState<any[]>([])
+  const [filteredArtworks, setFilteredArtworks] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
   const [orders, setOrders] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [supportMessages, setSupportMessages] = useState<any[]>([])
@@ -34,12 +36,26 @@ export default function AdminDashboard() {
     loadData()
   }, [activeTab])
 
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = artworks.filter((artwork: any) =>
+        artwork.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        artwork.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        artwork.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      setFilteredArtworks(filtered)
+    } else {
+      setFilteredArtworks(artworks)
+    }
+  }, [searchTerm, artworks])
+
   const loadData = async () => {
     setLoading(true)
     try {
       if (activeTab === 'artworks' || activeTab === 'home') {
         const arts = await getAllArtworks()
         setArtworks(arts)
+        setFilteredArtworks(arts)
       }
       if (activeTab === 'orders' || activeTab === 'home') {
         const ords = await getAllOrders()
@@ -278,14 +294,28 @@ export default function AdminDashboard() {
             </button>
           </div>
 
+          {/* Search Bar */}
+          <div className="mb-4">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search artworks..."
+                className="input-field pr-9 text-sm py-2"
+              />
+              <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-900 text-sm" />
+            </div>
+          </div>
+
           {loading ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading artworks...</p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3 lg:gap-4">
-              {artworks.map((artwork: any) => (
+            <div className="grid grid-cols-2 gap-2 md:gap-3 lg:gap-4">
+              {filteredArtworks.map((artwork: any) => (
                 <div key={artwork.id} className="card p-2 md:p-3 lg:p-4">
                   {artwork.images && artwork.images[0] && (
                     <img
