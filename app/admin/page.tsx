@@ -19,14 +19,19 @@ export default function AdminPage() {
 
   const checkAuth = async () => {
     try {
+      // Add a small delay to ensure Firebase is initialized
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
       const currentUser = await getCurrentUser()
       if (!currentUser) {
+        console.log('No user found, redirecting to login')
         router.push('/')
         return
       }
       
       const admin = await isAdmin(currentUser)
       if (!admin) {
+        console.log('User is not admin, redirecting to user page')
         router.push('/user')
         return
       }
@@ -35,7 +40,12 @@ export default function AdminPage() {
       setLoading(false)
     } catch (error) {
       console.error('Auth check error:', error)
-      router.push('/')
+      // Don't redirect immediately on error, show error state
+      setLoading(false)
+      // Only redirect if it's a clear auth error
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
     }
   }
 

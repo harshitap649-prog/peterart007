@@ -19,6 +19,9 @@ export default function UserPage() {
 
   const checkAuth = async () => {
     try {
+      // Add a small delay to ensure Firebase is initialized
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
       const currentUser = await getCurrentUser()
       if (!currentUser) {
         console.log('No user found, redirecting to login')
@@ -31,7 +34,10 @@ export default function UserPage() {
     } catch (error) {
       console.error('Auth check error:', error)
       setLoading(false)
-      // Don't redirect on error, just show the error
+      // Redirect to login after a delay if auth fails
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
     }
   }
 
