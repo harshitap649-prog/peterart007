@@ -256,13 +256,16 @@ export default function ArtworkDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Artwork Images */}
           <div className="space-y-4">
-            {artwork.images && artwork.images.length > 0 && (
+            {artwork.images && artwork.images.length > 0 ? (
               <div className="card p-4">
                 <div className="relative w-full h-96 rounded-lg overflow-hidden mb-4">
                   <img
                     src={artwork.images[0]}
                     alt={artwork.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23e5e7eb" width="400" height="400"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage not found%3C/text%3E%3C/svg%3E'
+                    }}
                   />
                 </div>
                 {artwork.images.length > 1 && (
@@ -273,11 +276,20 @@ export default function ArtworkDetailsPage() {
                           src={img}
                           alt={`${artwork.title} ${idx + 2}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="12"%3EImage not found%3C/text%3E%3C/svg%3E'
+                          }}
                         />
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+            ) : (
+              <div className="card p-4">
+                <div className="relative w-full h-96 rounded-lg overflow-hidden mb-4 bg-gray-200 flex items-center justify-center">
+                  <span className="text-gray-400">No image available</span>
+                </div>
               </div>
             )}
           </div>
