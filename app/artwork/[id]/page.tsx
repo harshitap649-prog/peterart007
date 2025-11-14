@@ -6,8 +6,9 @@ import { getCurrentUser } from '@/lib/auth'
 import { getArtworkById } from '@/lib/artworks'
 import { createOrder } from '@/lib/orders'
 import toast from 'react-hot-toast'
-import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX } from 'react-icons/fi'
+import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiThumbsUp } from 'react-icons/fi'
 import LoginModal from '@/components/LoginModal'
+import { likeArtwork } from '@/lib/comments'
 
 export default function ArtworkDetailsPage() {
   const params = useParams()
@@ -36,6 +37,7 @@ export default function ArtworkDetailsPage() {
   const [reviewImagePreviews, setReviewImagePreviews] = useState<string[]>([])
   const [submittingReview, setSubmittingReview] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [liking, setLiking] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -174,6 +176,27 @@ export default function ArtworkDetailsPage() {
     }))
   }
 
+  const handleLike = async () => {
+    if (!user || !user.uid) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to like artworks')
+      return
+    }
+
+    if (!artwork) return
+
+    setLiking(true)
+    try {
+      await likeArtwork(artwork.id, user.uid)
+      await loadArtwork() // Reload to get updated like count
+      toast.success(artwork.likedBy?.includes(user.uid) ? 'Removed like' : 'Liked artwork')
+    } catch (error) {
+      toast.error('Failed to like artwork')
+    } finally {
+      setLiking(false)
+    }
+  }
+
   const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitting(true)
@@ -297,8 +320,24 @@ export default function ArtworkDetailsPage() {
           {/* Artwork Details */}
           <div className="space-y-6">
             <div className="card p-6">
-              <h1 className="text-xl font-bold mb-3 text-gray-900">{artwork.title}</h1>
-              <p className="text-gray-600 mb-4 whitespace-pre-wrap text-sm">{artwork.description}</p>
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
+                  <h1 className="text-xl font-bold mb-3 text-gray-900">{artwork.title}</h1>
+                  <p className="text-gray-600 mb-4 whitespace-pre-wrap text-sm">{artwork.description}</p>
+                </div>
+                <button
+                  onClick={handleLike}
+                  disabled={liking}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors ${
+                    artwork.likedBy?.includes(user?.uid)
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                  }`}
+                >
+                  <FiThumbsUp className={`text-sm ${artwork.likedBy?.includes(user?.uid) ? 'fill-current' : ''}`} />
+                  <span className="text-sm font-medium">{artwork.likes || 0}</span>
+                </button>
+              </div>
               {artwork.category && (
                 <span className="inline-block px-3 py-1 bg-gray-100 text-gray-900 rounded-full text-xs mb-4">
                   {artwork.category}
