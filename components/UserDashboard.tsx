@@ -204,14 +204,14 @@ export default function UserDashboard({ user }: { user: any }) {
       {activeTab === 'artworks' && (
         <div className="mb-4">
           <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search artworks..."
-              className="input-field pl-9 text-sm py-2"
+              className="input-field pr-9 text-sm py-2"
             />
+            <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-900 text-sm" />
           </div>
         </div>
       )}
