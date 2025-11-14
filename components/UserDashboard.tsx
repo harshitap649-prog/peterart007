@@ -178,7 +178,10 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   const handleNavClick = (tab: string) => {
     if (tab === 'wishlist' || tab === 'orders' || tab === 'support') {
-      if (!user) {
+      // Check if user is logged in - if not, show login modal
+      if (!user || !user.uid) {
+        setLoginModalOpen(true)
+        toast.error('Please sign in to access this section')
         setSidebarOpen(false)
         setLoginModalOpen(true)
         toast.error('Please sign in to access this section')
