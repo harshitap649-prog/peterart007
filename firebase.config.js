@@ -47,6 +47,7 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
+
 // Initialize Analytics (only on client side)
 if (typeof window !== 'undefined') {
   getAnalytics(app);

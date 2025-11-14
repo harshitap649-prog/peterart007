@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFile, writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/firebase.config'
 
 const ARTWORKS_FILE = path.join(process.cwd(), 'data', 'artworks.json')
 const REVIEWS_DIR = path.join(process.cwd(), 'public', 'reviews')
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
       artworks[index].comments = []
     }
     
-    // Handle review images
+    // Handle review images - Use Firebase Storage for persistence
     const imageUrls: string[] = []
     const imageFiles = formData.getAll('images') as File[]
     
@@ -61,13 +63,30 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < imageFiles.length; i++) {
         const file = imageFiles[i]
         if (file && file.size > 0 && file.name) {
-          const bytes = await file.arrayBuffer()
-          const buffer = Buffer.from(bytes)
-          const fileName = `${reviewId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-          const filePath = path.join(REVIEWS_DIR, fileName)
-          
-          await writeFile(filePath, buffer)
-          imageUrls.push(`/reviews/${fileName}`)
+          try {
+            // Upload to Firebase Storage
+            const fileName = `reviews/${reviewId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+            const storageRef = ref(storage, fileName)
+            const bytes = await file.arrayBuffer()
+            const buffer = Buffer.from(bytes)
+            
+            await uploadBytes(storageRef, buffer)
+            const downloadURL = await getDownloadURL(storageRef)
+            imageUrls.push(downloadURL)
+          } catch (error) {
+            console.error('Error uploading review image to Firebase:', error)
+            // Fallback to local storage
+            try {
+              const bytes = await file.arrayBuffer()
+              const buffer = Buffer.from(bytes)
+              const fileName = `${reviewId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+              const filePath = path.join(REVIEWS_DIR, fileName)
+              await writeFile(filePath, buffer)
+              imageUrls.push(`/reviews/${fileName}`)
+            } catch (fallbackError) {
+              console.error('Error with fallback storage:', fallbackError)
+            }
+          }
         }
       }
     }

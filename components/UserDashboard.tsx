@@ -212,7 +212,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   return (
     <div className="min-h-screen bg-white">
       {/* Top Bar */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 py-2 flex items-center justify-between">
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 py-2 flex items-center justify-between relative">
         {/* Hamburger Menu */}
         <button
           onClick={() => setSidebarOpen(true)}
@@ -242,7 +242,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     className="fixed inset-0 z-40"
                     onClick={() => setUserMenuOpen(false)}
                   ></div>
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
                     <div className="py-2">
                       <div className="px-4 py-2 border-b border-gray-200">
                         <p className="text-sm font-medium text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
@@ -573,7 +573,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="card p-4 md:p-6 max-w-md w-full bg-white">
+          <div className="bg-white rounded-lg shadow-lg p-4 md:p-6 max-w-md w-full">
             <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">Confirm Logout</h3>
             <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">Are you sure you want to logout?</p>
             <div className="flex gap-3 md:gap-4">

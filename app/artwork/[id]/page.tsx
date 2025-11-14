@@ -199,6 +199,16 @@ export default function ArtworkDetailsPage() {
 
   const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Check if online payment is selected
+    if (paymentMethod === 'online') {
+      toast('Online payment feature coming soon!', { 
+        icon: 'ℹ️',
+        duration: 3000
+      })
+      return
+    }
+    
     setSubmitting(true)
 
     try {
@@ -206,6 +216,7 @@ export default function ArtworkDetailsPage() {
         // Validate COD form fields
         if (!formData.fullName || !formData.phone || !formData.address1 || !formData.pincode || !formData.city) {
           toast.error('Please fill in all required fields')
+          setSubmitting(false)
           return
         }
       }

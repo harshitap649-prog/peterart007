@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { getAllArtworks, addArtwork, updateArtwork, deleteArtwork } from '@/lib/artworks'
 import { getAllOrders, updateOrderStatus, getOrdersByStatus } from '@/lib/orders'
-import { getAllUsers } from '@/lib/users'
+import { getAllUsers, disableUser, deleteUser } from '@/lib/users'
 import { getAllSupportMessages, updateSupportMessage, deleteSupportMessage } from '@/lib/support'
 import toast from 'react-hot-toast'
 import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch } from 'react-icons/fi'
@@ -23,6 +23,8 @@ export default function AdminDashboard() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [artworkToDelete, setArtworkToDelete] = useState<string | null>(null)
   const [editingArtwork, setEditingArtwork] = useState<any>(null)
+  const [showUserDeleteConfirm, setShowUserDeleteConfirm] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -160,6 +162,36 @@ export default function AdminDashboard() {
       toast.error('Failed to delete artwork')
     }
   }
+
+  const handleDisableUser = async (userId: string, disabled: boolean) => {
+    try {
+      await disableUser(userId, disabled)
+      toast.success(`User ${disabled ? 'disabled' : 'enabled'} successfully`)
+      await loadData()
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update user')
+    }
+  }
+
+  const handleDeleteUser = (userId: string) => {
+    setUserToDelete(userId)
+    setShowUserDeleteConfirm(true)
+  }
+
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return
+    
+    try {
+      await deleteUser(userToDelete)
+      toast.success('User deleted successfully')
+      setShowUserDeleteConfirm(false)
+      setUserToDelete(null)
+      await loadData()
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete user')
+    }
+  }
+  
 
   const handleOrderStatusChange = async (orderId: string, status: string) => {
     try {
@@ -369,92 +401,250 @@ export default function AdminDashboard() {
               <p className="text-gray-400">Loading orders...</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {orders.map((order: any) => (
-                <div key={order.id} className="card p-3 md:p-4">
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2 md:mb-3">
-                        <div>
-                          <p className="font-bold text-base md:text-lg">Order #{order.id.slice(0, 8)}</p>
-                          <p className="text-gray-400 text-xs md:text-sm">{order.userEmail}</p>
-                          <p className="text-gray-400 text-xs md:text-sm">User: {order.userName || 'N/A'}</p>
-                        </div>
-                        <span className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium ${
-                          order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                          order.status === 'delivered' ? 'bg-green-500/20 text-green-400' :
-                          'bg-red-500/20 text-red-400'
-                        }`}>
-                          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </span>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-3 md:mb-4">
-                        <div>
-                          <p className="text-gray-400 text-xs mb-0.5">Artwork</p>
-                          <p className="font-medium text-xs md:text-sm">{order.artworkTitle}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs mb-0.5">Quantity</p>
-                          <p className="font-medium text-xs md:text-sm">{order.quantity || 1}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs mb-0.5">Unit Price</p>
-                          <p className="font-medium text-xs md:text-sm">₹{order.unitPrice || order.total}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
-                          <p className="text-gray-900 font-bold text-base md:text-xl">₹{order.total}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 text-xs mb-0.5">Payment</p>
-                          <p className="font-medium text-xs md:text-sm">
-                            {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
-                          </p>
-                        </div>
-                      </div>
+            <div className="space-y-6">
+              {/* Pending Orders Section */}
+              {pendingOrders.length > 0 && (
+                <div>
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-gray-900">Pending Orders ({pendingOrders.length})</h3>
+                  <div className="space-y-4">
+                    {pendingOrders.map((order: any) => (
+                      <div key={order.id} className="card p-3 md:p-4">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-2 md:mb-3">
+                              <div>
+                                <p className="font-bold text-base md:text-lg">Order #{order.id.slice(0, 8)}</p>
+                                <p className="text-gray-400 text-xs md:text-sm">{order.userEmail}</p>
+                                <p className="text-gray-400 text-xs md:text-sm">User: {order.userName || 'N/A'}</p>
+                              </div>
+                              <span className="px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-400">
+                                Pending
+                              </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-3 md:mb-4">
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Artwork</p>
+                                <p className="font-medium text-xs md:text-sm">{order.artworkTitle}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Quantity</p>
+                                <p className="font-medium text-xs md:text-sm">{order.quantity || 1}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Unit Price</p>
+                                <p className="font-medium text-xs md:text-sm">₹{order.unitPrice || order.total}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
+                                <p className="text-gray-900 font-bold text-base md:text-xl">₹{order.total}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Payment</p>
+                                <p className="font-medium text-xs md:text-sm">
+                                  {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
+                                </p>
+                              </div>
+                            </div>
 
-                      {order.paymentMethod === 'cod' && (
-                        <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-50 rounded-lg border border-gray-400/20">
-                          <p className="text-gray-900 font-medium mb-2 text-xs md:text-sm">Delivery Address:</p>
-                          <div className="space-y-0.5 md:space-y-1 text-xs md:text-sm">
-                            <p><span className="text-gray-400">Name:</span> <span className="text-gray-900">{order.fullName || 'N/A'}</span></p>
-                            <p><span className="text-gray-400">Phone:</span> <span className="text-gray-900">{order.phone || 'N/A'}</span></p>
-                            <p><span className="text-gray-400">Email:</span> <span className="text-gray-900">{order.email || order.userEmail}</span></p>
-                            <p><span className="text-gray-400">Address:</span> <span className="text-gray-900">{order.address1 || 'N/A'}</span></p>
-                            {order.address2 && (
-                              <p><span className="text-gray-400">Address 2:</span> <span className="text-gray-900">{order.address2}</span></p>
+                            {order.paymentMethod === 'cod' && (
+                              <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-50 rounded-lg border border-gray-400/20">
+                                <p className="text-gray-400 text-xs mb-1">Delivery Address</p>
+                                <p className="text-gray-900 text-xs md:text-sm">
+                                  {order.fullName || 'N/A'}<br />
+                                  {order.address1 || ''}<br />
+                                  {order.address2 && `${order.address2}, `}
+                                  {order.city || ''}, {order.state || ''} - {order.pincode || ''}<br />
+                                  {order.phone || ''}
+                                </p>
+                              </div>
                             )}
-                            <p>
-                              <span className="text-gray-400">City:</span> <span className="text-gray-900">{order.city || 'N/A'}</span>, {' '}
-                              <span className="text-gray-400">State:</span> <span className="text-gray-900">{order.state || 'N/A'}</span>
-                            </p>
-                            <p>
-                              <span className="text-gray-400">Pincode:</span> <span className="text-gray-900">{order.pincode || 'N/A'}</span>, {' '}
-                              <span className="text-gray-400">Country:</span> <span className="text-gray-900">{order.country || 'N/A'}</span>
-                            </p>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-600">
+                              Status
+                            </label>
+                            <select
+                              value={order.status}
+                              onChange={(e) => handleOrderStatusChange(order.id, e.target.value)}
+                              className="input-field text-xs md:text-sm py-1.5"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="left">Left</option>
+                            </select>
                           </div>
                         </div>
-                      )}
-                      
-                      <p className="text-gray-500 text-xs mt-2 md:mt-3">
-                        Ordered on: {new Date(order.createdAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <select
-                        value={order.status}
-                        onChange={(e) => handleOrderStatusChange(order.id, e.target.value)}
-                        className="input-field text-xs md:text-sm py-1.5"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="left">Left</option>
-                      </select>
-                    </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
+
+              {/* Delivered Orders Section */}
+              {deliveredOrders.length > 0 && (
+                <div>
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-gray-900">Delivered Orders ({deliveredOrders.length})</h3>
+                  <div className="space-y-4">
+                    {deliveredOrders.map((order: any) => (
+                      <div key={order.id} className="card p-3 md:p-4">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-2 md:mb-3">
+                              <div>
+                                <p className="font-bold text-base md:text-lg">Order #{order.id.slice(0, 8)}</p>
+                                <p className="text-gray-400 text-xs md:text-sm">{order.userEmail}</p>
+                                <p className="text-gray-400 text-xs md:text-sm">User: {order.userName || 'N/A'}</p>
+                              </div>
+                              <span className="px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
+                                Delivered
+                              </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-3 md:mb-4">
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Artwork</p>
+                                <p className="font-medium text-xs md:text-sm">{order.artworkTitle}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Quantity</p>
+                                <p className="font-medium text-xs md:text-sm">{order.quantity || 1}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Unit Price</p>
+                                <p className="font-medium text-xs md:text-sm">₹{order.unitPrice || order.total}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
+                                <p className="text-gray-900 font-bold text-base md:text-xl">₹{order.total}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Payment</p>
+                                <p className="font-medium text-xs md:text-sm">
+                                  {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
+                                </p>
+                              </div>
+                            </div>
+
+                            {order.paymentMethod === 'cod' && (
+                              <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-50 rounded-lg border border-gray-400/20">
+                                <p className="text-gray-400 text-xs mb-1">Delivery Address</p>
+                                <p className="text-gray-900 text-xs md:text-sm">
+                                  {order.fullName || 'N/A'}<br />
+                                  {order.address1 || ''}<br />
+                                  {order.address2 && `${order.address2}, `}
+                                  {order.city || ''}, {order.state || ''} - {order.pincode || ''}<br />
+                                  {order.phone || ''}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-shrink-0">
+                            <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-600">
+                              Status
+                            </label>
+                            <select
+                              value={order.status}
+                              onChange={(e) => handleOrderStatusChange(order.id, e.target.value)}
+                              className="input-field text-xs md:text-sm py-1.5"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="left">Left</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Left Orders Section */}
+              {leftOrders.length > 0 && (
+                <div>
+                  <h3 className="text-lg md:text-xl font-bold mb-3 text-gray-900">Left Orders ({leftOrders.length})</h3>
+                  <div className="space-y-4">
+                    {leftOrders.map((order: any) => (
+                      <div key={order.id} className="card p-3 md:p-4">
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-2 md:mb-3">
+                              <div>
+                                <p className="font-bold text-base md:text-lg">Order #{order.id.slice(0, 8)}</p>
+                                <p className="text-gray-400 text-xs md:text-sm">{order.userEmail}</p>
+                                <p className="text-gray-400 text-xs md:text-sm">User: {order.userName || 'N/A'}</p>
+                              </div>
+                              <span className="px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400">
+                                Left
+                              </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-3 md:mb-4">
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Artwork</p>
+                                <p className="font-medium text-xs md:text-sm">{order.artworkTitle}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Quantity</p>
+                                <p className="font-medium text-xs md:text-sm">{order.quantity || 1}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Unit Price</p>
+                                <p className="font-medium text-xs md:text-sm">₹{order.unitPrice || order.total}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
+                                <p className="text-gray-900 font-bold text-base md:text-xl">₹{order.total}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-400 text-xs mb-0.5">Payment</p>
+                                <p className="font-medium text-xs md:text-sm">
+                                  {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
+                                </p>
+                              </div>
+                            </div>
+
+                            {order.paymentMethod === 'cod' && (
+                              <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-50 rounded-lg border border-gray-400/20">
+                                <p className="text-gray-400 text-xs mb-1">Delivery Address</p>
+                                <p className="text-gray-900 text-xs md:text-sm">
+                                  {order.fullName || 'N/A'}<br />
+                                  {order.address1 || ''}<br />
+                                  {order.address2 && `${order.address2}, `}
+                                  {order.city || ''}, {order.state || ''} - {order.pincode || ''}<br />
+                                  {order.phone || ''}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-shrink-0">
+                            <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-600">
+                              Status
+                            </label>
+                            <select
+                              value={order.status}
+                              onChange={(e) => handleOrderStatusChange(order.id, e.target.value)}
+                              className="input-field text-xs md:text-sm py-1.5"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="left">Left</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* No Orders Message */}
+              {orders.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-400 text-sm">No orders found</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -470,17 +660,51 @@ export default function AdminDashboard() {
               <p className="text-gray-400">Loading users...</p>
             </div>
           ) : (
-            <div className="card p-3 md:p-4">
-              <div className="space-y-1.5 md:space-y-2">
-                {users.map((user: any) => (
-                  <div key={user.id} className="p-2 md:p-3 border-b border-dark-border last:border-0">
-                    <p className="font-medium text-sm md:text-base">{user.email}</p>
-                    <p className="text-gray-400 text-xs md:text-sm">
-                      Joined: {new Date(user.createdAt).toLocaleDateString()}
-                    </p>
+            <div className="space-y-3 md:space-y-4">
+              {users.map((user: any) => (
+                <div key={user.id} className="card p-3 md:p-4">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-bold text-base md:text-lg">{user.name || user.email?.split('@')[0]}</p>
+                          <p className="text-gray-400 text-xs md:text-sm">{user.email}</p>
+                          <p className="text-gray-400 text-xs md:text-sm">
+                            Joined: {new Date(user.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        {user.disabled && (
+                          <span className="px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400">
+                            Disabled
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 md:gap-3">
+                      <button
+                        onClick={() => handleDisableUser(user.id, !user.disabled)}
+                        className={`btn-secondary text-xs md:text-sm py-1.5 md:py-2 px-3 md:px-4 ${
+                          user.disabled ? 'text-green-600 hover:text-green-700' : 'text-yellow-600 hover:text-yellow-700'
+                        }`}
+                      >
+                        {user.disabled ? 'Enable' : 'Disable'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="btn-secondary text-xs md:text-sm py-1.5 md:py-2 px-3 md:px-4 text-red-600 hover:text-red-700"
+                      >
+                        <FiTrash2 className="inline mr-1" />
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+              {users.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-gray-400 text-sm">No users found</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -782,6 +1006,35 @@ export default function AdminDashboard() {
                 onClick={() => {
                   setShowDeleteConfirm(false)
                   setArtworkToDelete(null)
+                }}
+                className="btn-secondary flex-1 text-sm md:text-base py-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Delete Confirmation Modal */}
+      {showUserDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="card p-4 md:p-6 max-w-md w-full bg-white">
+            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">Confirm Delete User</h3>
+            <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
+              Are you sure you want to delete this user? This will remove them from the system. This action cannot be undone.
+            </p>
+            <div className="flex gap-3 md:gap-4">
+              <button
+                onClick={confirmDeleteUser}
+                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-gray-900 text-white hover:bg-gray-800"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => {
+                  setShowUserDeleteConfirm(false)
+                  setUserToDelete(null)
                 }}
                 className="btn-secondary flex-1 text-sm md:text-base py-2"
               >

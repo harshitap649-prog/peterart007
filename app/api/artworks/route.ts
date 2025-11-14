@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, readFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
+import { storage } from '@/firebase.config'
 
 const ARTWORKS_FILE = path.join(process.cwd(), 'data', 'artworks.json')
 const ARTWORKS_DIR = path.join(process.cwd(), 'public', 'artworks')
@@ -32,7 +34,20 @@ async function readArtworks() {
 
 async function writeArtworks(artworks: any[]) {
   await ensureDirectories()
-  await writeFile(ARTWORKS_FILE, JSON.stringify(artworks, null, 2), 'utf-8')
+  try {
+    // Write to file with error handling
+    await writeFile(ARTWORKS_FILE, JSON.stringify(artworks, null, 2), 'utf-8')
+    // Verify the write was successful
+    const verify = await readFile(ARTWORKS_FILE, 'utf-8')
+    const parsed = JSON.parse(verify)
+    if (parsed.length !== artworks.length) {
+      console.error('Artwork count mismatch after write!')
+      throw new Error('Write verification failed')
+    }
+  } catch (error) {
+    console.error('Error writing artworks file:', error)
+    throw error
+  }
 }
 
 // GET - Get all artworks
@@ -58,7 +73,7 @@ export async function POST(request: NextRequest) {
     const artworks = await readArtworks()
     const newId = Date.now().toString()
     
-    // Handle image uploads
+    // Handle image uploads - Use Firebase Storage for persistence
     const imageUrls: string[] = []
     const imageFiles = formData.getAll('images') as File[]
     
@@ -66,13 +81,30 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < imageFiles.length; i++) {
         const file = imageFiles[i]
         if (file && file.size > 0 && file.name) {
-          const bytes = await file.arrayBuffer()
-          const buffer = Buffer.from(bytes)
-          const fileName = `${newId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-          const filePath = path.join(ARTWORKS_DIR, fileName)
-          
-          await writeFile(filePath, buffer)
-          imageUrls.push(`/artworks/${fileName}`)
+          try {
+            // Upload to Firebase Storage
+            const fileName = `artworks/${newId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+            const storageRef = ref(storage, fileName)
+            const bytes = await file.arrayBuffer()
+            const buffer = Buffer.from(bytes)
+            
+            await uploadBytes(storageRef, buffer)
+            const downloadURL = await getDownloadURL(storageRef)
+            imageUrls.push(downloadURL)
+          } catch (error) {
+            console.error('Error uploading image to Firebase:', error)
+            // Fallback to local storage if Firebase fails
+            try {
+              const bytes = await file.arrayBuffer()
+              const buffer = Buffer.from(bytes)
+              const fileName = `${newId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+              const filePath = path.join(ARTWORKS_DIR, fileName)
+              await writeFile(filePath, buffer)
+              imageUrls.push(`/artworks/${fileName}`)
+            } catch (fallbackError) {
+              console.error('Error with fallback storage:', fallbackError)
+            }
+          }
         }
       }
     }
@@ -125,18 +157,35 @@ export async function PUT(request: NextRequest) {
     const existingArtwork = artworks[index]
     let imageUrls = existingArtwork.images || []
     
-    // Handle new image uploads
+    // Handle new image uploads - Use Firebase Storage
     const imageFiles = formData.getAll('images') as File[]
     for (let i = 0; i < imageFiles.length; i++) {
       const file = imageFiles[i]
       if (file && file.size > 0) {
-        const bytes = await file.arrayBuffer()
-        const buffer = Buffer.from(bytes)
-        const fileName = `${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-        const filePath = path.join(ARTWORKS_DIR, fileName)
-        
-        await writeFile(filePath, buffer)
-        imageUrls.push(`/artworks/${fileName}`)
+        try {
+          // Upload to Firebase Storage
+          const fileName = `artworks/${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+          const storageRef = ref(storage, fileName)
+          const bytes = await file.arrayBuffer()
+          const buffer = Buffer.from(bytes)
+          
+          await uploadBytes(storageRef, buffer)
+          const downloadURL = await getDownloadURL(storageRef)
+          imageUrls.push(downloadURL)
+        } catch (error) {
+          console.error('Error uploading image to Firebase:', error)
+          // Fallback to local storage
+          try {
+            const bytes = await file.arrayBuffer()
+            const buffer = Buffer.from(bytes)
+            const fileName = `${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+            const filePath = path.join(ARTWORKS_DIR, fileName)
+            await writeFile(filePath, buffer)
+            imageUrls.push(`/artworks/${fileName}`)
+          } catch (fallbackError) {
+            console.error('Error with fallback storage:', fallbackError)
+          }
+        }
       }
     }
     
@@ -176,26 +225,61 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Artwork not found' }, { status: 404 })
     }
     
-    // Delete image files
+    // Delete image files from Firebase Storage or local storage
     if (artwork.images && artwork.images.length > 0) {
-      const { unlink } = await import('fs/promises')
       for (const imageUrl of artwork.images) {
         try {
-          const fileName = imageUrl.split('/').pop()
-          if (fileName) {
-            const filePath = path.join(ARTWORKS_DIR, fileName)
-            if (existsSync(filePath)) {
-              await unlink(filePath)
+          // Check if it's a Firebase Storage URL
+          if (imageUrl.includes('firebasestorage.googleapis.com') || imageUrl.includes('firebase')) {
+            try {
+              // Extract path from Firebase Storage URL
+              // URL format: https://firebasestorage.googleapis.com/v0/b/bucket/o/path%2Fto%2Ffile?alt=media&token=...
+              const urlParts = imageUrl.split('/')
+              const oIndex = urlParts.findIndex((part: string) => part === 'o')
+              if (oIndex !== -1 && oIndex + 1 < urlParts.length) {
+                const encodedPath = urlParts[oIndex + 1].split('?')[0]
+                const decodedPath = decodeURIComponent(encodedPath)
+                const storageRef = ref(storage, decodedPath)
+                await deleteObject(storageRef)
+              }
+            } catch (firebaseError) {
+              console.error('Error deleting from Firebase Storage:', firebaseError)
+            }
+          } else {
+            // Delete from local storage
+            const { unlink } = await import('fs/promises')
+            const fileName = imageUrl.split('/').pop()
+            if (fileName) {
+              const filePath = path.join(ARTWORKS_DIR, fileName)
+              if (existsSync(filePath)) {
+                await unlink(filePath)
+              }
             }
           }
         } catch (error) {
           console.error('Error deleting image file:', error)
+          // Continue even if deletion fails
         }
       }
     }
     
     const filteredArtworks = artworks.filter((a: any) => a.id !== id)
+    
+    // Verify the artwork was actually removed
+    if (filteredArtworks.length !== artworks.length - 1) {
+      console.error('Artwork deletion verification failed!')
+      return NextResponse.json({ error: 'Failed to delete artwork - verification failed' }, { status: 500 })
+    }
+    
     await writeArtworks(filteredArtworks)
+    
+    // Verify the write was successful
+    const verify = await readArtworks()
+    const stillExists = verify.find((a: any) => a.id === id)
+    if (stillExists) {
+      console.error('Artwork still exists after deletion!')
+      return NextResponse.json({ error: 'Failed to delete artwork - still exists' }, { status: 500 })
+    }
     
     return NextResponse.json({ success: true })
   } catch (error) {
