@@ -262,6 +262,12 @@ export default function LoginPage() {
             </form>
           )}
 
+          <div className="relative my-4 md:my-6">
+            <div className="relative flex justify-center text-xs md:text-sm">
+              <span className="px-3 md:px-4 bg-white text-gray-400">Or continue with</span>
+            </div>
+          </div>
+
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
