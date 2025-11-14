@@ -36,6 +36,101 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [language, setLanguage] = useState<'en' | 'hi'>('en')
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
+
+  // Translations
+  const translations = {
+    en: {
+      changeLanguage: 'Change Language',
+      english: 'English',
+      hindi: 'Hindi',
+      peterArt: 'Peter Art',
+      fallInLove: 'Fall in love with art',
+      turnEmptyWalls: 'Turn Empty Walls into Expressions',
+      searchArtworks: 'Search artworks...',
+      menu: 'Menu',
+      artworks: 'Artworks',
+      wishlist: 'Wishlist',
+      myOrders: 'My Orders',
+      helpSupport: 'Help & Support',
+      buy: 'Buy',
+      buyNow: 'Buy Now',
+      loading: 'Loading...',
+      loadingArtworks: 'Loading artworks...',
+      wishlistEmpty: 'Your wishlist is empty',
+      noOrders: 'You have no orders yet',
+      noImage: 'No image',
+      imageNotFound: 'Image not found',
+      pleaseSignIn: 'Please sign in to',
+      addToWishlist: 'add items to wishlist',
+      likeArtworks: 'like artworks',
+      purchaseArtworks: 'purchase artworks',
+      accessSection: 'access this section',
+      removedFromWishlist: 'Removed from wishlist',
+      addedToWishlist: 'Added to wishlist',
+      commentAdded: 'Comment added',
+      linkCopied: 'Link copied to clipboard!',
+      failedToLoad: 'Failed to load data',
+      failedToUpdate: 'Failed to update wishlist',
+      failedToLike: 'Failed to like artwork',
+      failedToComment: 'Failed to add comment',
+    },
+    hi: {
+      changeLanguage: 'भाषा बदलें',
+      english: 'अंग्रेजी',
+      hindi: 'हिंदी',
+      peterArt: 'पीटर आर्ट',
+      fallInLove: 'कला से प्यार करें',
+      turnEmptyWalls: 'खाली दीवारों को अभिव्यक्ति में बदलें',
+      searchArtworks: 'कलाकृतियां खोजें...',
+      menu: 'मेनू',
+      artworks: 'कलाकृतियां',
+      wishlist: 'इच्छा सूची',
+      myOrders: 'मेरे ऑर्डर',
+      helpSupport: 'सहायता और समर्थन',
+      buy: 'खरीदें',
+      buyNow: 'अभी खरीदें',
+      loading: 'लोड हो रहा है...',
+      loadingArtworks: 'कलाकृतियां लोड हो रही हैं...',
+      wishlistEmpty: 'आपकी इच्छा सूची खाली है',
+      noOrders: 'आपके पास अभी कोई ऑर्डर नहीं है',
+      noImage: 'कोई छवि नहीं',
+      imageNotFound: 'छवि नहीं मिली',
+      pleaseSignIn: 'कृपया साइन इन करें',
+      addToWishlist: 'इच्छा सूची में आइटम जोड़ने के लिए',
+      likeArtworks: 'कलाकृतियों को पसंद करने के लिए',
+      purchaseArtworks: 'कलाकृतियां खरीदने के लिए',
+      accessSection: 'इस अनुभाग तक पहुंचने के लिए',
+      removedFromWishlist: 'इच्छा सूची से हटा दिया गया',
+      addedToWishlist: 'इच्छा सूची में जोड़ा गया',
+      commentAdded: 'टिप्पणी जोड़ी गई',
+      linkCopied: 'लिंक क्लिपबोर्ड पर कॉपी किया गया!',
+      failedToLoad: 'डेटा लोड करने में विफल',
+      failedToUpdate: 'इच्छा सूची अपडेट करने में विफल',
+      failedToLike: 'कलाकृति को पसंद करने में विफल',
+      failedToComment: 'टिप्पणी जोड़ने में विफल',
+    },
+  }
+
+  const t = translations[language]
+
+  // Load language from localStorage on mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('language') as 'en' | 'hi' | null
+    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'hi')) {
+      setLanguage(savedLanguage)
+    }
+  }, [])
+
+  // Save language to localStorage when changed
+  const changeLanguage = (lang: 'en' | 'hi') => {
+    setLanguage(lang)
+    localStorage.setItem('language', lang)
+    setShowLanguageMenu(false)
+    setUserMenuOpen(false)
+    toast.success(lang === 'en' ? 'Language changed to English' : 'भाषा हिंदी में बदली गई')
+  }
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -75,7 +170,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         setWishlist(wish)
       }
     } catch (error) {
-      toast.error('Failed to load data')
+      toast.error(t.failedToLoad)
     } finally {
       setLoading(false)
     }
@@ -85,7 +180,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     // Check if user is logged in - if not, show login modal
     if (!user || !user.uid) {
       setLoginModalOpen(true)
-      toast.error('Please sign in to add items to wishlist')
+      toast.error(`${t.pleaseSignIn} ${t.addToWishlist}`)
       return
     }
     
@@ -94,11 +189,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       if (inWishlist) {
         await removeFromWishlist(user.uid, artworkId)
         setWishlist(wishlist.filter(id => id !== artworkId))
-        toast.success('Removed from wishlist')
+        toast.success(t.removedFromWishlist)
       } else {
         await addToWishlist(user.uid, artworkId)
         setWishlist([...wishlist, artworkId])
-        toast.success('Added to wishlist')
+        toast.success(t.addedToWishlist)
       }
       const updatedWishlist = await getUserWishlist(user.uid)
       setWishlist(updatedWishlist)
@@ -112,7 +207,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     // Check if user is logged in - if not, show login modal
     if (!user || !user.uid) {
       setLoginModalOpen(true)
-      toast.error('Please sign in to like artworks')
+      toast.error(`${t.pleaseSignIn} ${t.likeArtworks}`)
       return
     }
     
@@ -120,7 +215,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       await likeArtwork(artworkId, user.uid)
       loadData()
     } catch (error) {
-      toast.error('Failed to like artwork')
+      toast.error(t.failedToLike)
     }
   }
 
@@ -134,11 +229,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         userName: user.displayName || user.email.split('@')[0],
         text: commentText
       })
-      toast.success('Comment added')
+      toast.success(t.commentAdded)
       setCommentText('')
       loadData()
     } catch (error) {
-      toast.error('Failed to add comment')
+      toast.error(t.failedToComment)
     }
   }
 
@@ -155,7 +250,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       }
     } else {
       navigator.clipboard.writeText(window.location.href)
-      toast.success('Link copied to clipboard!')
+      toast.success(t.linkCopied)
     }
   }
 
@@ -183,7 +278,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       if (!user || !user.uid) {
         setSidebarOpen(false)
         setLoginModalOpen(true)
-        toast.error('Please sign in to access this section')
+        toast.error(`${t.pleaseSignIn} ${t.accessSection}`)
         return
       }
     }
@@ -203,7 +298,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     // Check if user is logged in - if not, show login modal
     if (!user || !user.uid) {
       setLoginModalOpen(true)
-      toast.error('Please sign in to purchase artworks')
+      toast.error(`${t.pleaseSignIn} ${t.purchaseArtworks}`)
       return
     }
     router.push(`/artwork/${artworkId}`)
@@ -222,15 +317,15 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         </button>
 
         {/* Center - Peter Art */}
-        <h1 className="text-lg font-bold text-gray-900">Peter Art</h1>
+        <h1 className="text-lg font-bold text-gray-900">{t.peterArt}</h1>
 
         {/* User Icon / Settings */}
-        <div className="relative">
+        <div className="relative z-[60]">
           {user ? (
             <>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative z-[61]"
               >
                 <FiUser className="text-xl" />
               </button>
@@ -239,42 +334,47 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               {userMenuOpen && (
                 <>
                   <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setUserMenuOpen(false)}
+                    className="fixed inset-0 z-[55]"
+                    onClick={() => {
+                      setUserMenuOpen(false)
+                      setShowLanguageMenu(false)
+                    }}
                   ></div>
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-[9999] isolate">
                     <div className="py-2">
                       <div className="px-4 py-2 border-b border-gray-200">
                         <p className="text-sm font-medium text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
-                      <button
-                        onClick={() => {
-                          toast('Language settings coming soon', { icon: 'ℹ️' })
-                          setUserMenuOpen(false)
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Change Language
-                      </button>
-                      <button
-                        onClick={() => {
-                          toast('Theme settings coming soon', { icon: 'ℹ️' })
-                          setUserMenuOpen(false)
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Settings
-                      </button>
-                    <button
-                      onClick={() => {
-                        setShowLogoutConfirm(true)
-                        setUserMenuOpen(false)
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      Logout
-                    </button>
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                        >
+                          <span>{t.changeLanguage}</span>
+                          <span className="text-xs">{language === 'en' ? 'EN' : 'HI'}</span>
+                        </button>
+                        {showLanguageMenu && (
+                          <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-[10000]">
+                            <button
+                              onClick={() => changeLanguage('en')}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                                language === 'en' ? 'bg-gray-50 text-gray-900 font-medium' : 'text-gray-700'
+                              }`}
+                            >
+                              {t.english}
+                            </button>
+                            <button
+                              onClick={() => changeLanguage('hi')}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                                language === 'hi' ? 'bg-gray-50 text-gray-900 font-medium' : 'text-gray-700'
+                              }`}
+                            >
+                              {t.hindi}
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </>
@@ -300,7 +400,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           ></div>
           <div className="fixed left-0 top-0 h-full w-64 bg-white shadow-xl z-50 overflow-y-auto">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">Menu</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t.menu}</h2>
               <button
                 onClick={() => setSidebarOpen(false)}
                 className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg"
@@ -317,7 +417,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                Artworks
+                {t.artworks}
               </button>
               <button
                 onClick={() => handleNavClick('wishlist')}
@@ -327,7 +427,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                Wishlist
+                {t.wishlist}
               </button>
               <button
                 onClick={() => handleNavClick('orders')}
@@ -337,7 +437,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                My Orders
+                {t.myOrders}
               </button>
               <button
                 onClick={() => handleNavClick('support')}
@@ -347,20 +447,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                Help & Support
+                {t.helpSupport}
               </button>
-              {user && (
-                <button
-                  onClick={() => {
-                    setShowLogoutConfirm(true)
-                    setSidebarOpen(false)
-                  }}
-                  className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
-                >
-                  <FiLogOut className="text-base" />
-                  Logout
-                </button>
-              )}
             </nav>
           </div>
         </>
@@ -381,8 +469,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 }}
               />
             </div>
-            <h1 className="text-lg font-bold text-gray-900 mb-0.5">Fall in love with art</h1>
-            <p className="text-gray-600 text-xs">Turn Empty Walls into Expressions</p>
+            <h1 className="text-lg font-bold text-gray-900 mb-0.5">{t.fallInLove}</h1>
+            <p className="text-gray-600 text-xs">{t.turnEmptyWalls}</p>
           </div>
         )}
 
@@ -394,7 +482,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search artworks..."
+                placeholder={t.searchArtworks}
                 className="input-field pr-9 text-sm py-2"
               />
               <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-900 text-sm" />
@@ -408,7 +496,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
             {loading ? (
               <div className="text-center py-12">
                 <div className="w-12 h-12 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-400 text-sm">Loading artworks...</p>
+                <p className="text-gray-400 text-sm">{t.loadingArtworks}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-1.5">
@@ -427,7 +515,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </div>
                     ) : (
                       <div className="w-full h-28 mb-1 rounded bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">No image</span>
+                        <span className="text-gray-400 text-xs">{t.noImage}</span>
                       </div>
                     )}
                     <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{artwork.title}</h3>
@@ -458,7 +546,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                         onClick={() => handleBuyClick(artwork.id)}
                         className="flex-1 btn-primary text-xs py-1.5"
                       >
-                        Buy
+                        {t.buy}
                       </button>
                     </div>
 
@@ -475,7 +563,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
             {wishlist.length === 0 ? (
               <div className="text-center py-12">
                 <FiHeart className="text-6xl text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 text-sm">Your wishlist is empty</p>
+                <p className="text-gray-600 text-sm">{t.wishlistEmpty}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-1.5">
@@ -496,7 +584,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </div>
                     ) : (
                       <div className="w-full h-28 mb-1 rounded bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">No image</span>
+                        <span className="text-gray-400 text-xs">{t.noImage}</span>
                       </div>
                     )}
                       <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{artwork.title}</h3>
@@ -506,7 +594,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                         onClick={() => handleBuyClick(artwork.id)}
                         className="btn-primary w-full text-xs py-1.5"
                       >
-                        Buy Now
+                        {t.buyNow}
                       </button>
                     </div>
                   ))}
@@ -521,7 +609,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
             {orders.length === 0 ? (
               <div className="text-center py-12">
                 <FiShoppingCart className="text-6xl text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 text-sm">You have no orders yet</p>
+                <p className="text-gray-600 text-sm">{t.noOrders}</p>
               </div>
             ) : (
               <div className="space-y-3">
