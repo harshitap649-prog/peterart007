@@ -367,11 +367,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       )}
 
       {/* Main Content */}
-      <div className="px-4 py-4">
+      <div className="px-2 py-2">
         {/* Logo Image - Only show on artworks tab */}
         {activeTab === 'artworks' && (
-          <div className="text-center mb-4">
-            <div className="relative w-32 h-32 mx-auto mb-3 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
+          <div className="text-center mb-2">
+            <div className="relative w-24 h-24 mx-auto mb-1 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
               <img
                 src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
                 alt="Logo"
@@ -381,14 +381,14 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 }}
               />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">Fall in love with art</h1>
-            <p className="text-gray-600 text-sm italic">Turn Empty Walls into Expressions</p>
+            <h1 className="text-lg font-bold text-gray-900 mb-0.5">Fall in love with art</h1>
+            <p className="text-gray-600 text-xs">Turn Empty Walls into Expressions</p>
           </div>
         )}
 
         {/* Search Bar - Only show on artworks tab */}
         {activeTab === 'artworks' && (
-          <div className="mb-4">
+          <div className="mb-2">
             <div className="relative">
               <input
                 type="text"
