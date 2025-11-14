@@ -2,11 +2,44 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFile, writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { storage } from '@/firebase.config'
 
 const ARTWORKS_FILE = path.join(process.cwd(), 'data', 'artworks.json')
 const REVIEWS_DIR = path.join(process.cwd(), 'public', 'reviews')
+
+// Upload image to Imgur (free, no authentication required)
+async function uploadToImgur(imageBuffer: Buffer, fileName: string): Promise<string | null> {
+  try {
+    const base64Image = imageBuffer.toString('base64')
+    
+    const formData = new URLSearchParams()
+    formData.append('image', base64Image)
+    formData.append('type', 'base64')
+
+    const response = await fetch('https://api.imgur.com/3/image', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Client-ID 546c25a59c58ad7', // Imgur's public client ID for anonymous uploads
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formData.toString()
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Imgur upload failed:', errorText)
+      return null
+    }
+
+    const data = await response.json()
+    if (data.success && data.data && data.data.link) {
+      return data.data.link
+    }
+    return null
+  } catch (error) {
+    console.error('Error uploading to Imgur:', error)
+    return null
+  }
+}
 
 async function ensureDirectories() {
   if (!existsSync(REVIEWS_DIR)) {
@@ -54,7 +87,7 @@ export async function POST(request: NextRequest) {
       artworks[index].comments = []
     }
     
-    // Handle review images - Use Firebase Storage for persistence
+    // Handle review images - Use Imgur (free, no authentication)
     const imageUrls: string[] = []
     const imageFiles = formData.getAll('images') as File[]
     
@@ -64,18 +97,23 @@ export async function POST(request: NextRequest) {
         const file = imageFiles[i]
         if (file && file.size > 0 && file.name) {
           try {
-            // Upload to Firebase Storage
-            const fileName = `reviews/${reviewId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-            const storageRef = ref(storage, fileName)
             const bytes = await file.arrayBuffer()
             const buffer = Buffer.from(bytes)
+            const fileName = `${reviewId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
             
-            await uploadBytes(storageRef, buffer)
-            const downloadURL = await getDownloadURL(storageRef)
-            imageUrls.push(downloadURL)
+            // Upload to Imgur
+            const imgurUrl = await uploadToImgur(buffer, fileName)
+            if (imgurUrl) {
+              imageUrls.push(imgurUrl)
+            } else {
+              // Fallback to local storage if Imgur fails
+              const filePath = path.join(REVIEWS_DIR, fileName)
+              await writeFile(filePath, buffer)
+              imageUrls.push(`/reviews/${fileName}`)
+            }
           } catch (error) {
-            console.error('Error uploading review image to Firebase:', error)
-            // Fallback to local storage
+            console.error('Error uploading review image:', error)
+            // Final fallback to local storage
             try {
               const bytes = await file.arrayBuffer()
               const buffer = Buffer.from(bytes)

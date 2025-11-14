@@ -2,11 +2,44 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, readFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
-import { storage } from '@/firebase.config'
 
 const ARTWORKS_FILE = path.join(process.cwd(), 'data', 'artworks.json')
 const ARTWORKS_DIR = path.join(process.cwd(), 'public', 'artworks')
+
+// Upload image to Imgur (free, no authentication required)
+async function uploadToImgur(imageBuffer: Buffer, fileName: string): Promise<string | null> {
+  try {
+    const base64Image = imageBuffer.toString('base64')
+    
+    const formData = new URLSearchParams()
+    formData.append('image', base64Image)
+    formData.append('type', 'base64')
+
+    const response = await fetch('https://api.imgur.com/3/image', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Client-ID 546c25a59c58ad7', // Imgur's public client ID for anonymous uploads
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formData.toString()
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Imgur upload failed:', errorText)
+      return null
+    }
+
+    const data = await response.json()
+    if (data.success && data.data && data.data.link) {
+      return data.data.link
+    }
+    return null
+  } catch (error) {
+    console.error('Error uploading to Imgur:', error)
+    return null
+  }
+}
 
 // Ensure directories exist
 async function ensureDirectories() {
@@ -73,7 +106,7 @@ export async function POST(request: NextRequest) {
     const artworks = await readArtworks()
     const newId = Date.now().toString()
     
-    // Handle image uploads - Use Firebase Storage for persistence
+    // Handle image uploads - Use Imgur (free, no authentication)
     const imageUrls: string[] = []
     const imageFiles = formData.getAll('images') as File[]
     
@@ -82,18 +115,23 @@ export async function POST(request: NextRequest) {
         const file = imageFiles[i]
         if (file && file.size > 0 && file.name) {
           try {
-            // Upload to Firebase Storage
-            const fileName = `artworks/${newId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-            const storageRef = ref(storage, fileName)
             const bytes = await file.arrayBuffer()
             const buffer = Buffer.from(bytes)
+            const fileName = `${newId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
             
-            await uploadBytes(storageRef, buffer)
-            const downloadURL = await getDownloadURL(storageRef)
-            imageUrls.push(downloadURL)
+            // Upload to Imgur
+            const imgurUrl = await uploadToImgur(buffer, fileName)
+            if (imgurUrl) {
+              imageUrls.push(imgurUrl)
+            } else {
+              // Fallback to local storage if Imgur fails
+              const filePath = path.join(ARTWORKS_DIR, fileName)
+              await writeFile(filePath, buffer)
+              imageUrls.push(`/artworks/${fileName}`)
+            }
           } catch (error) {
-            console.error('Error uploading image to Firebase:', error)
-            // Fallback to local storage if Firebase fails
+            console.error('Error uploading image:', error)
+            // Final fallback to local storage
             try {
               const bytes = await file.arrayBuffer()
               const buffer = Buffer.from(bytes)
@@ -157,24 +195,29 @@ export async function PUT(request: NextRequest) {
     const existingArtwork = artworks[index]
     let imageUrls = existingArtwork.images || []
     
-    // Handle new image uploads - Use Firebase Storage
+    // Handle new image uploads - Use Imgur
     const imageFiles = formData.getAll('images') as File[]
     for (let i = 0; i < imageFiles.length; i++) {
       const file = imageFiles[i]
       if (file && file.size > 0) {
         try {
-          // Upload to Firebase Storage
-          const fileName = `artworks/${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-          const storageRef = ref(storage, fileName)
           const bytes = await file.arrayBuffer()
           const buffer = Buffer.from(bytes)
+          const fileName = `${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
           
-          await uploadBytes(storageRef, buffer)
-          const downloadURL = await getDownloadURL(storageRef)
-          imageUrls.push(downloadURL)
+          // Upload to Imgur
+          const imgurUrl = await uploadToImgur(buffer, fileName)
+          if (imgurUrl) {
+            imageUrls.push(imgurUrl)
+          } else {
+            // Fallback to local storage if Imgur fails
+            const filePath = path.join(ARTWORKS_DIR, fileName)
+            await writeFile(filePath, buffer)
+            imageUrls.push(`/artworks/${fileName}`)
+          }
         } catch (error) {
-          console.error('Error uploading image to Firebase:', error)
-          // Fallback to local storage
+          console.error('Error uploading image:', error)
+          // Final fallback to local storage
           try {
             const bytes = await file.arrayBuffer()
             const buffer = Buffer.from(bytes)
@@ -225,28 +268,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Artwork not found' }, { status: 404 })
     }
     
-    // Delete image files from Firebase Storage or local storage
+    // Delete image files from local storage (Imgur images don't need deletion)
     if (artwork.images && artwork.images.length > 0) {
       for (const imageUrl of artwork.images) {
         try {
-          // Check if it's a Firebase Storage URL
-          if (imageUrl.includes('firebasestorage.googleapis.com') || imageUrl.includes('firebase')) {
-            try {
-              // Extract path from Firebase Storage URL
-              // URL format: https://firebasestorage.googleapis.com/v0/b/bucket/o/path%2Fto%2Ffile?alt=media&token=...
-              const urlParts = imageUrl.split('/')
-              const oIndex = urlParts.findIndex((part: string) => part === 'o')
-              if (oIndex !== -1 && oIndex + 1 < urlParts.length) {
-                const encodedPath = urlParts[oIndex + 1].split('?')[0]
-                const decodedPath = decodeURIComponent(encodedPath)
-                const storageRef = ref(storage, decodedPath)
-                await deleteObject(storageRef)
-              }
-            } catch (firebaseError) {
-              console.error('Error deleting from Firebase Storage:', firebaseError)
-            }
-          } else {
-            // Delete from local storage
+          // Only delete local files, Imgur images are permanent and don't need deletion
+          if (imageUrl.startsWith('/artworks/')) {
             const { unlink } = await import('fs/promises')
             const fileName = imageUrl.split('/').pop()
             if (fileName) {
@@ -256,6 +283,7 @@ export async function DELETE(request: NextRequest) {
               }
             }
           }
+          // Imgur URLs (i.imgur.com) don't need deletion - they're permanent
         } catch (error) {
           console.error('Error deleting image file:', error)
           // Continue even if deletion fails
