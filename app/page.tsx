@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
