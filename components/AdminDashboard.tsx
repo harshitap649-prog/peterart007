@@ -739,7 +739,7 @@ export default function AdminDashboard() {
             <div className="flex gap-3 md:gap-4">
               <button
                 onClick={confirmDelete}
-                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-gradient-to-r from-[#ff6b00] via-[#FF7BA3] to-[#5B9FFF] text-gray-900 hover:from-[#ff8c00] hover:via-[#FF7BA3] hover:to-[#5B9FFF] hover:shadow-lg hover:shadow-[#ff6b00]/50"
+                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-gray-900 text-white hover:bg-gray-800"
               >
                 Yes, Delete
               </button>
