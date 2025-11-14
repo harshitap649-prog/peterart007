@@ -63,36 +63,36 @@ export default function HelpSupport({ user }: { user: any }) {
   }
 
   return (
-    <div className="card p-6">
-      <div className="flex items-center gap-3 mb-6">
-        <FiHelpCircle className="text-3xl text-gray-900" />
-        <h2 className="text-2xl font-bold text-gray-900">Help & Support</h2>
+    <div className="card p-4 md:p-6">
+      <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+        <FiHelpCircle className="text-xl md:text-2xl text-gray-900" />
+        <h2 className="text-lg md:text-xl font-bold text-gray-900">Help & Support</h2>
       </div>
 
       {!showForm ? (
-        <div className="text-center py-8">
-          <FiMessageSquare className="text-6xl text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 mb-6">
+        <div className="text-center py-4 md:py-8">
+          <FiMessageSquare className="text-4xl md:text-6xl text-gray-600 mx-auto mb-3 md:mb-4" />
+          <p className="text-xs md:text-sm text-gray-400 mb-4 md:mb-6 px-2">
             Need help? Have a question about your order or the website? We're here to help!
           </p>
           <button
             onClick={() => setShowForm(true)}
-            className="btn-primary flex items-center gap-2 mx-auto"
+            className="btn-primary flex items-center gap-2 mx-auto text-xs md:text-sm py-2 px-4"
           >
-            <FiSend />
+            <FiSend className="text-xs md:text-sm" />
             Contact Support
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">
+            <label className="block text-xs md:text-sm font-medium mb-1.5 md:mb-2 text-gray-300">
               Issue Type
             </label>
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-              className="input-field"
+              className="input-field text-xs md:text-sm py-2"
               required
             >
               <option value="general">General Inquiry</option>
@@ -104,13 +104,13 @@ export default function HelpSupport({ user }: { user: any }) {
 
           {formData.type === 'order' && userOrders.length > 0 && (
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-300">
+              <label className="block text-xs md:text-sm font-medium mb-1.5 md:mb-2 text-gray-300">
                 Related Order (Optional)
               </label>
               <select
                 value={formData.orderId}
                 onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
-                className="input-field"
+                className="input-field text-xs md:text-sm py-2"
               >
                 <option value="">Select an order</option>
                 {userOrders.map((order: any) => (
@@ -123,40 +123,40 @@ export default function HelpSupport({ user }: { user: any }) {
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">
+            <label className="block text-xs md:text-sm font-medium mb-1.5 md:mb-2 text-gray-300">
               Subject *
             </label>
             <input
               type="text"
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              className="input-field"
+              className="input-field text-xs md:text-sm py-2"
               placeholder="Brief description of your issue"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">
+            <label className="block text-xs md:text-sm font-medium mb-1.5 md:mb-2 text-gray-300">
               Message *
             </label>
             <textarea
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="input-field"
-              rows={6}
+              className="input-field text-xs md:text-sm py-2"
+              rows={5}
               placeholder="Please provide details about your issue or question..."
               required
             />
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-3 md:gap-4">
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary flex-1 flex items-center justify-center gap-2"
+              className="btn-primary flex-1 flex items-center justify-center gap-2 text-xs md:text-sm py-2"
             >
-              <FiSend />
+              <FiSend className="text-xs md:text-sm" />
               {loading ? 'Sending...' : 'Send Message'}
             </button>
             <button
@@ -165,7 +165,7 @@ export default function HelpSupport({ user }: { user: any }) {
                 setShowForm(false)
                 setFormData({ type: 'general', subject: '', message: '', orderId: '' })
               }}
-              className="btn-secondary flex-1"
+              className="btn-secondary flex-1 text-xs md:text-sm py-2"
             >
               Cancel
             </button>

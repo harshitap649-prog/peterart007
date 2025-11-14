@@ -5,8 +5,9 @@ import { useRouter, useParams } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtworkById } from '@/lib/artworks'
 import { createOrder } from '@/lib/orders'
+import { loadPopunderAd } from '@/lib/popunderAd'
 import toast from 'react-hot-toast'
-import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiThumbsUp } from 'react-icons/fi'
+import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiThumbsUp, FiTrash2, FiMessageCircle, FiChevronLeft, FiChevronRight, FiShare2 } from 'react-icons/fi'
 import LoginModal from '@/components/LoginModal'
 import { likeArtwork } from '@/lib/comments'
 
@@ -38,6 +39,14 @@ export default function ArtworkDetailsPage() {
   const [submittingReview, setSubmittingReview] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [liking, setLiking] = useState(false)
+  const [commentTexts, setCommentTexts] = useState<{ [key: string]: string }>({})
+  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({})
+  const [submittingComment, setSubmittingComment] = useState<{ [key: string]: boolean }>({})
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState(0)
+  const [touchEnd, setTouchEnd] = useState(0)
+  const [showDeleteReviewConfirm, setShowDeleteReviewConfirm] = useState(false)
+  const [reviewToDelete, setReviewToDelete] = useState<string | null>(null)
 
   useEffect(() => {
     checkAuth()
@@ -69,11 +78,75 @@ export default function ArtworkDetailsPage() {
         return
       }
       setArtwork(art)
+      setCurrentImageIndex(0) // Reset to first image when artwork loads
     } catch (error) {
       toast.error('Failed to load artwork')
       router.push('/user')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePreviousImage = () => {
+    if (!artwork || !artwork.images) return
+    setCurrentImageIndex((prev) => (prev === 0 ? artwork.images.length - 1 : prev - 1))
+  }
+
+  const handleNextImage = () => {
+    if (!artwork || !artwork.images) return
+    setCurrentImageIndex((prev) => (prev === artwork.images.length - 1 ? 0 : prev + 1))
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe) {
+      handleNextImage()
+    }
+    if (isRightSwipe) {
+      handlePreviousImage()
+    }
+  }
+
+  const handleShare = async () => {
+    const url = window.location.href
+    const shareData = {
+      title: artwork?.title || 'Peter Art - Artwork',
+      text: artwork?.description || 'Check out this artwork',
+      url: url
+    }
+
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData)
+        toast.success('Shared successfully!')
+      } else {
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.writeText(url)
+        toast.success('Link copied to clipboard!')
+      }
+    } catch (error: any) {
+      // User cancelled or error occurred
+      if (error.name !== 'AbortError') {
+        // Try clipboard as fallback
+        try {
+          await navigator.clipboard.writeText(url)
+          toast.success('Link copied to clipboard!')
+        } catch (clipboardError) {
+          toast.error('Failed to share')
+        }
+      }
     }
   }
 
@@ -197,6 +270,103 @@ export default function ArtworkDetailsPage() {
     }
   }
 
+  const handleDeleteReview = async () => {
+    if (!user || !artwork || !reviewToDelete) return
+
+    try {
+      const response = await fetch(`/api/artworks/comments?artworkId=${artwork.id}&commentId=${reviewToDelete}&userId=${user.uid}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete review')
+      }
+
+      toast.success('Review deleted successfully')
+      setShowDeleteReviewConfirm(false)
+      setReviewToDelete(null)
+      await loadArtwork()
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete review')
+    }
+  }
+
+  const confirmDeleteReview = (commentId: string) => {
+    setReviewToDelete(commentId)
+    setShowDeleteReviewConfirm(true)
+  }
+
+  const handleLikeReview = async (commentId: string) => {
+    if (!user || !user.uid) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to like reviews')
+      return
+    }
+
+    if (!artwork) return
+
+    try {
+      const response = await fetch('/api/artworks/comments', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ artworkId: artwork.id, userId: user.uid, commentId })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to like review')
+      }
+
+      await loadArtwork()
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to like review')
+    }
+  }
+
+  const handleCommentOnReview = async (commentId: string) => {
+    if (!user || !user.uid) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to comment on reviews')
+      return
+    }
+
+    const text = commentTexts[commentId]?.trim()
+    if (!text) {
+      toast.error('Please enter a comment')
+      return
+    }
+
+    if (!artwork) return
+
+    setSubmittingComment({ ...submittingComment, [commentId]: true })
+    try {
+      const formData = new FormData()
+      formData.append('artworkId', artwork.id)
+      formData.append('userId', user.uid)
+      formData.append('userName', user.displayName || user.email?.split('@')[0] || 'User')
+      formData.append('userEmail', user.email || '')
+      formData.append('text', text)
+      formData.append('parentCommentId', commentId)
+
+      const response = await fetch('/api/artworks/comments', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to add comment')
+      }
+
+      toast.success('Comment added successfully')
+      setCommentTexts({ ...commentTexts, [commentId]: '' })
+      setExpandedComments({ ...expandedComments, [commentId]: false })
+      await loadArtwork()
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to add comment')
+    } finally {
+      setSubmittingComment({ ...submittingComment, [commentId]: false })
+    }
+  }
+
   const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -247,6 +417,8 @@ export default function ArtworkDetailsPage() {
       })
 
       toast.success('Order placed successfully!')
+      // Load popunder ad after successful order
+      loadPopunderAd()
       setTimeout(() => {
         router.push('/user?tab=orders')
       }, 1000)
@@ -292,32 +464,68 @@ export default function ArtworkDetailsPage() {
           <div className="space-y-4">
             {artwork.images && artwork.images.length > 0 ? (
               <div className="card p-4">
-                <div className="relative w-full h-96 rounded-lg overflow-hidden mb-4">
+                <div 
+                  className="relative w-full h-96 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
                   <img
-                    src={artwork.images[0]}
-                    alt={artwork.title}
-                    className="w-full h-full object-cover"
+                    src={artwork.images[currentImageIndex]}
+                    alt={`${artwork.title} ${currentImageIndex + 1}`}
+                    className="w-full h-full object-contain select-none"
+                    draggable={false}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23e5e7eb" width="400" height="400"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage not found%3C/text%3E%3C/svg%3E'
                     }}
                   />
-                </div>
-                {artwork.images.length > 1 && (
-                  <div className="grid grid-cols-3 gap-2">
-                    {artwork.images.slice(1).map((img: string, idx: number) => (
-                      <div key={idx} className="relative w-full h-24 rounded-lg overflow-hidden">
-                        <img
-                          src={img}
-                          alt={`${artwork.title} ${idx + 2}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="12"%3EImage not found%3C/text%3E%3C/svg%3E'
-                          }}
-                        />
+                  
+                  {/* Navigation Arrows - Hidden on mobile, visible on desktop */}
+                  {artwork.images.length > 1 && (
+                    <>
+                      <button
+                        onClick={handlePreviousImage}
+                        className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-2 transition-all z-10 items-center justify-center"
+                        aria-label="Previous image"
+                      >
+                        <FiChevronLeft className="text-xl" />
+                      </button>
+                      <button
+                        onClick={handleNextImage}
+                        className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-2 transition-all z-10 items-center justify-center"
+                        aria-label="Next image"
+                      >
+                        <FiChevronRight className="text-xl" />
+                      </button>
+                      
+                      {/* Image Indicators */}
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                        {artwork.images.map((_img: string, idx: number) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentImageIndex(idx)}
+                            className={`h-2 rounded-full transition-all ${
+                              idx === currentImageIndex
+                                ? 'w-6 bg-white'
+                                : 'w-2 bg-white bg-opacity-50 hover:bg-opacity-75'
+                            }`}
+                            aria-label={`Go to image ${idx + 1}`}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </>
+                  )}
+                  
+                  {/* Share Button */}
+                  <button
+                    onClick={handleShare}
+                    className="absolute top-2 right-2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-2 transition-all z-10"
+                    aria-label="Share artwork"
+                    title="Share this artwork"
+                  >
+                    <FiShare2 className="text-lg" />
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="card p-4">
@@ -355,7 +563,7 @@ export default function ArtworkDetailsPage() {
                 </span>
               )}
               <div className="border-t border-gray-300 pt-4">
-                <p className="text-2xl font-bold text-gray-900 mb-6">₹{artwork.price}</p>
+                <p className="text-lg font-bold text-gray-900 mb-6">₹{artwork.price}</p>
 
                 {!showCheckout ? (
                   <>
@@ -386,7 +594,7 @@ export default function ArtworkDetailsPage() {
                     <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400 text-sm">Total Price:</span>
-                        <span className="text-xl font-bold text-gray-900">₹{totalPrice}</span>
+                        <span className="text-base font-bold text-gray-900">₹{totalPrice}</span>
                       </div>
                       <p className="text-xs text-gray-500 mt-2">
                         {quantity} × ₹{artwork.price} = ₹{totalPrice}
@@ -570,7 +778,7 @@ export default function ArtworkDetailsPage() {
                       <div className="border-t border-gray-300 pt-2 mt-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-bold">Total:</span>
-                          <span className="text-xl font-bold text-gray-900">₹{totalPrice}</span>
+                          <span className="text-base font-bold text-gray-900">₹{totalPrice}</span>
                         </div>
                       </div>
                     </div>
@@ -728,21 +936,32 @@ export default function ArtworkDetailsPage() {
                       <div key={comment.id} className="pb-4 border-b border-gray-100 last:border-0">
                         <div className="flex items-start gap-3 mb-2">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <p className="text-xs font-medium text-gray-900">{comment.userName}</p>
-                              {comment.rating && (
-                                <div className="flex items-center gap-0.5">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <FiStar
-                                      key={star}
-                                      className={`text-xs ${
-                                        star <= comment.rating
-                                          ? 'text-yellow-400 fill-yellow-400'
-                                          : 'text-gray-300'
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
+                            <div className="flex items-center gap-2 mb-1 justify-between">
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs font-medium text-gray-900">{comment.userName}</p>
+                                {comment.rating && (
+                                  <div className="flex items-center gap-0.5">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <FiStar
+                                        key={star}
+                                        className={`text-xs ${
+                                          star <= comment.rating
+                                            ? 'text-yellow-400 fill-yellow-400'
+                                            : 'text-gray-300'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {user && user.uid === comment.userId && (
+                                <button
+                                  onClick={() => confirmDeleteReview(comment.id)}
+                                  className="text-red-600 hover:text-red-700 p-1"
+                                  title="Delete review"
+                                >
+                                  <FiTrash2 className="text-xs" />
+                                </button>
                               )}
                             </div>
                             {comment.text && (
@@ -757,9 +976,69 @@ export default function ArtworkDetailsPage() {
                                 ))}
                               </div>
                             )}
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-500 mt-1 mb-2">
                               {new Date(comment.createdAt).toLocaleDateString()}
                             </p>
+                            
+                            {/* Like and Comment buttons */}
+                            <div className="flex items-center gap-4 mt-2">
+                              <button
+                                onClick={() => handleLikeReview(comment.id)}
+                                disabled={!user}
+                                className={`flex items-center gap-1 text-xs ${
+                                  comment.likedBy?.includes(user?.uid)
+                                    ? 'text-gray-900 font-medium'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              >
+                                <FiThumbsUp className={`text-xs ${comment.likedBy?.includes(user?.uid) ? 'fill-current' : ''}`} />
+                                <span>{comment.likes || 0}</span>
+                              </button>
+                              <button
+                                onClick={() => setExpandedComments({ ...expandedComments, [comment.id]: !expandedComments[comment.id] })}
+                                disabled={!user}
+                                className={`flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              >
+                                <FiMessageCircle className="text-xs" />
+                                <span>{comment.replies?.length || 0}</span>
+                              </button>
+                            </div>
+
+                            {/* Comment form */}
+                            {expandedComments[comment.id] && user && (
+                              <div className="mt-3 pt-3 border-t border-gray-100">
+                                <textarea
+                                  value={commentTexts[comment.id] || ''}
+                                  onChange={(e) => setCommentTexts({ ...commentTexts, [comment.id]: e.target.value })}
+                                  placeholder="Write a comment..."
+                                  className="input-field text-xs min-h-[60px] mb-2"
+                                />
+                                <button
+                                  onClick={() => handleCommentOnReview(comment.id)}
+                                  disabled={submittingComment[comment.id] || !commentTexts[comment.id]?.trim()}
+                                  className="btn-primary text-xs py-1.5 px-3 disabled:opacity-50"
+                                >
+                                  {submittingComment[comment.id] ? 'Posting...' : 'Post Comment'}
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Replies/Comments on review */}
+                            {comment.replies && comment.replies.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
+                                {comment.replies.map((reply: any) => (
+                                  <div key={reply.id} className="pl-3 border-l-2 border-gray-200">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <p className="text-xs font-medium text-gray-900">{reply.userName}</p>
+                                      <p className="text-xs text-gray-500">
+                                        {new Date(reply.createdAt).toLocaleDateString()}
+                                      </p>
+                                    </div>
+                                    <p className="text-xs text-gray-600">{reply.text}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -779,6 +1058,33 @@ export default function ArtworkDetailsPage() {
         onClose={() => setLoginModalOpen(false)}
         onSuccess={handleLoginSuccess}
       />
+
+      {/* Delete Review Confirmation Modal */}
+      {showDeleteReviewConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full border-0">
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Confirm Delete</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to delete this review? This action cannot be undone.</p>
+            <div className="flex gap-4">
+              <button
+                onClick={handleDeleteReview}
+                className="btn-primary flex-1"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteReviewConfirm(false)
+                  setReviewToDelete(null)
+                }}
+                className="btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

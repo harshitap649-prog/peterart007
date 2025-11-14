@@ -80,7 +80,7 @@ export default function AdminDashboard() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const files = Array.from(e.target.files).slice(0, 3)
+      const files = Array.from(e.target.files).slice(0, 6)
       setFormData({ ...formData, images: files })
       
       // Create previews
@@ -930,7 +930,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <label className="block text-xs md:text-sm font-medium mb-1.5">
-                  Images (up to 3) *
+                  Images (up to 6) *
                 </label>
                 <input
                   type="file"

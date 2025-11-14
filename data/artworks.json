@@ -19,8 +19,42 @@
     "createdAt": "2025-11-14T11:34:27.382Z",
     "updatedAt": "2025-11-14T11:38:08.192Z",
     "likes": 0,
-    "comments": [],
-    "likedBy": []
+    "comments": [
+      {
+        "id": "1763128233756",
+        "artworkId": "1763120060330",
+        "userId": "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1",
+        "userName": "harshitap14",
+        "userEmail": "harshitap14@gmail.com",
+        "text": "uhdxsm",
+        "rating": 2,
+        "images": [],
+        "likedBy": [
+          "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1"
+        ],
+        "likes": 1,
+        "replies": [
+          {
+            "id": "1763128254114",
+            "artworkId": "1763120060330",
+            "userId": "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1",
+            "userName": "harshitap14",
+            "userEmail": "harshitap14@gmail.com",
+            "text": "hddmhn",
+            "rating": null,
+            "images": [],
+            "likedBy": [],
+            "likes": 0,
+            "replies": [],
+            "createdAt": "2025-11-14T13:50:54.114Z"
+          }
+        ],
+        "createdAt": "2025-11-14T13:50:33.756Z"
+      }
+    ],
+    "likedBy": [],
+    "averageRating": "2.0",
+    "totalRatings": 1
   },
   {
     "id": "1763120341214",

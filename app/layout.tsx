@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
+import BannerAd from '@/components/BannerAd'
 
 export const metadata: Metadata = {
   title: 'Peter Art - Artwork Shop',
@@ -38,6 +39,9 @@ export default function RootLayout({
             },
           }}
         />
+        
+        {/* Banner Ad at Bottom */}
+        <BannerAd />
       </body>
     </html>
   )

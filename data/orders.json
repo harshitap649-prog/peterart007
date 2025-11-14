@@ -1,2 +1,27 @@
-[]
-
+[
+  {
+    "id": "1763131366840",
+    "userId": "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1",
+    "userEmail": "harshitap14@gmail.com",
+    "userName": "harshitap14",
+    "artworkId": "1763120403874",
+    "artworkTitle": "Mahadev – The Supreme Lord of Tranquility and Power",
+    "artworkImage": "/artworks/1763120403874_0_s.JPG",
+    "quantity": 1,
+    "unitPrice": 5000,
+    "total": 5000,
+    "paymentMethod": "cod",
+    "fullName": "harshitap14",
+    "phone": "+917400937728",
+    "email": "harshitap14@gmail.com",
+    "address1": "262, PATIDAR COLONY, SAGORE",
+    "address2": "SAGOR, PITHAMPUR",
+    "pincode": "454774",
+    "city": "DHAR",
+    "state": "Madhya Pradesh",
+    "country": "India",
+    "status": "pending",
+    "createdAt": "2025-11-14T14:42:46.840Z",
+    "updatedAt": "2025-11-14T14:42:46.840Z"
+  }
+]

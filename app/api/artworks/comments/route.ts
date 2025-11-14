@@ -129,15 +129,34 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    const parentCommentId = formData.get('parentCommentId') as string | null
+    
     const newComment = {
       id: Date.now().toString(),
+      artworkId,
       userId,
       userName,
       userEmail,
       text,
       rating: rating || null,
       images: imageUrls,
+      likedBy: [],
+      likes: 0,
+      replies: [],
       createdAt: new Date().toISOString()
+    }
+    
+    // If this is a reply to a comment, add it to the parent's replies
+    if (parentCommentId) {
+      const commentIndex = artworks[index].comments.findIndex((c: any) => c.id === parentCommentId)
+      if (commentIndex !== -1) {
+        if (!artworks[index].comments[commentIndex].replies) {
+          artworks[index].comments[commentIndex].replies = []
+        }
+        artworks[index].comments[commentIndex].replies.push(newComment)
+        await writeArtworks(artworks)
+        return NextResponse.json(newComment)
+      }
     }
     
     artworks[index].comments.push(newComment)
@@ -162,10 +181,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT - Like/unlike artwork
+// PUT - Like/unlike artwork or review
 export async function PUT(request: NextRequest) {
   try {
-    const { artworkId, userId } = await request.json()
+    const { artworkId, userId, commentId } = await request.json()
     
     const artworks = await readArtworks()
     const index = artworks.findIndex((a: any) => a.id === artworkId)
@@ -174,6 +193,37 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Artwork not found' }, { status: 404 })
     }
     
+    // If commentId is provided, like/unlike a review
+    if (commentId) {
+      const commentIndex = artworks[index].comments.findIndex((c: any) => c.id === commentId)
+      if (commentIndex === -1) {
+        return NextResponse.json({ error: 'Comment not found' }, { status: 404 })
+      }
+      
+      if (!artworks[index].comments[commentIndex].likedBy) {
+        artworks[index].comments[commentIndex].likedBy = []
+      }
+      
+      const likedBy = artworks[index].comments[commentIndex].likedBy || []
+      const isLiked = likedBy.includes(userId)
+      
+      if (isLiked) {
+        artworks[index].comments[commentIndex].likedBy = likedBy.filter((id: string) => id !== userId)
+        artworks[index].comments[commentIndex].likes = (artworks[index].comments[commentIndex].likes || 0) - 1
+      } else {
+        artworks[index].comments[commentIndex].likedBy = [...likedBy, userId]
+        artworks[index].comments[commentIndex].likes = (artworks[index].comments[commentIndex].likes || 0) + 1
+      }
+      
+      await writeArtworks(artworks)
+      
+      return NextResponse.json({ 
+        liked: !isLiked, 
+        likes: artworks[index].comments[commentIndex].likes 
+      })
+    }
+    
+    // Otherwise, like/unlike artwork
     if (!artworks[index].likedBy) {
       artworks[index].likedBy = []
     }
@@ -198,6 +248,56 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     console.error('Error updating like:', error)
     return NextResponse.json({ error: 'Failed to update like' }, { status: 500 })
+  }
+}
+
+// DELETE - Delete a review/comment
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const artworkId = searchParams.get('artworkId')
+    const commentId = searchParams.get('commentId')
+    const userId = searchParams.get('userId')
+    
+    if (!artworkId || !commentId || !userId) {
+      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
+    }
+    
+    const artworks = await readArtworks()
+    const index = artworks.findIndex((a: any) => a.id === artworkId)
+    
+    if (index === -1) {
+      return NextResponse.json({ error: 'Artwork not found' }, { status: 404 })
+    }
+    
+    const commentIndex = artworks[index].comments.findIndex((c: any) => c.id === commentId)
+    if (commentIndex === -1) {
+      return NextResponse.json({ error: 'Comment not found' }, { status: 404 })
+    }
+    
+    // Check if user owns the comment
+    if (artworks[index].comments[commentIndex].userId !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+    
+    // Remove the comment
+    artworks[index].comments.splice(commentIndex, 1)
+    
+    // Recalculate average rating
+    const ratings = artworks[index].comments
+      .filter((c: any) => c.rating)
+      .map((c: any) => c.rating)
+    artworks[index].averageRating = ratings.length > 0
+      ? (ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length).toFixed(1)
+      : null
+    artworks[index].totalRatings = ratings.length
+    
+    await writeArtworks(artworks)
+    
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting comment:', error)
+    return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 })
   }
 }
 
