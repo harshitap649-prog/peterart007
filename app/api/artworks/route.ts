@@ -180,10 +180,24 @@ export async function PUT(request: NextRequest) {
   try {
     const formData = await request.formData()
     const id = formData.get('id') as string
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Artwork ID is required' }, { status: 400 })
+    }
+    
     const title = formData.get('title') as string
     const description = formData.get('description') as string
-    const price = parseFloat(formData.get('price') as string)
+    const priceStr = formData.get('price') as string
     const category = formData.get('category') as string
+    
+    if (!title || !description || !priceStr) {
+      return NextResponse.json({ error: 'Title, description, and price are required' }, { status: 400 })
+    }
+    
+    const price = parseFloat(priceStr)
+    if (isNaN(price) || price <= 0) {
+      return NextResponse.json({ error: 'Invalid price' }, { status: 400 })
+    }
     
     const artworks = await readArtworks()
     const index = artworks.findIndex((a: any) => a.id === id)
@@ -193,51 +207,61 @@ export async function PUT(request: NextRequest) {
     }
     
     const existingArtwork = artworks[index]
-    let imageUrls = existingArtwork.images || []
+    // Start with existing images - they will be preserved if no new images are uploaded
+    let imageUrls = [...(existingArtwork.images || [])]
     
     // Handle new image uploads - Use Imgur
     const imageFiles = formData.getAll('images') as File[]
-    for (let i = 0; i < imageFiles.length; i++) {
-      const file = imageFiles[i]
-      if (file && file.size > 0) {
-        try {
-          const bytes = await file.arrayBuffer()
-          const buffer = Buffer.from(bytes)
-          const fileName = `${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-          
-          // Upload to Imgur
-          const imgurUrl = await uploadToImgur(buffer, fileName)
-          if (imgurUrl) {
-            imageUrls.push(imgurUrl)
-          } else {
-            // Fallback to local storage if Imgur fails
-            const filePath = path.join(ARTWORKS_DIR, fileName)
-            await writeFile(filePath, buffer)
-            imageUrls.push(`/artworks/${fileName}`)
-          }
-        } catch (error) {
-          console.error('Error uploading image:', error)
-          // Final fallback to local storage
+    if (imageFiles && imageFiles.length > 0) {
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i]
+        // Check if it's actually a File object and has content
+        if (file && file instanceof File && file.size > 0 && file.name) {
           try {
             const bytes = await file.arrayBuffer()
             const buffer = Buffer.from(bytes)
             const fileName = `${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
-            const filePath = path.join(ARTWORKS_DIR, fileName)
-            await writeFile(filePath, buffer)
-            imageUrls.push(`/artworks/${fileName}`)
-          } catch (fallbackError) {
-            console.error('Error with fallback storage:', fallbackError)
+            
+            // Upload to Imgur
+            const imgurUrl = await uploadToImgur(buffer, fileName)
+            if (imgurUrl) {
+              imageUrls.push(imgurUrl)
+            } else {
+              // Fallback to local storage if Imgur fails
+              const filePath = path.join(ARTWORKS_DIR, fileName)
+              await writeFile(filePath, buffer)
+              imageUrls.push(`/artworks/${fileName}`)
+            }
+          } catch (error) {
+            console.error('Error uploading image:', error)
+            // Final fallback to local storage
+            try {
+              const bytes = await file.arrayBuffer()
+              const buffer = Buffer.from(bytes)
+              const fileName = `${id}_${Date.now()}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+              const filePath = path.join(ARTWORKS_DIR, fileName)
+              await writeFile(filePath, buffer)
+              imageUrls.push(`/artworks/${fileName}`)
+            } catch (fallbackError) {
+              console.error('Error with fallback storage:', fallbackError)
+            }
           }
         }
       }
     }
     
+    // Ensure we have at least one image (keep existing if no new ones uploaded)
+    if (imageUrls.length === 0) {
+      return NextResponse.json({ error: 'Artwork must have at least one image' }, { status: 400 })
+    }
+    
+    // Update the artwork
     artworks[index] = {
       ...existingArtwork,
-      title,
-      description,
+      title: title.trim(),
+      description: description.trim(),
       price,
-      category: category || '',
+      category: (category || '').trim(),
       images: imageUrls,
       updatedAt: new Date().toISOString()
     }
@@ -245,9 +269,11 @@ export async function PUT(request: NextRequest) {
     await writeArtworks(artworks)
     
     return NextResponse.json(artworks[index])
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating artwork:', error)
-    return NextResponse.json({ error: 'Failed to update artwork' }, { status: 500 })
+    return NextResponse.json({ 
+      error: error.message || 'Failed to update artwork' 
+    }, { status: 500 })
   }
 }
 

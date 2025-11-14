@@ -115,10 +115,13 @@ export default function AdminDashboard() {
       toast.error('Please enter a valid price')
       return
     }
+    // Only require images for new artworks, not when editing
     if (!editingArtwork && formData.images.length === 0) {
       toast.error('Please select at least one image')
       return
     }
+    
+    // When editing, if no new images are selected, existing images will be preserved
     
     try {
       if (editingArtwork) {

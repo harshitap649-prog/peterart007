@@ -836,8 +836,23 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
             padding: '1rem'
           }}
         >
+          {/* Backdrop overlay to fade out background */}
           <div 
-            className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full"
+            className="absolute inset-0 bg-black bg-opacity-50"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1
+            }}
+            onClick={() => setShowLogoutConfirm(false)}
+          />
+          
+          {/* Modal content */}
+          <div 
+            className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative z-10"
             style={{ 
               border: 'none',
               margin: 'auto',
