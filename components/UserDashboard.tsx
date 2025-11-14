@@ -212,7 +212,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   return (
     <div className="min-h-screen bg-white">
       {/* Top Bar */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-2 py-2 flex items-center justify-between">
         {/* Hamburger Menu */}
         <button
           onClick={() => setSidebarOpen(true)}
@@ -367,7 +367,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       )}
 
       {/* Main Content */}
-      <div className="px-2 py-2">
+      <div>
         {/* Logo Image - Only show on artworks tab */}
         {activeTab === 'artworks' && (
           <div className="text-center mb-2">

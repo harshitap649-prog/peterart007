@@ -50,8 +50,8 @@ export default function UserPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen p-3 md:p-4">
+      <div className="container mx-auto">
         <Suspense fallback={
           <div className="text-center py-12">
             <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
