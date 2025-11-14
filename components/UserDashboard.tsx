@@ -6,11 +6,11 @@ import { getAllArtworks, searchArtworks } from '@/lib/artworks'
 import { getUserOrders, createOrder } from '@/lib/orders'
 import { getUserWishlist, addToWishlist, removeFromWishlist, isInWishlist } from '@/lib/wishlist'
 import { addComment, likeArtwork, isLiked } from '@/lib/comments'
+import { logout } from '@/lib/auth'
 import toast from 'react-hot-toast'
-import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle } from 'react-icons/fi'
+import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle, FiMenu, FiX, FiSettings, FiLogOut } from 'react-icons/fi'
 import { FaHeart } from 'react-icons/fa'
 import HelpSupport from './HelpSupport'
-import LogoutButton from './LogoutButton'
 
 export default function UserDashboard({ user }: { user: any }) {
   const router = useRouter()
@@ -24,6 +24,8 @@ export default function UserDashboard({ user }: { user: any }) {
   const [loading, setLoading] = useState(true)
   const [commentText, setCommentText] = useState('')
   const [showComments, setShowComments] = useState<string | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -83,7 +85,6 @@ export default function UserDashboard({ user }: { user: any }) {
         setWishlist([...wishlist, artworkId])
         toast.success('Added to wishlist')
       }
-      // Reload wishlist to ensure sync
       const updatedWishlist = await getUserWishlist(user.uid)
       setWishlist(updatedWishlist)
     } catch (error) {
@@ -102,7 +103,6 @@ export default function UserDashboard({ user }: { user: any }) {
       toast.error('Failed to like artwork')
     }
   }
-
 
   const handleComment = async (artworkId: string) => {
     if (!user || !commentText.trim()) return
@@ -134,210 +134,213 @@ export default function UserDashboard({ user }: { user: any }) {
         // User cancelled or error
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href)
       toast.success('Link copied to clipboard!')
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await logout()
+      toast.success('Logged out successfully')
+      router.push('/')
+    } catch (error: any) {
+      toast.error(error.message || 'Logout failed')
+    }
+  }
+
+  const handleNavClick = (tab: string) => {
+    setActiveTab(tab)
+    setSidebarOpen(false)
+  }
+
   return (
-    <div>
-      {/* Logo - Only show on artworks tab */}
-      {activeTab === 'artworks' && (
-        <div className="text-center mb-6 relative">
-          <div className="flex justify-end mb-2">
-            <LogoutButton />
-          </div>
-          <div className="relative w-48 h-48 md:w-40 md:h-40 mx-auto mb-3 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
-            <img
-              src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-              alt="Logo"
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none'
-              }}
-            />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Fall in love with art</h1>
-          <p className="text-gray-600 text-sm md:text-base italic mt-2">Turn Empty Walls into Expressions</p>
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div className="flex gap-1.5 md:gap-2 mb-4 overflow-x-auto pb-2">
+    <div className="min-h-screen bg-white">
+      {/* Top Bar */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        {/* Hamburger Menu */}
         <button
-          onClick={() => setActiveTab('artworks')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'artworks' ? 'btn-primary' : 'btn-secondary'
-          }`}
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          Artworks
+          <FiMenu className="text-xl" />
         </button>
-        <button
-          onClick={() => setActiveTab('wishlist')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'wishlist' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          Wishlist
-        </button>
-        <button
-          onClick={() => setActiveTab('orders')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          My Orders
-        </button>
-        <button
-          onClick={() => setActiveTab('support')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'support' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          <FiHelpCircle className="inline mr-1 text-xs md:text-sm" />
-          Help & Support
-        </button>
-      </div>
 
-      {/* Search Bar - Only show on artworks tab */}
-      {activeTab === 'artworks' && (
-        <div className="mb-4">
-          <div className="relative">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search artworks..."
-              className="input-field pr-9 text-sm py-2"
-            />
-            <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-900 text-sm" />
-          </div>
-        </div>
-      )}
+        {/* Center - Peter Art */}
+        <h1 className="text-lg font-bold text-gray-900">Peter Art</h1>
 
-      {/* Artworks Tab */}
-      {activeTab === 'artworks' && (
-        <div>
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="w-12 h-12 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-400">Loading artworks...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              {filteredArtworks.map((artwork: any) => (
-                <div key={artwork.id} className="card p-3">
-                  {artwork.images && artwork.images[0] && (
-                    <div className="relative w-full h-40 md:h-48 mb-3 rounded-lg overflow-hidden">
-                      <img
-                        src={artwork.images[0]}
-                        alt={artwork.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <h3 className="font-bold text-base md:text-lg mb-1.5">{artwork.title}</h3>
-                  <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{artwork.description}</p>
-                  <p className="text-gray-900 font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
-                  
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <button
-                      onClick={() => handleLike(artwork.id)}
-                      className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors text-xs"
-                    >
-                      <FiThumbsUp className={artwork.likedBy?.includes(user?.uid) ? 'text-gray-900' : ''} />
-                      <span className="text-xs">{artwork.likes || 0}</span>
-                    </button>
-                    <button
-                      onClick={() => setShowComments(showComments === artwork.id ? null : artwork.id)}
-                      className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors text-xs"
-                    >
-                      <FiMessageCircle className="text-xs" />
-                      <span className="text-xs">{artwork.comments?.length || 0}</span>
-                    </button>
-                    <button
-                      onClick={() => handleShare(artwork)}
-                      className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors text-xs"
-                    >
-                      <FiShare2 className="text-xs" />
-                    </button>
-                  </div>
+        {/* Settings Icon */}
+        <div className="relative">
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <FiSettings className="text-xl" />
+          </button>
 
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={() => handleWishlist(artwork.id)}
-                      className={`flex-1 flex items-center justify-center gap-1 btn-secondary text-xs py-1.5 ${
-                        wishlist.includes(artwork.id) ? 'text-red-400' : ''
-                      }`}
-                    >
-                      {wishlist.includes(artwork.id) ? <FaHeart className="text-xs" /> : <FiHeart className="text-xs" />}
-                      <span className="text-xs">Wishlist</span>
-                    </button>
-                    <button
-                      onClick={() => router.push(`/artwork/${artwork.id}`)}
-                      className="flex-1 btn-primary text-xs py-1.5"
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-
-                  {/* Comments Section */}
-                  {showComments === artwork.id && (
-                    <div className="mt-4 pt-4 border-t border-dark-border">
-                      <div className="space-y-2 mb-3 max-h-40 overflow-y-auto">
-                        {artwork.comments?.map((comment: any) => (
-                          <div key={comment.id} className="text-sm">
-                            <p className="font-medium text-gray-900">{comment.userName}</p>
-                            <p className="text-gray-600">{comment.text}</p>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={commentText}
-                          onChange={(e) => setCommentText(e.target.value)}
-                          placeholder="Add a comment..."
-                          className="input-field flex-1 text-sm"
-                          onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                              handleComment(artwork.id)
-                            }
-                          }}
-                        />
-                        <button
-                          onClick={() => handleComment(artwork.id)}
-                          className="btn-primary px-4"
-                        >
-                          Post
-                        </button>
-                      </div>
-                    </div>
-                  )}
+          {/* Settings Dropdown */}
+          {settingsOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setSettingsOpen(false)}
+              ></div>
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <div className="py-2">
+                  <button
+                    onClick={() => {
+                      toast.info('Language settings coming soon')
+                      setSettingsOpen(false)
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Change Language
+                  </button>
+                  <button
+                    onClick={() => {
+                      toast.info('Theme settings coming soon')
+                      setSettingsOpen(false)
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Theme
+                  </button>
+                  <button
+                    onClick={() => {
+                      toast.info('Notifications settings coming soon')
+                      setSettingsOpen(false)
+                    }}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Notifications
+                  </button>
                 </div>
-              ))}
-            </div>
+              </div>
+            </>
           )}
         </div>
+      </div>
+
+      {/* Sidebar */}
+      {sidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-50"
+            onClick={() => setSidebarOpen(false)}
+          ></div>
+          <div className="fixed left-0 top-0 h-full w-64 bg-white shadow-xl z-50 overflow-y-auto">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">Menu</h2>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg"
+              >
+                <FiX className="text-xl" />
+              </button>
+            </div>
+            <nav className="py-4">
+              <button
+                onClick={() => handleNavClick('artworks')}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'artworks'
+                    ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Artworks
+              </button>
+              <button
+                onClick={() => handleNavClick('wishlist')}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'wishlist'
+                    ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Wishlist
+              </button>
+              <button
+                onClick={() => handleNavClick('orders')}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'orders'
+                    ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                My Orders
+              </button>
+              <button
+                onClick={() => handleNavClick('support')}
+                className={`w-full text-left px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'support'
+                    ? 'bg-gray-100 text-gray-900 border-l-4 border-gray-900'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Help & Support
+              </button>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+              >
+                <FiLogOut className="text-base" />
+                Logout
+              </button>
+            </nav>
+          </div>
+        </>
       )}
 
-      {/* Wishlist Tab */}
-      {activeTab === 'wishlist' && (
-        <div>
-          {wishlist.length === 0 ? (
-            <div className="text-center py-12">
-              <FiHeart className="text-6xl text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">Your wishlist is empty</p>
+      {/* Main Content */}
+      <div className="px-4 py-4">
+        {/* Logo Image - Only show on artworks tab */}
+        {activeTab === 'artworks' && (
+          <div className="text-center mb-4">
+            <div className="relative w-32 h-32 mx-auto mb-3 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
+              <img
+                src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+                alt="Logo"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none'
+                }}
+              />
             </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              {artworks
-                .filter((artwork: any) => wishlist.includes(artwork.id))
-                .map((artwork: any) => (
-                  <div key={artwork.id} className="card p-3">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">Fall in love with art</h1>
+            <p className="text-gray-600 text-sm italic">Turn Empty Walls into Expressions</p>
+          </div>
+        )}
+
+        {/* Search Bar - Only show on artworks tab */}
+        {activeTab === 'artworks' && (
+          <div className="mb-4">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search artworks..."
+                className="input-field pr-9 text-sm py-2"
+              />
+              <FiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-900 text-sm" />
+            </div>
+          </div>
+        )}
+
+        {/* Artworks Tab */}
+        {activeTab === 'artworks' && (
+          <div>
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-400 text-sm">Loading artworks...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {filteredArtworks.map((artwork: any) => (
+                  <div key={artwork.id} className="card p-2">
                     {artwork.images && artwork.images[0] && (
-                      <div className="relative w-full h-40 md:h-48 mb-3 rounded-lg overflow-hidden">
+                      <div className="relative w-full h-32 mb-2 rounded overflow-hidden">
                         <img
                           src={artwork.images[0]}
                           alt={artwork.title}
@@ -345,92 +348,170 @@ export default function UserDashboard({ user }: { user: any }) {
                         />
                       </div>
                     )}
-                    <h3 className="font-bold text-base md:text-lg mb-1.5">{artwork.title}</h3>
-                    <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{artwork.description}</p>
-                    <p className="text-gray-900 font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
-                    <button
-                      onClick={() => router.push(`/artwork/${artwork.id}`)}
-                      className="btn-primary w-full text-xs py-1.5"
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
-      )}
+                    <h3 className="font-semibold text-xs mb-1 line-clamp-1">{artwork.title}</h3>
+                    <p className="text-gray-600 text-xs mb-1.5 line-clamp-2">{artwork.description}</p>
+                    <p className="text-gray-900 font-bold text-sm mb-2">₹{artwork.price}</p>
+                    
+                    <div className="flex items-center gap-1 mb-2">
+                      <button
+                        onClick={() => handleLike(artwork.id)}
+                        className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors"
+                      >
+                        <FiThumbsUp className={`text-xs ${artwork.likedBy?.includes(user?.uid) ? 'text-gray-900' : ''}`} />
+                        <span className="text-xs">{artwork.likes || 0}</span>
+                      </button>
+                      <button
+                        onClick={() => setShowComments(showComments === artwork.id ? null : artwork.id)}
+                        className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors"
+                      >
+                        <FiMessageCircle className="text-xs" />
+                        <span className="text-xs">{artwork.comments?.length || 0}</span>
+                      </button>
+                    </div>
 
-      {/* Orders Tab */}
-      {activeTab === 'orders' && (
-        <div>
-          {orders.length === 0 ? (
-            <div className="text-center py-12">
-              <FiShoppingCart className="text-6xl text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">You have no orders yet</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {orders.map((order: any) => (
-                <div key={order.id} className="card p-3">
-                  <div className="flex flex-col md:flex-row gap-3">
-                    {order.artworkImage && (
-                      <div className="relative w-full md:w-24 h-24 rounded-lg overflow-hidden">
-                        <img
-                          src={order.artworkImage}
-                          alt={order.artworkTitle}
-                          className="w-full h-full object-cover"
-                        />
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleWishlist(artwork.id)}
+                        className={`flex-1 flex items-center justify-center gap-0.5 btn-secondary text-xs py-1.5 ${
+                          wishlist.includes(artwork.id) ? 'text-red-400' : ''
+                        }`}
+                      >
+                        {wishlist.includes(artwork.id) ? <FaHeart className="text-xs" /> : <FiHeart className="text-xs" />}
+                      </button>
+                      <button
+                        onClick={() => router.push(`/artwork/${artwork.id}`)}
+                        className="flex-1 btn-primary text-xs py-1.5"
+                      >
+                        Buy
+                      </button>
+                    </div>
+
+                    {/* Comments Section */}
+                    {showComments === artwork.id && (
+                      <div className="mt-2 pt-2 border-t border-gray-300">
+                        <div className="space-y-1 mb-2 max-h-24 overflow-y-auto">
+                          {artwork.comments?.map((comment: any) => (
+                            <div key={comment.id} className="text-xs">
+                              <p className="font-medium text-gray-900">{comment.userName}</p>
+                              <p className="text-gray-600">{comment.text}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-1">
+                          <input
+                            type="text"
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            placeholder="Add comment..."
+                            className="input-field flex-1 text-xs py-1"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                handleComment(artwork.id)
+                              }
+                            }}
+                          />
+                          <button
+                            onClick={() => handleComment(artwork.id)}
+                            className="btn-primary px-2 text-xs py-1"
+                          >
+                            Post
+                          </button>
+                        </div>
                       </div>
                     )}
-                    <div className="flex-1">
-                      <h3 className="font-bold text-base md:text-lg mb-1.5">{order.artworkTitle}</h3>
-                      <div className="flex items-center gap-3 mb-1.5">
-                        <p className="text-gray-400 text-xs">
-                          Quantity: <span className="text-gray-900 font-medium">{order.quantity || 1}</span>
-                        </p>
-                        <p className="text-gray-400 text-xs">
-                          Unit: <span className="text-gray-900 font-medium">₹{order.unitPrice || order.total}</span>
-                        </p>
-                      </div>
-                      <p className="text-gray-900 font-bold text-lg md:text-xl mb-1.5">Total: ₹{order.total}</p>
-                      <p className="text-gray-400 text-xs mb-1">
-                        Payment: {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
-                      </p>
-                      {order.paymentMethod === 'cod' && order.address1 && (
-                        <div className="mt-1.5 p-1.5 bg-dark-card rounded text-xs">
-                          <p className="text-gray-400">Delivery to: {order.address1}, {order.city}, {order.pincode}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Wishlist Tab */}
+        {activeTab === 'wishlist' && (
+          <div>
+            {wishlist.length === 0 ? (
+              <div className="text-center py-12">
+                <FiHeart className="text-6xl text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 text-sm">Your wishlist is empty</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {artworks
+                  .filter((artwork: any) => wishlist.includes(artwork.id))
+                  .map((artwork: any) => (
+                    <div key={artwork.id} className="card p-2">
+                      {artwork.images && artwork.images[0] && (
+                        <div className="relative w-full h-32 mb-2 rounded overflow-hidden">
+                          <img
+                            src={artwork.images[0]}
+                            alt={artwork.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                       )}
-                      <p className="text-gray-400 text-xs mb-1 mt-1.5">
-                        Status: <span className={`font-medium ${
-                          order.status === 'delivered' ? 'text-green-400' :
-                          order.status === 'pending' ? 'text-yellow-400' :
-                          'text-red-400'
-                        }`}>
+                      <h3 className="font-semibold text-xs mb-1 line-clamp-1">{artwork.title}</h3>
+                      <p className="text-gray-600 text-xs mb-1.5 line-clamp-2">{artwork.description}</p>
+                      <p className="text-gray-900 font-bold text-sm mb-2">₹{artwork.price}</p>
+                      <button
+                        onClick={() => router.push(`/artwork/${artwork.id}`)}
+                        className="btn-primary w-full text-xs py-1.5"
+                      >
+                        Buy Now
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Orders Tab */}
+        {activeTab === 'orders' && (
+          <div>
+            {orders.length === 0 ? (
+              <div className="text-center py-12">
+                <FiShoppingCart className="text-6xl text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 text-sm">You have no orders yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {orders.map((order: any) => (
+                  <div key={order.id} className="card p-3">
+                    <div className="flex gap-3">
+                      {order.artworkImage && (
+                        <div className="relative w-20 h-20 rounded overflow-hidden flex-shrink-0">
+                          <img
+                            src={order.artworkImage}
+                            alt={order.artworkTitle}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm mb-1 line-clamp-1">{order.artworkTitle}</h3>
+                        <p className="text-gray-600 text-xs mb-1">
+                          Qty: {order.quantity || 1} × ₹{order.unitPrice || order.total}
+                        </p>
+                        <p className="text-gray-900 font-bold text-sm mb-1">₹{order.total}</p>
+                        <p className="text-gray-500 text-xs">
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                        </span>
-                      </p>
-                      <p className="text-gray-500 text-xs">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </p>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Help & Support Tab */}
-      {activeTab === 'support' && (
-        <div>
-          <HelpSupport user={user} />
-        </div>
-      )}
-
+        {/* Help & Support Tab */}
+        {activeTab === 'support' && (
+          <div>
+            <HelpSupport user={user} />
+          </div>
+        )}
+      </div>
     </div>
   )
 }
-
