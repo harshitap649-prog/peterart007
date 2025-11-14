@@ -35,6 +35,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -107,7 +108,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   }
 
   const handleLike = async (artworkId: string) => {
-    if (!user) {
+    // Check if user is logged in - if not, show login modal
+    if (!user || !user.uid) {
       setLoginModalOpen(true)
       toast.error('Please sign in to like artworks')
       return
@@ -160,10 +162,18 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     try {
       await logout()
       toast.success('Logged out successfully')
+      if (onUserUpdate) {
+        onUserUpdate(null)
+      }
       router.push('/')
     } catch (error: any) {
       toast.error(error.message || 'Logout failed')
     }
+  }
+
+  const confirmLogout = async () => {
+    setShowLogoutConfirm(false)
+    await handleLogout()
   }
 
   const handleNavClick = (tab: string) => {
@@ -188,7 +198,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   }
 
   const handleBuyClick = (artworkId: string) => {
-    if (!user) {
+    // Check if user is logged in - if not, show login modal
+    if (!user || !user.uid) {
       setLoginModalOpen(true)
       toast.error('Please sign in to purchase artworks')
       return
@@ -253,15 +264,15 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       >
                         Settings
                       </button>
-                      <button
-                        onClick={() => {
-                          handleLogout()
-                          setUserMenuOpen(false)
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                      >
-                        Logout
-                      </button>
+                    <button
+                      onClick={() => {
+                        setShowLogoutConfirm(true)
+                        setUserMenuOpen(false)
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Logout
+                    </button>
                     </div>
                   </div>
                 </>
@@ -339,7 +350,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               {user && (
                 <button
                   onClick={() => {
-                    handleLogout()
+                    setShowLogoutConfirm(true)
                     setSidebarOpen(false)
                   }}
                   className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
@@ -591,6 +602,30 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         onClose={() => setLoginModalOpen(false)}
         onSuccess={handleLoginSuccess}
       />
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="card p-4 md:p-6 max-w-md w-full bg-white">
+            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">Confirm Logout</h3>
+            <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">Are you sure you want to logout?</p>
+            <div className="flex gap-3 md:gap-4">
+              <button
+                onClick={confirmLogout}
+                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-gray-900 text-white hover:bg-gray-800"
+              >
+                Yes, Logout
+              </button>
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="btn-secondary flex-1 text-sm md:text-base py-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
