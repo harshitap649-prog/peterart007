@@ -435,20 +435,14 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     <p className="text-gray-900 font-bold text-xs mb-1">₹{artwork.price}</p>
                     
                     <div className="flex items-center gap-1 mb-1">
-                      <button
-                        onClick={() => handleLike(artwork.id)}
-                        className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors"
-                      >
+                      <div className="flex items-center gap-0.5 text-gray-400">
                         <FiThumbsUp className={`text-xs ${artwork.likedBy?.includes(user?.uid) ? 'text-gray-900' : ''}`} />
                         <span className="text-xs">{artwork.likes || 0}</span>
-                      </button>
-                      <button
-                        onClick={() => setShowComments(showComments === artwork.id ? null : artwork.id)}
-                        className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors"
-                      >
+                      </div>
+                      <div className="flex items-center gap-0.5 text-gray-400">
                         <FiMessageCircle className="text-xs" />
                         <span className="text-xs">{artwork.comments?.length || 0}</span>
-                      </button>
+                      </div>
                     </div>
 
                     <div className="flex gap-1">
@@ -468,39 +462,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </button>
                     </div>
 
-                    {/* Comments Section */}
-                    {showComments === artwork.id && (
-                      <div className="mt-1 pt-1 border-t border-gray-300">
-                        <div className="space-y-0.5 mb-1 max-h-20 overflow-y-auto">
-                          {artwork.comments?.map((comment: any) => (
-                            <div key={comment.id} className="text-xs">
-                              <p className="font-medium text-gray-900">{comment.userName}</p>
-                              <p className="text-gray-600">{comment.text}</p>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex gap-1">
-                          <input
-                            type="text"
-                            value={commentText}
-                            onChange={(e) => setCommentText(e.target.value)}
-                            placeholder="Add comment..."
-                            className="input-field flex-1 text-xs py-1"
-                            onKeyPress={(e) => {
-                              if (e.key === 'Enter') {
-                                handleComment(artwork.id)
-                              }
-                            }}
-                          />
-                          <button
-                            onClick={() => handleComment(artwork.id)}
-                            className="btn-primary px-2 text-xs py-1"
-                          >
-                            Post
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
