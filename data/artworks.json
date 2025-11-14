@@ -42,8 +42,10 @@
     ],
     "createdAt": "2025-11-13T18:37:34.299Z",
     "updatedAt": "2025-11-13T18:37:34.299Z",
-    "likes": 0,
+    "likes": 1,
     "comments": [],
-    "likedBy": []
+    "likedBy": [
+      "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1"
+    ]
   }
 ]

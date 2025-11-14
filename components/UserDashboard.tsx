@@ -8,11 +8,18 @@ import { getUserWishlist, addToWishlist, removeFromWishlist, isInWishlist } from
 import { addComment, likeArtwork, isLiked } from '@/lib/comments'
 import { logout } from '@/lib/auth'
 import toast from 'react-hot-toast'
-import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle, FiMenu, FiX, FiSettings, FiLogOut } from 'react-icons/fi'
+import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle, FiMenu, FiX, FiSettings, FiLogOut, FiUser } from 'react-icons/fi'
 import { FaHeart } from 'react-icons/fa'
 import HelpSupport from './HelpSupport'
+import LoginModal from './LoginModal'
+import { getCurrentUser } from '@/lib/auth'
 
-export default function UserDashboard({ user }: { user: any }) {
+interface UserDashboardProps {
+  user: any
+  onUserUpdate?: (user: any) => void
+}
+
+export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [artworks, setArtworks] = useState<any[]>([])
@@ -26,6 +33,8 @@ export default function UserDashboard({ user }: { user: any }) {
   const [showComments, setShowComments] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   useEffect(() => {
     const tab = searchParams.get('tab')
@@ -72,7 +81,11 @@ export default function UserDashboard({ user }: { user: any }) {
   }
 
   const handleWishlist = async (artworkId: string) => {
-    if (!user) return
+    if (!user) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to add items to wishlist')
+      return
+    }
     
     try {
       const inWishlist = await isInWishlist(user.uid, artworkId)
@@ -94,7 +107,11 @@ export default function UserDashboard({ user }: { user: any }) {
   }
 
   const handleLike = async (artworkId: string) => {
-    if (!user) return
+    if (!user) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to like artworks')
+      return
+    }
     
     try {
       await likeArtwork(artworkId, user.uid)
@@ -150,8 +167,33 @@ export default function UserDashboard({ user }: { user: any }) {
   }
 
   const handleNavClick = (tab: string) => {
+    if (tab === 'wishlist' || tab === 'orders' || tab === 'support') {
+      if (!user) {
+        setSidebarOpen(false)
+        setLoginModalOpen(true)
+        toast.error('Please sign in to access this section')
+        return
+      }
+    }
     setActiveTab(tab)
     setSidebarOpen(false)
+  }
+
+  const handleLoginSuccess = async (loggedInUser: any) => {
+    if (onUserUpdate) {
+      onUserUpdate(loggedInUser)
+    }
+    // Reload data after login
+    await loadData()
+  }
+
+  const handleBuyClick = (artworkId: string) => {
+    if (!user) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to purchase artworks')
+      return
+    }
+    router.push(`/artwork/${artworkId}`)
   }
 
   return (
@@ -169,54 +211,69 @@ export default function UserDashboard({ user }: { user: any }) {
         {/* Center - Peter Art */}
         <h1 className="text-lg font-bold text-gray-900">Peter Art</h1>
 
-        {/* Settings Icon */}
+        {/* User Icon / Settings */}
         <div className="relative">
-          <button
-            onClick={() => setSettingsOpen(!settingsOpen)}
-            className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <FiSettings className="text-xl" />
-          </button>
-
-          {/* Settings Dropdown */}
-          {settingsOpen && (
+          {user ? (
             <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setSettingsOpen(false)}
-              ></div>
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                <div className="py-2">
-                  <button
-                    onClick={() => {
-                      toast.info('Language settings coming soon')
-                      setSettingsOpen(false)
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Change Language
-                  </button>
-                  <button
-                    onClick={() => {
-                      toast.info('Theme settings coming soon')
-                      setSettingsOpen(false)
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Theme
-                  </button>
-                  <button
-                    onClick={() => {
-                      toast.info('Notifications settings coming soon')
-                      setSettingsOpen(false)
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Notifications
-                  </button>
-                </div>
-              </div>
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <FiUser className="text-xl" />
+              </button>
+
+              {/* User Menu Dropdown */}
+              {userMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setUserMenuOpen(false)}
+                  ></div>
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="py-2">
+                      <div className="px-4 py-2 border-b border-gray-200">
+                        <p className="text-sm font-medium text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          toast.info('Language settings coming soon')
+                          setUserMenuOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Change Language
+                      </button>
+                      <button
+                        onClick={() => {
+                          toast.info('Theme settings coming soon')
+                          setUserMenuOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Settings
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleLogout()
+                          setUserMenuOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
+          ) : (
+            <button
+              onClick={() => setLoginModalOpen(true)}
+              className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <FiUser className="text-xl" />
+            </button>
           )}
         </div>
       </div>
@@ -379,7 +436,7 @@ export default function UserDashboard({ user }: { user: any }) {
                         {wishlist.includes(artwork.id) ? <FaHeart className="text-xs" /> : <FiHeart className="text-xs" />}
                       </button>
                       <button
-                        onClick={() => router.push(`/artwork/${artwork.id}`)}
+                        onClick={() => handleBuyClick(artwork.id)}
                         className="flex-1 btn-primary text-xs py-1.5"
                       >
                         Buy
@@ -453,7 +510,7 @@ export default function UserDashboard({ user }: { user: any }) {
                       <p className="text-gray-600 text-xs mb-1.5 line-clamp-2">{artwork.description}</p>
                       <p className="text-gray-900 font-bold text-sm mb-2">₹{artwork.price}</p>
                       <button
-                        onClick={() => router.push(`/artwork/${artwork.id}`)}
+                        onClick={() => handleBuyClick(artwork.id)}
                         className="btn-primary w-full text-xs py-1.5"
                       >
                         Buy Now
@@ -512,6 +569,13 @@ export default function UserDashboard({ user }: { user: any }) {
           </div>
         )}
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSuccess={handleLoginSuccess}
+      />
     </div>
   )
 }

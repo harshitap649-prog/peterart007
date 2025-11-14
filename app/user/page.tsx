@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export default function UserPage() {
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -23,21 +23,18 @@ export default function UserPage() {
       await new Promise(resolve => setTimeout(resolve, 100))
       
       const currentUser = await getCurrentUser()
-      if (!currentUser) {
-        console.log('No user found, redirecting to login')
-        router.push('/')
-        return
+      if (currentUser) {
+        console.log('User authenticated:', currentUser.email)
+        setUser(currentUser)
+      } else {
+        console.log('No user found, allowing guest browsing')
+        setUser(null)
       }
-      console.log('User authenticated:', currentUser.email)
-      setUser(currentUser)
       setLoading(false)
     } catch (error) {
       console.error('Auth check error:', error)
+      setUser(null)
       setLoading(false)
-      // Redirect to login after a delay if auth fails
-      setTimeout(() => {
-        router.push('/')
-      }, 2000)
     }
   }
 
@@ -61,7 +58,7 @@ export default function UserPage() {
             <p className="text-gray-600">Loading...</p>
           </div>
         }>
-          <UserDashboard user={user} />
+          <UserDashboard user={user} onUserUpdate={setUser} />
         </Suspense>
       </div>
     </div>
