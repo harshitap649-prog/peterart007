@@ -411,11 +411,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-gray-400 text-sm">Loading artworks...</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {filteredArtworks.map((artwork: any) => (
-                  <div key={artwork.id} className="card p-2">
+                  <div key={artwork.id} className="card p-1.5">
                     {artwork.images && artwork.images[0] ? (
-                      <div className="relative w-full h-32 mb-2 rounded overflow-hidden">
+                      <div className="relative w-full h-28 mb-1 rounded overflow-hidden">
                         <img
                           src={artwork.images[0]}
                           alt={artwork.title}
@@ -426,15 +426,15 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                         />
                       </div>
                     ) : (
-                      <div className="w-full h-32 mb-2 rounded bg-gray-200 flex items-center justify-center">
+                      <div className="w-full h-28 mb-1 rounded bg-gray-200 flex items-center justify-center">
                         <span className="text-gray-400 text-xs">No image</span>
                       </div>
                     )}
-                    <h3 className="font-semibold text-xs mb-1 line-clamp-1">{artwork.title}</h3>
-                    <p className="text-gray-600 text-xs mb-1.5 line-clamp-2">{artwork.description}</p>
-                    <p className="text-gray-900 font-bold text-sm mb-2">₹{artwork.price}</p>
+                    <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{artwork.title}</h3>
+                    <p className="text-gray-600 text-xs mb-1 line-clamp-2">{artwork.description}</p>
+                    <p className="text-gray-900 font-bold text-xs mb-1">₹{artwork.price}</p>
                     
-                    <div className="flex items-center gap-1 mb-2">
+                    <div className="flex items-center gap-1 mb-1">
                       <button
                         onClick={() => handleLike(artwork.id)}
                         className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors"
@@ -470,8 +470,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
                     {/* Comments Section */}
                     {showComments === artwork.id && (
-                      <div className="mt-2 pt-2 border-t border-gray-300">
-                        <div className="space-y-1 mb-2 max-h-24 overflow-y-auto">
+                      <div className="mt-1 pt-1 border-t border-gray-300">
+                        <div className="space-y-0.5 mb-1 max-h-20 overflow-y-auto">
                           {artwork.comments?.map((comment: any) => (
                             <div key={comment.id} className="text-xs">
                               <p className="font-medium text-gray-900">{comment.userName}</p>
@@ -517,26 +517,30 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-gray-600 text-sm">Your wishlist is empty</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {artworks
                   .filter((artwork: any) => wishlist.includes(artwork.id))
                   .map((artwork: any) => (
-                    <div key={artwork.id} className="card p-2">
-                      {artwork.images && artwork.images[0] && (
-                        <div className="relative w-full h-32 mb-2 rounded overflow-hidden">
+                    <div key={artwork.id} className="card p-1.5">
+                      {artwork.images && artwork.images[0] ? (
+                        <div className="relative w-full h-28 mb-1 rounded overflow-hidden">
                           <img
                             src={artwork.images[0]}
                             alt={artwork.title}
                             className="w-full h-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
-                            }}
-                          />
-                        </div>
-                      )}
-                      <h3 className="font-semibold text-xs mb-1 line-clamp-1">{artwork.title}</h3>
-                      <p className="text-gray-600 text-xs mb-1.5 line-clamp-2">{artwork.description}</p>
-                      <p className="text-gray-900 font-bold text-sm mb-2">₹{artwork.price}</p>
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-28 mb-1 rounded bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">No image</span>
+                      </div>
+                    )}
+                      <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{artwork.title}</h3>
+                      <p className="text-gray-600 text-xs mb-1 line-clamp-2">{artwork.description}</p>
+                      <p className="text-gray-900 font-bold text-xs mb-1">₹{artwork.price}</p>
                       <button
                         onClick={() => handleBuyClick(artwork.id)}
                         className="btn-primary w-full text-xs py-1.5"
