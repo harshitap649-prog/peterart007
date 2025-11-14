@@ -6,8 +6,8 @@ import { getCurrentUser } from '@/lib/auth'
 import { getArtworkById } from '@/lib/artworks'
 import { createOrder } from '@/lib/orders'
 import toast from 'react-hot-toast'
-import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus } from 'react-icons/fi'
-import LogoutButton from '@/components/LogoutButton'
+import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX } from 'react-icons/fi'
+import LoginModal from '@/components/LoginModal'
 
 export default function ArtworkDetailsPage() {
   const params = useParams()
@@ -30,6 +30,12 @@ export default function ArtworkDetailsPage() {
     country: 'India'
   })
   const [submitting, setSubmitting] = useState(false)
+  const [reviewText, setReviewText] = useState('')
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewImages, setReviewImages] = useState<File[]>([])
+  const [reviewImagePreviews, setReviewImagePreviews] = useState<string[]>([])
+  const [submittingReview, setSubmittingReview] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -39,18 +45,16 @@ export default function ArtworkDetailsPage() {
   const checkAuth = async () => {
     try {
       const currentUser = await getCurrentUser()
-      if (!currentUser) {
-        router.push('/')
-        return
+      if (currentUser) {
+        setUser(currentUser)
+        setFormData(prev => ({
+          ...prev,
+          email: currentUser.email || '',
+          fullName: currentUser.displayName || currentUser.email?.split('@')[0] || ''
+        }))
       }
-      setUser(currentUser)
-      setFormData(prev => ({
-        ...prev,
-        email: currentUser.email || '',
-        fullName: currentUser.displayName || currentUser.email?.split('@')[0] || ''
-      }))
     } catch (error) {
-      router.push('/')
+      // Allow guest viewing
     }
   }
 
@@ -79,7 +83,95 @@ export default function ArtworkDetailsPage() {
   }
 
   const handleBuyNow = () => {
+    if (!user) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to purchase artworks')
+      return
+    }
     setShowCheckout(true)
+  }
+
+  const handleReviewImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length + reviewImages.length > 3) {
+      toast.error('Maximum 3 images allowed')
+      return
+    }
+    setReviewImages([...reviewImages, ...files])
+    files.forEach(file => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setReviewImagePreviews(prev => [...prev, e.target?.result as string])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const removeReviewImage = (index: number) => {
+    setReviewImages(reviewImages.filter((_, i) => i !== index))
+    setReviewImagePreviews(reviewImagePreviews.filter((_, i) => i !== index))
+  }
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) {
+      setLoginModalOpen(true)
+      toast.error('Please sign in to submit a review')
+      return
+    }
+    if (!reviewText.trim()) {
+      toast.error('Please enter your review')
+      return
+    }
+    if (reviewRating === 0) {
+      toast.error('Please select a rating')
+      return
+    }
+
+    setSubmittingReview(true)
+    try {
+      const formData = new FormData()
+      formData.append('artworkId', artwork.id)
+      formData.append('userId', user.uid)
+      formData.append('userName', user.displayName || user.email?.split('@')[0] || 'User')
+      formData.append('userEmail', user.email || '')
+      formData.append('text', reviewText)
+      formData.append('rating', reviewRating.toString())
+      
+      reviewImages.forEach((image) => {
+        formData.append('images', image)
+      })
+
+      const response = await fetch('/api/artworks/comments', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit review')
+      }
+
+      toast.success('Review submitted successfully!')
+      setReviewText('')
+      setReviewRating(0)
+      setReviewImages([])
+      setReviewImagePreviews([])
+      loadArtwork()
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to submit review')
+    } finally {
+      setSubmittingReview(false)
+    }
+  }
+
+  const handleLoginSuccess = async (loggedInUser: any) => {
+    setUser(loggedInUser)
+    setLoginModalOpen(false)
+    setFormData(prev => ({
+      ...prev,
+      email: loggedInUser.email || '',
+      fullName: loggedInUser.displayName || loggedInUser.email?.split('@')[0] || ''
+    }))
   }
 
   const handleOrderSubmit = async (e: React.FormEvent) => {
@@ -159,7 +251,6 @@ export default function ArtworkDetailsPage() {
             <FiArrowLeft />
             Back to Artworks
           </button>
-          <LogoutButton />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -230,7 +321,7 @@ export default function ArtworkDetailsPage() {
                       </div>
                     </div>
 
-                    <div className="mb-6 p-4 bg-dark-card rounded-lg">
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Total Price:</span>
                         <span className="text-3xl font-bold text-gray-900">₹{totalPrice}</span>
@@ -405,7 +496,7 @@ export default function ArtworkDetailsPage() {
                       </>
                     )}
 
-                    <div className="p-4 bg-dark-card rounded-lg">
+                    <div className="p-4 bg-gray-50 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-gray-400">Quantity:</span>
                         <span className="font-medium">{quantity}</span>

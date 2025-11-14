@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 
 const ARTWORKS_FILE = path.join(process.cwd(), 'data', 'artworks.json')
+const REVIEWS_DIR = path.join(process.cwd(), 'public', 'reviews')
+
+async function ensureDirectories() {
+  if (!existsSync(REVIEWS_DIR)) {
+    await mkdir(REVIEWS_DIR, { recursive: true })
+  }
+}
 
 async function readArtworks() {
   try {
@@ -21,10 +28,18 @@ async function writeArtworks(artworks: any[]) {
   await writeFile(ARTWORKS_FILE, JSON.stringify(artworks, null, 2), 'utf-8')
 }
 
-// POST - Add comment to artwork
+// POST - Add comment/review to artwork
 export async function POST(request: NextRequest) {
   try {
-    const { artworkId, comment } = await request.json()
+    await ensureDirectories()
+    
+    const formData = await request.formData()
+    const artworkId = formData.get('artworkId') as string
+    const userId = formData.get('userId') as string
+    const userName = formData.get('userName') as string
+    const userEmail = formData.get('userEmail') as string
+    const text = formData.get('text') as string
+    const rating = formData.get('rating') ? parseInt(formData.get('rating') as string) : null
     
     const artworks = await readArtworks()
     const index = artworks.findIndex((a: any) => a.id === artworkId)
@@ -37,13 +52,50 @@ export async function POST(request: NextRequest) {
       artworks[index].comments = []
     }
     
+    // Handle review images
+    const imageUrls: string[] = []
+    const imageFiles = formData.getAll('images') as File[]
+    
+    if (imageFiles && imageFiles.length > 0) {
+      const reviewId = Date.now().toString()
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i]
+        if (file && file.size > 0 && file.name) {
+          const bytes = await file.arrayBuffer()
+          const buffer = Buffer.from(bytes)
+          const fileName = `${reviewId}_${i}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`
+          const filePath = path.join(REVIEWS_DIR, fileName)
+          
+          await writeFile(filePath, buffer)
+          imageUrls.push(`/reviews/${fileName}`)
+        }
+      }
+    }
+    
     const newComment = {
       id: Date.now().toString(),
-      ...comment,
+      userId,
+      userName,
+      userEmail,
+      text,
+      rating: rating || null,
+      images: imageUrls,
       createdAt: new Date().toISOString()
     }
     
     artworks[index].comments.push(newComment)
+    
+    // Calculate average rating
+    if (rating) {
+      const ratings = artworks[index].comments
+        .filter((c: any) => c.rating)
+        .map((c: any) => c.rating)
+      artworks[index].averageRating = ratings.length > 0
+        ? (ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length).toFixed(1)
+        : null
+      artworks[index].totalRatings = ratings.length
+    }
+    
     await writeArtworks(artworks)
     
     return NextResponse.json(newComment)
