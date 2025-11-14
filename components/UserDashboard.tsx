@@ -7,7 +7,7 @@ import { getUserOrders, createOrder } from '@/lib/orders'
 import { getUserWishlist, addToWishlist, removeFromWishlist, isInWishlist } from '@/lib/wishlist'
 import { addComment, likeArtwork, isLiked } from '@/lib/comments'
 import { logout } from '@/lib/auth'
-import { loadPopunderAd } from '@/lib/popunderAd'
+import { loadPopunderAd, resetPopunderAd } from '@/lib/popunderAd'
 import toast from 'react-hot-toast'
 import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle, FiMenu, FiX, FiSettings, FiLogOut, FiUser, FiStar } from 'react-icons/fi'
 import { FaHeart } from 'react-icons/fa'
@@ -281,6 +281,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const handleLogout = async () => {
     try {
       await logout()
+      // Reset popunder flag on logout so it can trigger again in new session
+      resetPopunderAd()
       toast.success('Logged out successfully')
       if (onUserUpdate) {
         onUserUpdate(null)
@@ -293,8 +295,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   const confirmLogout = async () => {
     setShowLogoutConfirm(false)
-    // Load popunder ad before logout
-    loadPopunderAd()
+    // Load popunder ad before logout (only triggers once per session)
+    loadPopunderAd('logout')
     await handleLogout()
   }
 

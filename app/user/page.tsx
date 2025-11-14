@@ -26,15 +26,16 @@ export default function UserPage() {
       if (currentUser) {
         console.log('User authenticated:', currentUser.email)
         setUser(currentUser)
+        setLoading(false)
       } else {
-        console.log('No user found, allowing guest browsing')
-        setUser(null)
+        console.log('No user found, redirecting to login')
+        // Redirect to login page if not authenticated
+        router.push('/')
       }
-      setLoading(false)
     } catch (error) {
       console.error('Auth check error:', error)
-      setUser(null)
-      setLoading(false)
+      // Redirect to login on error
+      router.push('/')
     }
   }
 

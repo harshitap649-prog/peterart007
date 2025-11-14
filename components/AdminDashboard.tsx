@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getAllArtworks, addArtwork, updateArtwork, deleteArtwork } from '@/lib/artworks'
 import { getAllOrders, updateOrderStatus, getOrdersByStatus } from '@/lib/orders'
 import { getAllUsers, disableUser, deleteUser } from '@/lib/users'
@@ -33,6 +33,7 @@ export default function AdminDashboard() {
     images: [] as File[]
   })
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     loadData()
@@ -100,31 +101,65 @@ export default function AdminDashboard() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validation
+    if (!formData.title.trim()) {
+      toast.error('Please enter a title')
+      return
+    }
+    if (!formData.description.trim()) {
+      toast.error('Please enter a description')
+      return
+    }
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      toast.error('Please enter a valid price')
+      return
+    }
+    if (!editingArtwork && formData.images.length === 0) {
+      toast.error('Please select at least one image')
+      return
+    }
+    
     try {
       if (editingArtwork) {
         await updateArtwork(editingArtwork.id, {
-          title: formData.title,
-          description: formData.description,
+          title: formData.title.trim(),
+          description: formData.description.trim(),
           price: parseFloat(formData.price),
-          category: formData.category
+          category: formData.category.trim()
         }, formData.images)
         toast.success('Artwork updated successfully')
       } else {
         await addArtwork({
-          title: formData.title,
-          description: formData.description,
+          title: formData.title.trim(),
+          description: formData.description.trim(),
           price: parseFloat(formData.price),
-          category: formData.category
+          category: formData.category.trim()
         }, formData.images)
         toast.success('Artwork added successfully')
       }
+      
+      // Reset form and close modal
       setShowArtworkForm(false)
       setEditingArtwork(null)
       setFormData({ title: '', description: '', price: '', category: '', images: [] })
       setImagePreviews([])
-      loadData()
-    } catch (error) {
-      toast.error('Failed to save artwork')
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+      
+      // Reload data to show updated list
+      await loadData()
+      
+      // Ensure artworks tab is active to see the new artwork
+      if (activeTab !== 'artworks' && activeTab !== 'home') {
+        setActiveTab('artworks')
+      }
+    } catch (error: any) {
+      console.error('Error saving artwork:', error)
+      toast.error(error.message || 'Failed to save artwork. Please try again.')
     }
   }
 
@@ -155,11 +190,17 @@ export default function AdminDashboard() {
       toast.success('Artwork deleted successfully')
       setShowDeleteConfirm(false)
       setArtworkToDelete(null)
+      
       // Force reload data and clear filtered artworks
       setSearchTerm('')
       await loadData()
-    } catch (error) {
-      toast.error('Failed to delete artwork')
+      
+      // Also update the artworks state directly to ensure UI updates
+      setArtworks(prev => prev.filter(a => a.id !== artworkToDelete))
+      setFilteredArtworks(prev => prev.filter(a => a.id !== artworkToDelete))
+    } catch (error: any) {
+      console.error('Error deleting artwork:', error)
+      toast.error(error.message || 'Failed to delete artwork. Please try again.')
     }
   }
 
@@ -933,6 +974,7 @@ export default function AdminDashboard() {
                   Images (up to 6) *
                 </label>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   multiple
@@ -978,6 +1020,9 @@ export default function AdminDashboard() {
                     setEditingArtwork(null)
                     setFormData({ title: '', description: '', price: '', category: '', images: [] })
                     setImagePreviews([])
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = ''
+                    }
                   }}
                   className="btn-secondary flex-1 text-sm md:text-base py-2"
                 >

@@ -417,8 +417,8 @@ export default function ArtworkDetailsPage() {
       })
 
       toast.success('Order placed successfully!')
-      // Load popunder ad after successful order
-      loadPopunderAd()
+      // Load popunder ad after successful order (only triggers once per session)
+      loadPopunderAd('order')
       setTimeout(() => {
         router.push('/user?tab=orders')
       }, 1000)
