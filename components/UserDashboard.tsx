@@ -237,7 +237,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </div>
                       <button
                         onClick={() => {
-                          toast.info('Language settings coming soon')
+                          toast('Language settings coming soon', { icon: 'ℹ️' })
                           setUserMenuOpen(false)
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -246,7 +246,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </button>
                       <button
                         onClick={() => {
-                          toast.info('Theme settings coming soon')
+                          toast('Theme settings coming soon', { icon: 'ℹ️' })
                           setUserMenuOpen(false)
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -336,13 +336,18 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               >
                 Help & Support
               </button>
-              <button
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
-              >
-                <FiLogOut className="text-base" />
-                Logout
-              </button>
+              {user && (
+                <button
+                  onClick={() => {
+                    handleLogout()
+                    setSidebarOpen(false)
+                  }}
+                  className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                >
+                  <FiLogOut className="text-base" />
+                  Logout
+                </button>
+              )}
             </nav>
           </div>
         </>
