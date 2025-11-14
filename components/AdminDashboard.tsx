@@ -146,16 +146,18 @@ export default function AdminDashboard() {
   }
 
   const confirmDelete = async () => {
-    if (artworkToDelete) {
-      try {
-        await deleteArtwork(artworkToDelete)
-        toast.success('Artwork deleted successfully')
-        setShowDeleteConfirm(false)
-        setArtworkToDelete(null)
-        loadData()
-      } catch (error) {
-        toast.error('Failed to delete artwork')
-      }
+    if (!artworkToDelete) return
+    
+    try {
+      await deleteArtwork(artworkToDelete)
+      toast.success('Artwork deleted successfully')
+      setShowDeleteConfirm(false)
+      setArtworkToDelete(null)
+      // Force reload data and clear filtered artworks
+      setSearchTerm('')
+      await loadData()
+    } catch (error) {
+      toast.error('Failed to delete artwork')
     }
   }
 
@@ -317,12 +319,19 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-2 md:gap-3 lg:gap-4">
               {filteredArtworks.map((artwork: any) => (
                 <div key={artwork.id} className="card p-2 md:p-3 lg:p-4">
-                  {artwork.images && artwork.images[0] && (
+                  {artwork.images && artwork.images[0] ? (
                     <img
                       src={artwork.images[0]}
                       alt={artwork.title}
                       className="w-full h-28 sm:h-36 md:h-48 object-cover rounded-lg mb-2 md:mb-3"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
+                      }}
                     />
+                  ) : (
+                    <div className="w-full h-28 sm:h-36 md:h-48 bg-gray-200 rounded-lg mb-2 md:mb-3 flex items-center justify-center">
+                      <span className="text-gray-400 text-xs">No image</span>
+                    </div>
                   )}
                   <h3 className="font-bold text-xs md:text-base lg:text-lg mb-1 md:mb-1.5 line-clamp-1">{artwork.title}</h3>
                   <p className="text-gray-400 text-xs mb-1 md:mb-2 line-clamp-2 hidden sm:block">{artwork.description}</p>

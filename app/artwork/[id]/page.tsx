@@ -285,48 +285,48 @@ export default function ArtworkDetailsPage() {
           {/* Artwork Details */}
           <div className="space-y-6">
             <div className="card p-6">
-              <h1 className="text-3xl font-bold mb-4 text-gray-900">{artwork.title}</h1>
-              <p className="text-gray-600 mb-4 whitespace-pre-wrap">{artwork.description}</p>
+              <h1 className="text-xl font-bold mb-3 text-gray-900">{artwork.title}</h1>
+              <p className="text-gray-600 mb-4 whitespace-pre-wrap text-sm">{artwork.description}</p>
               {artwork.category && (
-                <span className="inline-block px-3 py-1 bg-gray-100 text-gray-900 rounded-full text-sm mb-4">
+                <span className="inline-block px-3 py-1 bg-gray-100 text-gray-900 rounded-full text-xs mb-4">
                   {artwork.category}
                 </span>
               )}
               <div className="border-t border-gray-300 pt-4">
-                <p className="text-4xl font-bold text-gray-900 mb-6">₹{artwork.price}</p>
+                <p className="text-2xl font-bold text-gray-900 mb-6">₹{artwork.price}</p>
 
                 {!showCheckout ? (
                   <>
                     {/* Quantity Selector */}
                     <div className="mb-6">
-                      <label className="block text-sm font-medium mb-2 text-gray-600">
+                      <label className="block text-xs font-medium mb-2 text-gray-600">
                         Quantity (Max 5)
                       </label>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => handleQuantityChange(-1)}
                           disabled={quantity <= 1}
-                          className="btn-secondary w-12 h-12 flex items-center justify-center disabled:opacity-50"
+                          className="w-10 h-10 rounded-full border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-400 transition-colors"
                         >
-                          <FiMinus />
+                          <FiMinus className="text-lg" />
                         </button>
-                        <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
+                        <span className="text-lg font-bold w-10 text-center">{quantity}</span>
                         <button
                           onClick={() => handleQuantityChange(1)}
                           disabled={quantity >= 5}
-                          className="btn-secondary w-12 h-12 flex items-center justify-center disabled:opacity-50"
+                          className="w-10 h-10 rounded-full border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-400 transition-colors"
                         >
-                          <FiPlus />
+                          <FiPlus className="text-lg" />
                         </button>
                       </div>
                     </div>
 
                     <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-400">Total Price:</span>
-                        <span className="text-3xl font-bold text-gray-900">₹{totalPrice}</span>
+                        <span className="text-gray-400 text-sm">Total Price:</span>
+                        <span className="text-xl font-bold text-gray-900">₹{totalPrice}</span>
                       </div>
-                      <p className="text-sm text-gray-500 mt-2">
+                      <p className="text-xs text-gray-500 mt-2">
                         {quantity} × ₹{artwork.price} = ₹{totalPrice}
                       </p>
                     </div>
@@ -507,8 +507,8 @@ export default function ArtworkDetailsPage() {
                       </div>
                       <div className="border-t border-gray-300 pt-2 mt-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-lg font-bold">Total:</span>
-                          <span className="text-2xl font-bold text-gray-900">₹{totalPrice}</span>
+                          <span className="text-sm font-bold">Total:</span>
+                          <span className="text-xl font-bold text-gray-900">₹{totalPrice}</span>
                         </div>
                       </div>
                     </div>

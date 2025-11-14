@@ -401,13 +401,20 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               <div className="grid grid-cols-2 gap-2">
                 {filteredArtworks.map((artwork: any) => (
                   <div key={artwork.id} className="card p-2">
-                    {artwork.images && artwork.images[0] && (
+                    {artwork.images && artwork.images[0] ? (
                       <div className="relative w-full h-32 mb-2 rounded overflow-hidden">
                         <img
                           src={artwork.images[0]}
                           alt={artwork.title}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
+                          }}
                         />
+                      </div>
+                    ) : (
+                      <div className="w-full h-32 mb-2 rounded bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">No image</span>
                       </div>
                     )}
                     <h3 className="font-semibold text-xs mb-1 line-clamp-1">{artwork.title}</h3>
@@ -508,6 +515,9 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                             src={artwork.images[0]}
                             alt={artwork.title}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
+                            }}
                           />
                         </div>
                       )}
