@@ -533,9 +533,190 @@ export default function ArtworkDetailsPage() {
                 )}
               </div>
             </div>
+
+            {/* Reviews Section */}
+            <div className="card p-6 mt-6">
+              <h2 className="text-xl font-bold mb-4 text-gray-900">Reviews</h2>
+              
+              {/* Average Rating */}
+              {artwork.averageRating && (
+                <div className="mb-6 pb-4 border-b border-gray-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-3xl font-bold text-gray-900">{artwork.averageRating}</span>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FiStar
+                          key={star}
+                          className={`text-lg ${
+                            star <= Math.round(parseFloat(artwork.averageRating))
+                              ? 'text-yellow-400 fill-yellow-400'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      ({artwork.totalRatings || artwork.comments?.filter((c: any) => c.rating)?.length || 0} {artwork.totalRatings === 1 ? 'review' : 'reviews'})
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Review Form */}
+              {user ? (
+                <form onSubmit={handleSubmitReview} className="mb-6 pb-6 border-b border-gray-200">
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium mb-1.5 text-gray-700">Rating *</label>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewRating(star)}
+                          className="focus:outline-none"
+                        >
+                          <FiStar
+                            className={`text-xl transition-colors ${
+                              star <= reviewRating
+                                ? 'text-yellow-400 fill-yellow-400'
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium mb-1.5 text-gray-700">Your Review *</label>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      className="input-field text-xs min-h-[80px]"
+                      placeholder="Share your experience with this artwork..."
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="block text-xs font-medium mb-1.5 text-gray-700">Add Photos (Optional, max 3)</label>
+                    <div className="flex items-center gap-2">
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleReviewImageChange}
+                          className="hidden"
+                          disabled={reviewImages.length >= 3}
+                        />
+                        <span className="btn-secondary text-xs py-2 px-3 flex items-center gap-1">
+                          <FiImage className="text-xs" />
+                          Add Photos
+                        </span>
+                      </label>
+                      {reviewImages.length > 0 && (
+                        <span className="text-xs text-gray-500">{reviewImages.length}/3</span>
+                      )}
+                    </div>
+                    {reviewImagePreviews.length > 0 && (
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        {reviewImagePreviews.map((preview, index) => (
+                          <div key={index} className="relative w-20 h-20 rounded overflow-hidden">
+                            <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => removeReviewImage(index)}
+                              className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                            >
+                              <FiX className="text-xs" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submittingReview}
+                    className="btn-primary text-xs py-2 px-4"
+                  >
+                    {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </form>
+              ) : (
+                <div className="mb-6 pb-6 border-b border-gray-200 text-center">
+                  <p className="text-xs text-gray-600 mb-2">Sign in to write a review</p>
+                  <button
+                    onClick={() => setLoginModalOpen(true)}
+                    className="btn-primary text-xs py-2 px-4"
+                  >
+                    Sign In
+                  </button>
+                </div>
+              )}
+
+              {/* Reviews List */}
+              <div className="space-y-4">
+                {artwork.comments && artwork.comments.length > 0 ? (
+                  artwork.comments
+                    .filter((comment: any) => comment.rating || comment.text)
+                    .map((comment: any) => (
+                      <div key={comment.id} className="pb-4 border-b border-gray-100 last:border-0">
+                        <div className="flex items-start gap-3 mb-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="text-xs font-medium text-gray-900">{comment.userName}</p>
+                              {comment.rating && (
+                                <div className="flex items-center gap-0.5">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <FiStar
+                                      key={star}
+                                      className={`text-xs ${
+                                        star <= comment.rating
+                                          ? 'text-yellow-400 fill-yellow-400'
+                                          : 'text-gray-300'
+                                      }`}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            {comment.text && (
+                              <p className="text-xs text-gray-600 mb-2">{comment.text}</p>
+                            )}
+                            {comment.images && comment.images.length > 0 && (
+                              <div className="flex gap-2 mt-2 flex-wrap">
+                                {comment.images.map((img: string, idx: number) => (
+                                  <div key={idx} className="w-16 h-16 rounded overflow-hidden">
+                                    <img src={img} alt={`Review ${idx + 1}`} className="w-full h-full object-cover" />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <p className="text-xs text-gray-500 mt-1">
+                              {new Date(comment.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                  <p className="text-xs text-gray-500 text-center py-4">No reviews yet. Be the first to review!</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSuccess={handleLoginSuccess}
+      />
     </div>
   )
 }
