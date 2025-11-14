@@ -128,10 +128,6 @@ export default function LoginPage() {
                 (e.target as HTMLImageElement).style.display = 'none'
               }}
             />
-            <div 
-              className="absolute inset-0 border-2 border-black pointer-events-none"
-              style={{ borderRadius: '0 0 50% 50%' }}
-            ></div>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Peter Art</h1>
           <p className="text-gray-600 text-sm md:text-base italic">Fall in love with art — take one home today</p>
