@@ -150,7 +150,7 @@ export default function UserDashboard({ user }: { user: any }) {
           </div>
           <div className="relative w-48 h-48 md:w-40 md:h-40 mx-auto mb-3 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
             <img
-              src="https://png.pngtree.com/png-vector/20240627/ourmid/pngtree-vector-art-of-a-woman-wearing-neon-headphones-png-image_12855446.png"
+              src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
               alt="Logo"
               className="w-full h-full object-contain"
               onError={(e) => {
