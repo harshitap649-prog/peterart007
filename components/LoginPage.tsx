@@ -133,8 +133,8 @@ export default function LoginPage() {
               style={{ borderRadius: '0 0 50% 50%' }}
             ></div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Peter Art</h1>
-          <p className="text-gray-300 text-sm md:text-base italic">Fall in love with art — take one home today</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Peter Art</h1>
+          <p className="text-gray-600 text-sm md:text-base italic">Fall in love with art — take one home today</p>
         </div>
         
         <div className="card p-4 md:p-6 lg:p-8">
@@ -171,7 +171,7 @@ export default function LoginPage() {
           {activeTab === 'signin' ? (
             <form onSubmit={handleSignIn} className="space-y-4 md:space-y-5">
               <div>
-                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-300">
+                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Email
                 </label>
                 <input
@@ -186,7 +186,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-300">
+                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Password
                 </label>
                 <input
@@ -211,7 +211,7 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleSignUp} className="space-y-4 md:space-y-5">
               <div>
-                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-300">
+                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Full Name
                 </label>
                 <input
@@ -226,7 +226,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-300">
+                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Email
                 </label>
                 <input
@@ -241,7 +241,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-300">
+                <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Password
                 </label>
                 <input

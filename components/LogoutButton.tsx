@@ -28,7 +28,7 @@ export default function LogoutButton({ className = '' }: LogoutButtonProps) {
     <>
       <button
         onClick={() => setShowConfirm(true)}
-        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-[#ff6b00] via-[#FF7BA3] to-[#5B9FFF] text-white hover:from-[#ff8c00] hover:via-[#FF7BA3] hover:to-[#5B9FFF] hover:shadow-lg hover:shadow-[#ff6b00]/50 ${className}`}
+        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-all bg-gray-900 text-white hover:bg-gray-800 ${className}`}
       >
         <FiLogOut className="text-base" />
         <span className="hidden sm:inline">Logout</span>
@@ -36,9 +36,9 @@ export default function LogoutButton({ className = '' }: LogoutButtonProps) {
 
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="card p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold mb-4 gradient-text">Confirm Logout</h3>
-            <p className="text-gray-300 mb-6">Are you sure you want to logout?</p>
+          <div className="card p-6 max-w-md w-full bg-white">
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Confirm Logout</h3>
+            <p className="text-gray-600 mb-6">Are you sure you want to logout?</p>
             <div className="flex gap-4">
               <button
                 onClick={handleLogout}

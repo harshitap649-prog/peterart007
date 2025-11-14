@@ -206,7 +206,7 @@ export default function AdminDashboard() {
           <FiMessageSquare className="inline mr-1 md:mr-2 text-xs md:text-sm" />
           Support Messages
           {supportMessages.filter((m: any) => m.status === 'pending').length > 0 && (
-            <span className="ml-1.5 md:ml-2 px-1.5 md:px-2 py-0.5 bg-red-500 text-white text-xs rounded-full">
+            <span className="ml-1.5 md:ml-2 px-1.5 md:px-2 py-0.5 bg-red-500 text-gray-900 text-xs rounded-full">
               {supportMessages.filter((m: any) => m.status === 'pending').length}
             </span>
           )}
@@ -232,12 +232,12 @@ export default function AdminDashboard() {
                 style={{ borderRadius: '0 0 50% 50%' }}
               ></div>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Admin Panel</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Admin Panel</h1>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6">
             <div className="card p-3 md:p-4">
               <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Total Artworks</h3>
-              <p className="text-2xl md:text-3xl font-bold gradient-text">{artworks.length}</p>
+              <p className="text-2xl md:text-3xl font-bold text-gray-900">{artworks.length}</p>
             </div>
             <div className="card p-3 md:p-4">
               <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Pending Orders</h3>
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
             </div>
             <div className="card p-3 md:p-4">
               <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Support Messages</h3>
-              <p className="text-2xl md:text-3xl font-bold text-neon-pink">
+              <p className="text-2xl md:text-3xl font-bold text-gray-900">
                 {supportMessages.filter((m: any) => m.status === 'pending').length}
               </p>
               <p className="text-xs text-gray-500 mt-1">Pending</p>
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
 
           {loading ? (
             <div className="text-center py-12">
-              <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading artworks...</p>
             </div>
           ) : (
@@ -300,7 +300,7 @@ export default function AdminDashboard() {
                   )}
                   <h3 className="font-bold text-xs md:text-base lg:text-lg mb-1 md:mb-1.5 line-clamp-1">{artwork.title}</h3>
                   <p className="text-gray-400 text-xs mb-1 md:mb-2 line-clamp-2 hidden sm:block">{artwork.description}</p>
-                  <p className="text-neon-pink font-bold text-sm md:text-base lg:text-lg mb-2 md:mb-3">₹{artwork.price}</p>
+                  <p className="text-gray-900 font-bold text-sm md:text-base lg:text-lg mb-2 md:mb-3">₹{artwork.price}</p>
                   <div className="flex gap-1 md:gap-1.5 lg:gap-2">
                     <button
                       onClick={() => handleEdit(artwork)}
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
           <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">All Orders</h2>
           {loading ? (
             <div className="text-center py-12">
-              <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading orders...</p>
             </div>
           ) : (
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
-                          <p className="text-neon-pink font-bold text-base md:text-xl">₹{order.total}</p>
+                          <p className="text-gray-900 font-bold text-base md:text-xl">₹{order.total}</p>
                         </div>
                         <div>
                           <p className="text-gray-400 text-xs mb-0.5">Payment</p>
@@ -380,23 +380,23 @@ export default function AdminDashboard() {
                       </div>
 
                       {order.paymentMethod === 'cod' && (
-                        <div className="mt-3 md:mt-4 p-2 md:p-3 bg-dark-card rounded-lg border border-neon-pink/20">
-                          <p className="text-neon-pink font-medium mb-2 text-xs md:text-sm">Delivery Address:</p>
+                        <div className="mt-3 md:mt-4 p-2 md:p-3 bg-gray-50 rounded-lg border border-gray-400/20">
+                          <p className="text-gray-900 font-medium mb-2 text-xs md:text-sm">Delivery Address:</p>
                           <div className="space-y-0.5 md:space-y-1 text-xs md:text-sm">
-                            <p><span className="text-gray-400">Name:</span> <span className="text-white">{order.fullName || 'N/A'}</span></p>
-                            <p><span className="text-gray-400">Phone:</span> <span className="text-white">{order.phone || 'N/A'}</span></p>
-                            <p><span className="text-gray-400">Email:</span> <span className="text-white">{order.email || order.userEmail}</span></p>
-                            <p><span className="text-gray-400">Address:</span> <span className="text-white">{order.address1 || 'N/A'}</span></p>
+                            <p><span className="text-gray-400">Name:</span> <span className="text-gray-900">{order.fullName || 'N/A'}</span></p>
+                            <p><span className="text-gray-400">Phone:</span> <span className="text-gray-900">{order.phone || 'N/A'}</span></p>
+                            <p><span className="text-gray-400">Email:</span> <span className="text-gray-900">{order.email || order.userEmail}</span></p>
+                            <p><span className="text-gray-400">Address:</span> <span className="text-gray-900">{order.address1 || 'N/A'}</span></p>
                             {order.address2 && (
-                              <p><span className="text-gray-400">Address 2:</span> <span className="text-white">{order.address2}</span></p>
+                              <p><span className="text-gray-400">Address 2:</span> <span className="text-gray-900">{order.address2}</span></p>
                             )}
                             <p>
-                              <span className="text-gray-400">City:</span> <span className="text-white">{order.city || 'N/A'}</span>, {' '}
-                              <span className="text-gray-400">State:</span> <span className="text-white">{order.state || 'N/A'}</span>
+                              <span className="text-gray-400">City:</span> <span className="text-gray-900">{order.city || 'N/A'}</span>, {' '}
+                              <span className="text-gray-400">State:</span> <span className="text-gray-900">{order.state || 'N/A'}</span>
                             </p>
                             <p>
-                              <span className="text-gray-400">Pincode:</span> <span className="text-white">{order.pincode || 'N/A'}</span>, {' '}
-                              <span className="text-gray-400">Country:</span> <span className="text-white">{order.country || 'N/A'}</span>
+                              <span className="text-gray-400">Pincode:</span> <span className="text-gray-900">{order.pincode || 'N/A'}</span>, {' '}
+                              <span className="text-gray-400">Country:</span> <span className="text-gray-900">{order.country || 'N/A'}</span>
                             </p>
                           </div>
                         </div>
@@ -431,7 +431,7 @@ export default function AdminDashboard() {
           <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">All Users</h2>
           {loading ? (
             <div className="text-center py-12">
-              <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading users...</p>
             </div>
           ) : (
@@ -457,7 +457,7 @@ export default function AdminDashboard() {
           <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Support Messages</h2>
           {loading ? (
             <div className="text-center py-12">
-              <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading messages...</p>
             </div>
           ) : supportMessages.length === 0 ? (
@@ -500,11 +500,11 @@ export default function AdminDashboard() {
                           {message.status.charAt(0).toUpperCase() + message.status.slice(1).replace('-', ' ')}
                         </span>
                       </div>
-                      <p className="text-gray-300 text-xs md:text-sm mb-2 md:mb-3 whitespace-pre-wrap">{message.message}</p>
+                      <p className="text-gray-600 text-xs md:text-sm mb-2 md:mb-3 whitespace-pre-wrap">{message.message}</p>
                       {message.adminResponse && (
-                        <div className="mt-2 md:mt-3 p-2 md:p-3 bg-dark-card rounded-lg border border-neon-pink/20">
-                          <p className="text-neon-pink font-medium mb-1 text-xs md:text-sm">Admin Response:</p>
-                          <p className="text-gray-300 text-xs md:text-sm whitespace-pre-wrap">{message.adminResponse}</p>
+                        <div className="mt-2 md:mt-3 p-2 md:p-3 bg-gray-50 rounded-lg border border-gray-400/20">
+                          <p className="text-gray-900 font-medium mb-1 text-xs md:text-sm">Admin Response:</p>
+                          <p className="text-gray-600 text-xs md:text-sm whitespace-pre-wrap">{message.adminResponse}</p>
                         </div>
                       )}
                       <p className="text-gray-500 text-xs mt-2">
@@ -569,10 +569,10 @@ export default function AdminDashboard() {
       {selectedMessage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="card p-6 max-w-2xl w-full">
-            <h3 className="text-2xl font-bold mb-4 gradient-text">Admin Response</h3>
+            <h3 className="text-2xl font-bold mb-4 text-gray-900">Admin Response</h3>
             <div className="mb-4">
               <p className="text-gray-400 text-sm mb-2">Message from: {selectedMessage.userEmail}</p>
-              <p className="text-gray-300 mb-2">{selectedMessage.message}</p>
+              <p className="text-gray-600 mb-2">{selectedMessage.message}</p>
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-2">Your Response</label>
@@ -623,7 +623,7 @@ export default function AdminDashboard() {
       {showArtworkForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="card p-4 md:p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 gradient-text">
+            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">
               {editingArtwork ? 'Edit Artwork' : 'Add New Artwork'}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
@@ -693,10 +693,10 @@ export default function AdminDashboard() {
                         <img
                           src={preview}
                           alt={`Preview ${index + 1}`}
-                          className="w-full h-24 md:h-32 object-cover rounded-lg border-2 border-neon-pink/30"
+                          className="w-full h-24 md:h-32 object-cover rounded-lg border-2 border-gray-400/30"
                         />
                         {editingArtwork && !formData.images.length && (
-                          <span className="absolute top-1 right-1 bg-dark-card px-1.5 py-0.5 rounded text-xs">
+                          <span className="absolute top-1 right-1 bg-gray-50 px-1.5 py-0.5 rounded text-xs">
                             Current
                           </span>
                         )}
@@ -734,12 +734,12 @@ export default function AdminDashboard() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="card p-4 md:p-6 max-w-md w-full">
-            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 gradient-text">Confirm Delete</h3>
-            <p className="text-gray-300 mb-4 md:mb-6 text-sm md:text-base">Are you sure you want to delete this artwork?</p>
+            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">Confirm Delete</h3>
+            <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">Are you sure you want to delete this artwork?</p>
             <div className="flex gap-3 md:gap-4">
               <button
                 onClick={confirmDelete}
-                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-gradient-to-r from-[#ff6b00] via-[#FF7BA3] to-[#5B9FFF] text-white hover:from-[#ff8c00] hover:via-[#FF7BA3] hover:to-[#5B9FFF] hover:shadow-lg hover:shadow-[#ff6b00]/50"
+                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-gradient-to-r from-[#ff6b00] via-[#FF7BA3] to-[#5B9FFF] text-gray-900 hover:from-[#ff8c00] hover:via-[#FF7BA3] hover:to-[#5B9FFF] hover:shadow-lg hover:shadow-[#ff6b00]/50"
               >
                 Yes, Delete
               </button>

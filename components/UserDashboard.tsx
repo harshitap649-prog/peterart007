@@ -162,8 +162,8 @@ export default function UserDashboard({ user }: { user: any }) {
               style={{ borderRadius: '0 0 50% 50%' }}
             ></div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold gradient-text">Fall in love with art</h1>
-          <p className="text-gray-300 text-sm md:text-base italic mt-2">Turn Empty Walls into Expressions</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Fall in love with art</h1>
+          <p className="text-gray-600 text-sm md:text-base italic mt-2">Turn Empty Walls into Expressions</p>
         </div>
       )}
 
@@ -225,7 +225,7 @@ export default function UserDashboard({ user }: { user: any }) {
         <div>
           {loading ? (
             <div className="text-center py-12">
-              <div className="w-12 h-12 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="w-12 h-12 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading artworks...</p>
             </div>
           ) : (
@@ -243,26 +243,26 @@ export default function UserDashboard({ user }: { user: any }) {
                   )}
                   <h3 className="font-bold text-base md:text-lg mb-1.5">{artwork.title}</h3>
                   <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{artwork.description}</p>
-                  <p className="text-neon-pink font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
+                  <p className="text-gray-900 font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
                   
                   <div className="flex items-center gap-1.5 mb-3">
                     <button
                       onClick={() => handleLike(artwork.id)}
-                      className="flex items-center gap-0.5 text-gray-400 hover:text-neon-pink transition-colors text-xs"
+                      className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors text-xs"
                     >
-                      <FiThumbsUp className={artwork.likedBy?.includes(user?.uid) ? 'text-neon-pink' : ''} />
+                      <FiThumbsUp className={artwork.likedBy?.includes(user?.uid) ? 'text-gray-900' : ''} />
                       <span className="text-xs">{artwork.likes || 0}</span>
                     </button>
                     <button
                       onClick={() => setShowComments(showComments === artwork.id ? null : artwork.id)}
-                      className="flex items-center gap-0.5 text-gray-400 hover:text-neon-pink transition-colors text-xs"
+                      className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors text-xs"
                     >
                       <FiMessageCircle className="text-xs" />
                       <span className="text-xs">{artwork.comments?.length || 0}</span>
                     </button>
                     <button
                       onClick={() => handleShare(artwork)}
-                      className="flex items-center gap-0.5 text-gray-400 hover:text-neon-pink transition-colors text-xs"
+                      className="flex items-center gap-0.5 text-gray-400 hover:text-gray-900 transition-colors text-xs"
                     >
                       <FiShare2 className="text-xs" />
                     </button>
@@ -292,8 +292,8 @@ export default function UserDashboard({ user }: { user: any }) {
                       <div className="space-y-2 mb-3 max-h-40 overflow-y-auto">
                         {artwork.comments?.map((comment: any) => (
                           <div key={comment.id} className="text-sm">
-                            <p className="font-medium text-neon-pink">{comment.userName}</p>
-                            <p className="text-gray-300">{comment.text}</p>
+                            <p className="font-medium text-gray-900">{comment.userName}</p>
+                            <p className="text-gray-600">{comment.text}</p>
                           </div>
                         ))}
                       </div>
@@ -351,7 +351,7 @@ export default function UserDashboard({ user }: { user: any }) {
                     )}
                     <h3 className="font-bold text-base md:text-lg mb-1.5">{artwork.title}</h3>
                     <p className="text-gray-400 text-xs md:text-sm mb-2 line-clamp-2">{artwork.description}</p>
-                    <p className="text-neon-pink font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
+                    <p className="text-gray-900 font-bold text-lg md:text-xl mb-3">₹{artwork.price}</p>
                     <button
                       onClick={() => router.push(`/artwork/${artwork.id}`)}
                       className="btn-primary w-full text-xs py-1.5"
@@ -391,13 +391,13 @@ export default function UserDashboard({ user }: { user: any }) {
                       <h3 className="font-bold text-base md:text-lg mb-1.5">{order.artworkTitle}</h3>
                       <div className="flex items-center gap-3 mb-1.5">
                         <p className="text-gray-400 text-xs">
-                          Quantity: <span className="text-white font-medium">{order.quantity || 1}</span>
+                          Quantity: <span className="text-gray-900 font-medium">{order.quantity || 1}</span>
                         </p>
                         <p className="text-gray-400 text-xs">
-                          Unit: <span className="text-white font-medium">₹{order.unitPrice || order.total}</span>
+                          Unit: <span className="text-gray-900 font-medium">₹{order.unitPrice || order.total}</span>
                         </p>
                       </div>
-                      <p className="text-neon-pink font-bold text-lg md:text-xl mb-1.5">Total: ₹{order.total}</p>
+                      <p className="text-gray-900 font-bold text-lg md:text-xl mb-1.5">Total: ₹{order.total}</p>
                       <p className="text-gray-400 text-xs mb-1">
                         Payment: {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
                       </p>

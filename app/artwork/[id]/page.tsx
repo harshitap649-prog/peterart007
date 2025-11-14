@@ -135,8 +135,8 @@ export default function ArtworkDetailsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-neon-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading...</p>
+          <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-900 text-lg">Loading...</p>
         </div>
       </div>
     )
@@ -194,21 +194,21 @@ export default function ArtworkDetailsPage() {
           {/* Artwork Details */}
           <div className="space-y-6">
             <div className="card p-6">
-              <h1 className="text-3xl font-bold mb-4 gradient-text">{artwork.title}</h1>
-              <p className="text-gray-300 mb-4 whitespace-pre-wrap">{artwork.description}</p>
+              <h1 className="text-3xl font-bold mb-4 text-gray-900">{artwork.title}</h1>
+              <p className="text-gray-600 mb-4 whitespace-pre-wrap">{artwork.description}</p>
               {artwork.category && (
-                <span className="inline-block px-3 py-1 bg-neon-pink/20 text-neon-pink rounded-full text-sm mb-4">
+                <span className="inline-block px-3 py-1 bg-gray-100 text-gray-900 rounded-full text-sm mb-4">
                   {artwork.category}
                 </span>
               )}
-              <div className="border-t border-dark-border pt-4">
-                <p className="text-4xl font-bold gradient-text mb-6">₹{artwork.price}</p>
+              <div className="border-t border-gray-300 pt-4">
+                <p className="text-4xl font-bold text-gray-900 mb-6">₹{artwork.price}</p>
 
                 {!showCheckout ? (
                   <>
                     {/* Quantity Selector */}
                     <div className="mb-6">
-                      <label className="block text-sm font-medium mb-2 text-gray-300">
+                      <label className="block text-sm font-medium mb-2 text-gray-600">
                         Quantity (Max 5)
                       </label>
                       <div className="flex items-center gap-4">
@@ -233,7 +233,7 @@ export default function ArtworkDetailsPage() {
                     <div className="mb-6 p-4 bg-dark-card rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400">Total Price:</span>
-                        <span className="text-3xl font-bold gradient-text">₹{totalPrice}</span>
+                        <span className="text-3xl font-bold text-gray-900">₹{totalPrice}</span>
                       </div>
                       <p className="text-sm text-gray-500 mt-2">
                         {quantity} × ₹{artwork.price} = ₹{totalPrice}
@@ -250,15 +250,15 @@ export default function ArtworkDetailsPage() {
                   </>
                 ) : (
                   <form onSubmit={handleOrderSubmit} className="space-y-4">
-                    <h3 className="text-xl font-bold mb-4 gradient-text">Checkout</h3>
+                    <h3 className="text-xl font-bold mb-4 text-gray-900">Checkout</h3>
 
                     {/* Payment Method */}
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-300">
+                      <label className="block text-sm font-medium mb-2 text-gray-600">
                         Payment Method *
                       </label>
                       <div className="space-y-2">
-                        <label className="flex items-center gap-2 cursor-pointer p-3 border border-dark-border rounded-lg hover:border-neon-pink/50 transition-colors">
+                        <label className="flex items-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
                           <input
                             type="radio"
                             value="cod"
@@ -268,7 +268,7 @@ export default function ArtworkDetailsPage() {
                           />
                           <span>Cash on Delivery</span>
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer p-3 border border-dark-border rounded-lg hover:border-neon-pink/50 transition-colors">
+                        <label className="flex items-center gap-2 cursor-pointer p-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
                           <input
                             type="radio"
                             value="online"
@@ -284,7 +284,7 @@ export default function ArtworkDetailsPage() {
                     {paymentMethod === 'cod' && (
                       <>
                         <div>
-                          <label className="block text-sm font-medium mb-2 text-gray-300">
+                          <label className="block text-sm font-medium mb-2 text-gray-600">
                             Full Name *
                           </label>
                           <input
@@ -297,7 +297,7 @@ export default function ArtworkDetailsPage() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-2 text-gray-300">
+                          <label className="block text-sm font-medium mb-2 text-gray-600">
                             Phone Number *
                           </label>
                           <input
@@ -311,7 +311,7 @@ export default function ArtworkDetailsPage() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-2 text-gray-300">
+                          <label className="block text-sm font-medium mb-2 text-gray-600">
                             Email *
                           </label>
                           <input
@@ -324,7 +324,7 @@ export default function ArtworkDetailsPage() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-2 text-gray-300">
+                          <label className="block text-sm font-medium mb-2 text-gray-600">
                             Address Line 1 *
                           </label>
                           <input
@@ -338,7 +338,7 @@ export default function ArtworkDetailsPage() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-2 text-gray-300">
+                          <label className="block text-sm font-medium mb-2 text-gray-600">
                             Address Line 2
                           </label>
                           <input
@@ -352,7 +352,7 @@ export default function ArtworkDetailsPage() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium mb-2 text-gray-300">
+                            <label className="block text-sm font-medium mb-2 text-gray-600">
                               Pincode *
                             </label>
                             <input
@@ -365,7 +365,7 @@ export default function ArtworkDetailsPage() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium mb-2 text-gray-300">
+                            <label className="block text-sm font-medium mb-2 text-gray-600">
                               City *
                             </label>
                             <input
@@ -380,7 +380,7 @@ export default function ArtworkDetailsPage() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium mb-2 text-gray-300">
+                            <label className="block text-sm font-medium mb-2 text-gray-600">
                               State
                             </label>
                             <input
@@ -391,7 +391,7 @@ export default function ArtworkDetailsPage() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium mb-2 text-gray-300">
+                            <label className="block text-sm font-medium mb-2 text-gray-600">
                               Country
                             </label>
                             <input
@@ -414,10 +414,10 @@ export default function ArtworkDetailsPage() {
                         <span className="text-gray-400">Unit Price:</span>
                         <span className="font-medium">₹{artwork.price}</span>
                       </div>
-                      <div className="border-t border-dark-border pt-2 mt-2">
+                      <div className="border-t border-gray-300 pt-2 mt-2">
                         <div className="flex justify-between items-center">
                           <span className="text-lg font-bold">Total:</span>
-                          <span className="text-2xl font-bold gradient-text">₹{totalPrice}</span>
+                          <span className="text-2xl font-bold text-gray-900">₹{totalPrice}</span>
                         </div>
                       </div>
                     </div>

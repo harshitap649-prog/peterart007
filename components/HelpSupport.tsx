@@ -65,8 +65,8 @@ export default function HelpSupport({ user }: { user: any }) {
   return (
     <div className="card p-6">
       <div className="flex items-center gap-3 mb-6">
-        <FiHelpCircle className="text-3xl text-neon-pink" />
-        <h2 className="text-2xl font-bold gradient-text">Help & Support</h2>
+        <FiHelpCircle className="text-3xl text-gray-900" />
+        <h2 className="text-2xl font-bold text-gray-900">Help & Support</h2>
       </div>
 
       {!showForm ? (
