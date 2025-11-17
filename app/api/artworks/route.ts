@@ -83,10 +83,37 @@ async function writeArtworks(artworks: any[]) {
   }
 }
 
-// GET - Get all artworks
-export async function GET() {
+// GET - Get all artworks (only from approved artists for public access)
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const includePending = searchParams.get('includePending') === 'true' // For admin use
+    
     const artworks = await readArtworks()
+    
+    // If not admin request, filter out artworks from unapproved artists
+    if (!includePending) {
+      const { readFile } = await import('fs/promises')
+      const { existsSync } = await import('fs')
+      const artistsFile = path.join(process.cwd(), 'data', 'artists.json')
+      
+      if (existsSync(artistsFile)) {
+        const artistsData = await readFile(artistsFile, 'utf-8')
+        const artists = JSON.parse(artistsData)
+        
+        // Filter artworks to only include those from approved artists or no artist
+        const filteredArtworks = artworks.filter((artwork: any) => {
+          if (!artwork.artistId) {
+            return true // Platform artworks are always visible
+          }
+          const artist = artists.find((a: any) => a.id === artwork.artistId)
+          return artist && artist.status === 'approved'
+        })
+        
+        return NextResponse.json(filteredArtworks)
+      }
+    }
+    
     return NextResponse.json(artworks)
   } catch (error) {
     console.error('Error fetching artworks:', error)
@@ -102,6 +129,7 @@ export async function POST(request: NextRequest) {
     const description = formData.get('description') as string
     const price = parseFloat(formData.get('price') as string)
     const category = formData.get('category') as string
+    const artistId = formData.get('artistId') as string || null
     
     const artworks = await readArtworks()
     const newId = Date.now().toString()
@@ -158,11 +186,32 @@ export async function POST(request: NextRequest) {
       price,
       category: category || '',
       images: imageUrls,
+      artistId: artistId || null,
+      artistCommissionRate: null, // Will be set from artist profile if artistId exists
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       likes: 0,
       comments: [],
       likedBy: []
+    }
+    
+    // If artistId is provided, get artist commission rate
+    if (artistId) {
+      const { readFile } = await import('fs/promises')
+      const { existsSync } = await import('fs')
+      const artistsFile = path.join(process.cwd(), 'data', 'artists.json')
+      if (existsSync(artistsFile)) {
+        try {
+          const artistsData = await readFile(artistsFile, 'utf-8')
+          const artists = JSON.parse(artistsData)
+          const artist = artists.find((a: any) => a.id === artistId && a.status === 'approved')
+          if (artist) {
+            newArtwork.artistCommissionRate = artist.commissionRate || 70
+          }
+        } catch (error) {
+          console.error('Error fetching artist commission:', error)
+        }
+      }
     }
     
     artworks.push(newArtwork)
@@ -189,6 +238,7 @@ export async function PUT(request: NextRequest) {
     const description = formData.get('description') as string
     const priceStr = formData.get('price') as string
     const category = formData.get('category') as string
+    const artistId = formData.get('artistId') as string || null
     
     if (!title || !description || !priceStr) {
       return NextResponse.json({ error: 'Title, description, and price are required' }, { status: 400 })
@@ -255,6 +305,28 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Artwork must have at least one image' }, { status: 400 })
     }
     
+    // Update artist commission rate if artistId changed
+    let artistCommissionRate = existingArtwork.artistCommissionRate || null
+    if (artistId && artistId !== existingArtwork.artistId) {
+      const { readFile } = await import('fs/promises')
+      const { existsSync } = await import('fs')
+      const artistsFile = path.join(process.cwd(), 'data', 'artists.json')
+      if (existsSync(artistsFile)) {
+        try {
+          const artistsData = await readFile(artistsFile, 'utf-8')
+          const artists = JSON.parse(artistsData)
+          const artist = artists.find((a: any) => a.id === artistId && a.status === 'approved')
+          if (artist) {
+            artistCommissionRate = artist.commissionRate || 70
+          }
+        } catch (error) {
+          console.error('Error fetching artist commission:', error)
+        }
+      }
+    } else if (!artistId) {
+      artistCommissionRate = null
+    }
+    
     // Update the artwork
     artworks[index] = {
       ...existingArtwork,
@@ -263,6 +335,8 @@ export async function PUT(request: NextRequest) {
       price,
       category: (category || '').trim(),
       images: imageUrls,
+      artistId: artistId || null,
+      artistCommissionRate,
       updatedAt: new Date().toISOString()
     }
     

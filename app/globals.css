@@ -9,14 +9,24 @@
 }
 
 body {
-  background: #ffffff;
-  color: #1a1a1a;
+  background: #ffffff !important;
+  color: #1a1a1a !important;
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background: #ffffff !important;
+}
+
+.dark body {
+  background: #111827;
+  color: #f9fafb;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom scrollbar */
@@ -28,13 +38,106 @@ body {
   background: #f5f5f5;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #d1d1d1;
   border-radius: 4px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #b1b1b1;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Sidebar slide-in animation */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+/* Range slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-track {
+  background: transparent;
+  height: 8px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #f97316;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  margin-top: -6px;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #ea580c;
+  transform: scale(1.1);
+  transition: all 0.2s;
+}
+
+input[type="range"]::-moz-range-track {
+  background: transparent;
+  height: 8px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  background: #f97316;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  background: #ea580c;
+  transform: scale(1.1);
+  transition: all 0.2s;
 }
 
 /* Card styles */
@@ -46,9 +149,20 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.dark .card {
+  background: #1f2937;
+  border-color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 .card:hover {
   border-color: #d1d1d1;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .card:hover {
+  border-color: #4b5563;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* Button styles */
@@ -64,10 +178,20 @@ body {
   font-size: 14px;
 }
 
+.dark .btn-primary {
+  background: #f97316;
+  color: white;
+}
+
 .btn-primary:hover {
   background: #333333;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dark .btn-primary:hover {
+  background: #ea580c;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
 .btn-secondary {
@@ -82,9 +206,20 @@ body {
   font-size: 14px;
 }
 
+.dark .btn-secondary {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
 .btn-secondary:hover {
   background: #f5f5f5;
   border-color: #b1b1b1;
+}
+
+.dark .btn-secondary:hover {
+  background: #4b5563;
+  border-color: #6b7280;
 }
 
 /* Input styles */
@@ -99,14 +234,29 @@ body {
   font-size: 14px;
 }
 
+.dark .input-field {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
 .input-field:focus {
   outline: none;
   border-color: #1a1a1a;
   box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
+.dark .input-field:focus {
+  border-color: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
 .input-field::placeholder {
   color: #999999;
+}
+
+.dark .input-field::placeholder {
+  color: #9ca3af;
 }
 
 /* Content wrapper */

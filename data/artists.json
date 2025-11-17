@@ -1,0 +1,54 @@
+[
+  {
+    "id": "1763384986597",
+    "userId": "0Nh0V8iGpfUSAxxoNkZUUS3OHUu1",
+    "email": "harshita@gmail.com",
+    "displayName": "harshita",
+    "artistName": "harshita",
+    "bio": "i am an artist",
+    "portfolio": [],
+    "socialLinks": {
+      "website": "",
+      "instagram": "harshitaa_14",
+      "facebook": "",
+      "twitter": ""
+    },
+    "commissionRate": 70,
+    "bankDetails": null,
+    "documents": [],
+    "status": "approved",
+    "verificationStatus": "verified",
+    "createdAt": "2025-11-17T13:09:46.597Z",
+    "updatedAt": "2025-11-17T13:30:57.237Z",
+    "totalArtworks": 0,
+    "totalSales": 0,
+    "totalRevenue": 0,
+    "totalEarnings": 0
+  },
+  {
+    "id": "1763388299184",
+    "userId": "ZUzqmCqTRiRlVyJYbf4eMYstV8E3",
+    "email": "shristi123@gmail.com",
+    "displayName": "shristi123",
+    "artistName": "shristi",
+    "bio": "i am an artist",
+    "portfolio": [],
+    "socialLinks": {
+      "website": "",
+      "instagram": "",
+      "facebook": "",
+      "twitter": ""
+    },
+    "commissionRate": 70,
+    "bankDetails": null,
+    "documents": [],
+    "status": "approved",
+    "verificationStatus": "verified",
+    "createdAt": "2025-11-17T14:04:59.184Z",
+    "updatedAt": "2025-11-17T15:33:45.990Z",
+    "totalArtworks": 0,
+    "totalSales": 0,
+    "totalRevenue": 0,
+    "totalEarnings": 0
+  }
+]

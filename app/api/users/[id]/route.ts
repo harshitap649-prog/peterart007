@@ -2,6 +2,34 @@ import { NextRequest, NextResponse } from 'next/server'
 import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore'
 import { db } from '@/firebase.config'
 
+// GET - Get user by ID
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const userId = params.id
+
+    const userRef = doc(db, 'users', userId)
+    const userDoc = await getDoc(userRef)
+
+    if (!userDoc.exists()) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const userData = userDoc.data()
+    return NextResponse.json({
+      uid: userDoc.id,
+      email: userData.email,
+      displayName: userData.displayName || userData.name || null,
+      ...userData
+    })
+  } catch (error) {
+    console.error('Error getting user:', error)
+    return NextResponse.json({ error: 'Failed to get user' }, { status: 500 })
+  }
+}
+
 // PUT - Disable/Enable user
 export async function PUT(
   request: NextRequest,

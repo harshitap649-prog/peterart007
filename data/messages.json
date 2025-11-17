@@ -1,0 +1,13 @@
+[
+  {
+    "id": "1763400916775",
+    "conversationId": "ZUzqmCqTRiRlVyJYbf4eMYstV8E3_0Nh0V8iGpfUSAxxoNkZUUS3OHUu1_direct",
+    "senderId": "ZUzqmCqTRiRlVyJYbf4eMYstV8E3",
+    "receiverId": "0Nh0V8iGpfUSAxxoNkZUUS3OHUu1",
+    "orderId": null,
+    "type": "direct",
+    "message": "hyy",
+    "read": false,
+    "createdAt": "2025-11-17T17:35:16.775Z"
+  }
+]

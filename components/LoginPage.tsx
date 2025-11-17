@@ -17,26 +17,22 @@ export default function LoginPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       if (!name.trim()) {
         toast.error('Please enter your name')
         return
       }
-      
+
       const user = await signUpWithEmail(email, password, name)
-      
       if (!user) {
         toast.error('Registration failed. Please try again.')
         return
       }
-      
+
       toast.success('Account created successfully!')
-      
-      // Wait a bit for user state to be set
       await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Check if admin
+
       const admin = await isAdmin(user)
       if (admin) {
         window.location.href = '/admin'
@@ -54,21 +50,17 @@ export default function LoginPage() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       const user = await loginWithEmail(email, password)
-      
       if (!user) {
         toast.error('Login failed. Please try again.')
         return
       }
-      
+
       toast.success('Login successful!')
-      
-      // Wait a bit for user state to be set
       await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Check if admin
+
       const admin = await isAdmin(user)
       if (admin) {
         window.location.href = '/admin'
@@ -85,21 +77,16 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setLoading(true)
-    
     try {
       const user = await loginWithGoogle()
-      
       if (!user) {
         toast.error('Google login failed. Please try again.')
         return
       }
-      
+
       toast.success('Login successful!')
-      
-      // Wait a bit for user state to be set
       await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Check if admin
+
       const admin = await isAdmin(user)
       if (admin) {
         window.location.href = '/admin'
@@ -117,9 +104,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo at top */}
-        <div className="text-center mb-4 md:mb-6">
-          <div className="relative w-32 h-32 md:w-44 md:h-44 mx-auto mb-3 md:mb-4 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
+        <div className="text-center mb-6">
+          <div
+            className="relative w-32 h-32 md:w-44 md:h-44 mx-auto mb-4 overflow-hidden"
+            style={{ borderRadius: '0 0 50% 50%' }}
+          >
             <img
               src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
               alt="Logo"
@@ -130,42 +119,33 @@ export default function LoginPage() {
             />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Peter Art</h1>
-          <p className="text-gray-600 text-sm md:text-base italic">Fall in love with art — take one home today</p>
+          <p className="text-gray-600 text-sm md:text-base italic">
+            Fall in love with art — take one home today
+          </p>
         </div>
-        
+
         <div className="card p-4 md:p-6 lg:p-8">
-          {/* Tabs */}
-          <div className="flex gap-1.5 md:gap-2 mb-4 md:mb-6">
+          <div className="flex gap-2 mb-4">
             <button
               onClick={() => setActiveTab('signin')}
-              className={`flex-1 py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-sm md:text-base font-medium transition-all ${
-                activeTab === 'signin'
-                  ? 'btn-primary'
-                  : 'btn-secondary'
+              className={`flex-1 py-2 rounded-lg text-sm md:text-base font-medium transition-all ${
+                activeTab === 'signin' ? 'btn-primary' : 'btn-secondary'
               }`}
             >
               Sign In
             </button>
             <button
               onClick={() => setActiveTab('signup')}
-              className={`flex-1 py-1.5 md:py-2 px-3 md:px-4 rounded-lg text-sm md:text-base font-medium transition-all ${
-                activeTab === 'signup'
-                  ? 'btn-primary'
-                  : 'btn-secondary'
+              className={`flex-1 py-2 rounded-lg text-sm md:text-base font-medium transition-all ${
+                activeTab === 'signup' ? 'btn-primary' : 'btn-secondary'
               }`}
             >
               Sign Up
             </button>
           </div>
 
-          <div className="text-center mb-4 md:mb-6">
-            <p className="text-gray-400 text-sm md:text-base">
-              {activeTab === 'signin' ? 'Sign in to continue' : 'Create a new account'}
-            </p>
-          </div>
-
           {activeTab === 'signin' ? (
-            <form onSubmit={handleSignIn} className="space-y-4 md:space-y-5">
+            <form onSubmit={handleSignIn} className="space-y-4">
               <div>
                 <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Email
@@ -176,7 +156,6 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-field text-sm py-2"
                   placeholder="Enter your email"
-                  autoComplete="email"
                   required
                 />
               </div>
@@ -191,7 +170,6 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="input-field text-sm py-2"
                   placeholder="Enter your password"
-                  autoComplete="current-password"
                   required
                 />
               </div>
@@ -205,7 +183,7 @@ export default function LoginPage() {
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSignUp} className="space-y-4 md:space-y-5">
+            <form onSubmit={handleSignUp} className="space-y-4">
               <div>
                 <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Full Name
@@ -216,11 +194,9 @@ export default function LoginPage() {
                   onChange={(e) => setName(e.target.value)}
                   className="input-field text-sm py-2"
                   placeholder="Enter your full name"
-                  autoComplete="name"
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Email
@@ -231,11 +207,9 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="input-field text-sm py-2"
                   placeholder="Enter your email"
-                  autoComplete="email"
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-xs md:text-sm font-medium mb-1.5 text-gray-700">
                   Password
@@ -246,7 +220,6 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="input-field text-sm py-2"
                   placeholder="Create a password (min 6 characters)"
-                  autoComplete="new-password"
                   required
                   minLength={6}
                 />
@@ -262,20 +235,36 @@ export default function LoginPage() {
             </form>
           )}
 
-          <div className="relative my-4 md:my-6">
+          <div className="relative my-5">
             <div className="relative flex justify-center text-xs md:text-sm">
-              <span className="px-3 md:px-4 bg-white text-gray-400">Or continue with</span>
+              <span className="px-3 bg-white text-gray-400">Or continue with</span>
             </div>
           </div>
 
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 md:gap-3 btn-secondary text-sm md:text-base py-2"
+            className="w-full flex items-center justify-center gap-2 btn-secondary text-sm md:text-base py-2 mb-3"
           >
-            <FcGoogle className="text-xl md:text-2xl" />
+            <FcGoogle className="text-xl" />
             <span>Sign in with Google</span>
           </button>
+
+          <button
+            onClick={() => router.push('/artist/apply')}
+            className="w-full bg-black text-white py-2 rounded-lg text-sm md:text-base font-semibold shadow-md hover:bg-gray-900 transition-colors"
+          >
+            Become an Artist & Start Earning Money
+          </button>
+          <p className="text-xs text-center text-gray-500 mt-2">
+            Already selling?{' '}
+            <button
+              onClick={() => router.push('/artist/apply')}
+              className="text-orange-600 hover:underline font-medium"
+            >
+              Go to artist portal
+            </button>
+          </p>
         </div>
       </div>
     </div>

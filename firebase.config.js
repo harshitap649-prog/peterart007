@@ -50,6 +50,11 @@ export const googleProvider = new GoogleAuthProvider();
 
 // Initialize Analytics (only on client side)
 if (typeof window !== 'undefined') {
-  getAnalytics(app);
+  try {
+    getAnalytics(app);
+  } catch (error) {
+    // Analytics might fail if already initialized or in development
+    console.warn('Analytics initialization warning:', error);
+  }
 }
 

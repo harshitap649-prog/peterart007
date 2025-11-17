@@ -15,52 +15,101 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    checkAuth()
-    
-    // Listen for auth state changes to handle logout and login
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser)
-        const admin = await isAdmin(currentUser)
-        if (admin) {
-          router.push('/admin')
-        } else {
-          router.push('/user')
+    // Set a maximum timeout to prevent infinite loading
+    const maxTimeout = setTimeout(() => {
+      console.log('Auth check timeout - showing login page')
+      setLoading(false)
+    }, 3000) // 3 second max timeout
+
+    let unsubscribe: (() => void) | null = null
+    let mounted = true
+
+    const initializeAuth = async () => {
+      try {
+        // First, set up the auth state listener
+        unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+          if (!mounted) return
+          
+          clearTimeout(maxTimeout)
+          
+          if (currentUser) {
+            try {
+              setUser(currentUser)
+              const admin = await isAdmin(currentUser)
+              if (admin) {
+                router.push('/admin')
+              } else {
+                router.push('/user')
+              }
+            } catch (error) {
+              console.error('Error checking admin status:', error)
+              setUser(null)
+              setLoading(false)
+            }
+          } else {
+            setUser(null)
+            setLoading(false)
+          }
+        })
+
+        // Also try to get current user immediately
+        try {
+          const currentUser = await Promise.race([
+            getCurrentUser(),
+            new Promise((resolve) => setTimeout(() => resolve(null), 2000))
+          ]) as any
+          
+          if (!mounted) return
+          
+          if (currentUser) {
+            clearTimeout(maxTimeout)
+            setUser(currentUser)
+            try {
+              const admin = await isAdmin(currentUser)
+              if (admin) {
+                router.push('/admin')
+              } else {
+                router.push('/user')
+              }
+            } catch (error) {
+              console.error('Error checking admin status:', error)
+              setUser(null)
+              setLoading(false)
+            }
+          } else {
+            clearTimeout(maxTimeout)
+            setLoading(false)
+          }
+        } catch (error) {
+          console.error('Auth check error:', error)
+          if (mounted) {
+            clearTimeout(maxTimeout)
+            setLoading(false)
+          }
         }
-      } else {
-        setUser(null)
-        setLoading(false)
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+        if (mounted) {
+          clearTimeout(maxTimeout)
+          setLoading(false)
+        }
       }
-    })
+    }
+
+    initializeAuth()
     
     return () => {
-      unsubscribe()
+      mounted = false
+      clearTimeout(maxTimeout)
+      if (unsubscribe) {
+        unsubscribe()
+      }
     }
   }, [router])
 
-  const checkAuth = async () => {
-    try {
-      const currentUser = await getCurrentUser()
-      if (currentUser) {
-        setUser(currentUser)
-        const admin = await isAdmin(currentUser)
-        if (admin) {
-          router.push('/admin')
-        } else {
-          router.push('/user')
-        }
-      } else {
-        setLoading(false)
-      }
-    } catch (error) {
-      console.error('Auth check error:', error)
-      setLoading(false)
-    }
-  }
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-900 text-lg">Loading...</p>

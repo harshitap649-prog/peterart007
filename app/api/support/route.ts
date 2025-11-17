@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { userId, userEmail, userName, subject, message, orderId, type } = body
+    const { userId, userEmail, userName, subject, message, orderId, type, images } = body
     
     if (!subject || !message) {
       return NextResponse.json({ error: 'Subject and message are required' }, { status: 400 })
@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
       message,
       type: type || 'general', // 'general', 'order', 'website', 'other'
       orderId: orderId || null,
+      images: images || [], // Array of base64 encoded images
       status: 'pending', // 'pending', 'in-progress', 'resolved', 'closed'
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

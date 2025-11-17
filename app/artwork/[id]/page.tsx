@@ -9,11 +9,16 @@ import { loadPopunderAd } from '@/lib/popunderAd'
 import toast from 'react-hot-toast'
 import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiThumbsUp, FiTrash2, FiMessageCircle, FiChevronLeft, FiChevronRight, FiShare2 } from 'react-icons/fi'
 import LoginModal from '@/components/LoginModal'
+import Cart from '@/components/Cart'
+import RecommendationSection from '@/components/RecommendationSection'
+import ArtistBadge from '@/components/ArtistBadge'
 import { likeArtwork } from '@/lib/comments'
+import { useCart } from '@/contexts/CartContext'
 
 export default function ArtworkDetailsPage() {
   const params = useParams()
   const router = useRouter()
+  const { addToCart } = useCart()
   const [user, setUser] = useState<any>(null)
   const [artwork, setArtwork] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -457,6 +462,7 @@ export default function ArtworkDetailsPage() {
             <FiArrowLeft />
             Back to Artworks
           </button>
+          <Cart />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -541,7 +547,12 @@ export default function ArtworkDetailsPage() {
             <div className="card p-6">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h1 className="text-xl font-bold mb-3 text-gray-900">{artwork.title}</h1>
+                  <h1 className="text-xl font-bold mb-4 text-gray-900">{artwork.title}</h1>
+                  {artwork.artistId && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                      <ArtistBadge artistId={artwork.artistId} />
+                    </div>
+                  )}
                   <p className="text-gray-600 mb-4 whitespace-pre-wrap text-sm">{artwork.description}</p>
                 </div>
                 <button
@@ -601,13 +612,36 @@ export default function ArtworkDetailsPage() {
                       </p>
                     </div>
 
-                    <button
-                      onClick={handleBuyNow}
-                      className="btn-primary w-full flex items-center justify-center gap-2 text-lg py-4"
-                    >
-                      <FiShoppingCart />
-                      Buy Now
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => {
+                          if (!user) {
+                            setLoginModalOpen(true)
+                            toast.error('Please sign in to add items to cart')
+                            return
+                          }
+                          addToCart({
+                            artworkId: artwork.id,
+                            artworkTitle: artwork.title,
+                            artworkImage: artwork.images?.[0] || '',
+                            unitPrice: artwork.price,
+                            quantity: quantity
+                          })
+                          toast.success('Added to cart!')
+                        }}
+                        className="btn-secondary flex-1 flex items-center justify-center gap-2 text-lg py-4"
+                      >
+                        <FiShoppingCart />
+                        Add to Cart
+                      </button>
+                      <button
+                        onClick={handleBuyNow}
+                        className="btn-primary flex-1 flex items-center justify-center gap-2 text-lg py-4"
+                      >
+                        <FiShoppingCart />
+                        Buy Now
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <form onSubmit={handleOrderSubmit} className="space-y-4">
@@ -1061,8 +1095,51 @@ export default function ArtworkDetailsPage() {
 
       {/* Delete Review Confirmation Modal */}
       {showDeleteReviewConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full border-0">
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-[9999] p-4"
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh',
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: 0,
+            padding: '1rem'
+          }}
+        >
+          {/* Backdrop overlay to fade out background */}
+          <div 
+            className="absolute inset-0 bg-black bg-opacity-40 transition-opacity duration-300"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1
+            }}
+            onClick={() => {
+              setShowDeleteReviewConfirm(false)
+              setReviewToDelete(null)
+            }}
+          />
+          
+          {/* Modal content */}
+          <div 
+            className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full border-2 border-gray-200 relative z-10"
+            style={{ 
+              position: 'relative',
+              zIndex: 10,
+              margin: 'auto',
+              animation: 'fadeIn 0.3s ease-in-out'
+            }}
+          >
             <h3 className="text-xl font-bold mb-4 text-gray-900">Confirm Delete</h3>
             <p className="text-gray-600 mb-6">Are you sure you want to delete this review? This action cannot be undone.</p>
             <div className="flex gap-4">
@@ -1084,6 +1161,17 @@ export default function ArtworkDetailsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Similar Artworks Section */}
+      {artwork && (
+        <RecommendationSection
+          type="similar"
+          artworkId={artwork.id}
+          title="Similar Artworks"
+          subtitle="You might also like these"
+          limit={6}
+        />
       )}
     </div>
   )

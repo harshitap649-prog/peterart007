@@ -41,7 +41,7 @@ export default function UserPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-900 text-lg">Loading...</p>
@@ -51,7 +51,7 @@ export default function UserPage() {
   }
 
   return (
-    <div className="min-h-screen p-3 md:p-4">
+    <div className="min-h-screen bg-white p-3 md:p-4">
       <div className="container mx-auto">
         <Suspense fallback={
           <div className="text-center py-12">

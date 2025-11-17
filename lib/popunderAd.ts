@@ -28,35 +28,54 @@ export function loadPopunderAd(action: 'logout' | 'order' = 'order') {
     existingScript.remove()
   }
 
-  // Create and load the popunder ad script - using protocol-relative URL (EXACT format from Adsterra)
+  // Create and load the popunder ad script - Use HTTPS explicitly
   const script = document.createElement('script')
   script.type = 'text/javascript'
-  script.src = '//pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
+  script.src = 'https://pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
   script.id = 'popunder-ad-script'
   script.async = true
+  script.crossOrigin = 'anonymous'
   
   // Handle script load
   script.onload = () => {
-    console.log('Popunder ad script loaded successfully')
+    console.log('✅ Popunder ad: Script loaded successfully')
+    console.log('📋 Popunder ad: Script will trigger on user interaction (click, etc.)')
+    // Popunder ads typically trigger on user interaction
     // Keep script for a short time, then remove it
     setTimeout(() => {
       const scriptElement = document.getElementById('popunder-ad-script')
       if (scriptElement) {
         scriptElement.remove()
-        console.log('Popunder ad script removed')
+        console.log('📋 Popunder ad: Script removed after 10 seconds')
       }
     }, 10000) // Remove after 10 seconds to give ad time to trigger
   }
   
-  script.onerror = () => {
-    console.error('Failed to load popunder ad script')
-    // Reset the flag on error so user can try again
-    sessionStorage.removeItem(popunderKey)
+  script.onerror = (error) => {
+    console.error('❌ Popunder ad: Failed to load script', error)
+    console.error('🔍 Popunder ad: Check Network tab for failed request to effectivegatecpm.com')
+    // Try with different approach as fallback
+    const fallbackScript = document.createElement('script')
+    fallbackScript.type = 'text/javascript'
+    fallbackScript.src = 'https://pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
+    fallbackScript.id = 'popunder-ad-script-fallback'
+    fallbackScript.async = true
+    fallbackScript.defer = false
+    fallbackScript.crossOrigin = 'anonymous'
+    fallbackScript.onload = () => {
+      console.log('Popunder ad: Fallback script loaded successfully')
+    }
+    fallbackScript.onerror = () => {
+      console.error('Popunder ad: Both script URLs failed to load')
+      // Reset the flag on error so user can try again
+      sessionStorage.removeItem(popunderKey)
+    }
+    document.body.appendChild(fallbackScript)
   }
   
-  // Append to body
+  // Append to body (popunder ads work better when in body, not head)
   document.body.appendChild(script)
-  console.log('Popunder ad script appended to body')
+  console.log('Popunder ad: Script appended to body')
 }
 
 /**

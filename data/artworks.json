@@ -19,42 +19,10 @@
     "createdAt": "2025-11-14T11:34:27.382Z",
     "updatedAt": "2025-11-14T11:38:08.192Z",
     "likes": 0,
-    "comments": [
-      {
-        "id": "1763128233756",
-        "artworkId": "1763120060330",
-        "userId": "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1",
-        "userName": "harshitap14",
-        "userEmail": "harshitap14@gmail.com",
-        "text": "uhdxsm",
-        "rating": 2,
-        "images": [],
-        "likedBy": [
-          "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1"
-        ],
-        "likes": 1,
-        "replies": [
-          {
-            "id": "1763128254114",
-            "artworkId": "1763120060330",
-            "userId": "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1",
-            "userName": "harshitap14",
-            "userEmail": "harshitap14@gmail.com",
-            "text": "hddmhn",
-            "rating": null,
-            "images": [],
-            "likedBy": [],
-            "likes": 0,
-            "replies": [],
-            "createdAt": "2025-11-14T13:50:54.114Z"
-          }
-        ],
-        "createdAt": "2025-11-14T13:50:33.756Z"
-      }
-    ],
+    "comments": [],
     "likedBy": [],
-    "averageRating": "2.0",
-    "totalRatings": 1
+    "averageRating": null,
+    "totalRatings": 0
   },
   {
     "id": "1763120341214",
@@ -85,6 +53,74 @@
     ],
     "createdAt": "2025-11-14T11:40:09.050Z",
     "updatedAt": "2025-11-14T11:40:09.050Z",
+    "likes": 0,
+    "comments": [],
+    "likedBy": []
+  },
+  {
+    "id": "1763384987127",
+    "title": "ganesh ji sketch",
+    "description": "lord ganesh sketch",
+    "price": 4999,
+    "category": "god sketch",
+    "images": [
+      "/artworks/1763384987127_0_g1.jpg"
+    ],
+    "artistId": "1763384986597",
+    "artistCommissionRate": null,
+    "createdAt": "2025-11-17T13:09:48.778Z",
+    "updatedAt": "2025-11-17T13:09:48.778Z",
+    "likes": 0,
+    "comments": [],
+    "likedBy": []
+  },
+  {
+    "id": "1763384988827",
+    "title": "shiv ji sketch",
+    "description": "lord shiv sketch",
+    "price": 4999,
+    "category": "god sketch",
+    "images": [
+      "/artworks/1763384988827_0_s1.JPG"
+    ],
+    "artistId": "1763384986597",
+    "artistCommissionRate": null,
+    "createdAt": "2025-11-17T13:09:50.371Z",
+    "updatedAt": "2025-11-17T13:09:50.371Z",
+    "likes": 0,
+    "comments": [],
+    "likedBy": []
+  },
+  {
+    "id": "1763388299449",
+    "title": "sketch",
+    "description": "best sketch",
+    "price": 500,
+    "category": "General",
+    "images": [
+      "/artworks/1763388299449_0_h1.jpg"
+    ],
+    "artistId": "1763388299184",
+    "artistCommissionRate": null,
+    "createdAt": "2025-11-17T14:05:01.169Z",
+    "updatedAt": "2025-11-17T14:05:01.169Z",
+    "likes": 0,
+    "comments": [],
+    "likedBy": []
+  },
+  {
+    "id": "1763388301219",
+    "title": "hdcb",
+    "description": "jdb",
+    "price": 236,
+    "category": "General",
+    "images": [
+      "/artworks/1763388301219_0_s1.JPG"
+    ],
+    "artistId": "1763388299184",
+    "artistCommissionRate": null,
+    "createdAt": "2025-11-17T14:05:03.883Z",
+    "updatedAt": "2025-11-17T14:05:03.883Z",
     "likes": 0,
     "comments": [],
     "likedBy": []

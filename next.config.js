@@ -3,6 +3,26 @@ const nextConfig = {
   images: {
     domains: ['firebasestorage.googleapis.com', 'png.pngtree.com', 'icon2.cleanpng.com', 'static.vecteezy.com'],
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.highperformanceformat.com https://pl28052492.effectivegatecpm.com https://*.adsterra.com https://*.highperformanceformat.com https://*.effectivegatecpm.com https://*.sourshaped.com https://sourshaped.com https://*.realizationnewestfangs.com https://realizationnewestfangs.com https://www.googletagmanager.com https://www.google-analytics.com https://*.firebase.googleapis.com https://firebase.googleapis.com https://*.googleapis.com https://*.gstatic.com https://apis.google.com https://www.googleapis.com",
+              "frame-src 'self' https://www.highperformanceformat.com https://*.adsterra.com https://*.highperformanceformat.com https://*.effectivegatecpm.com https://*.sourshaped.com https://sourshaped.com https://*.realizationnewestfangs.com https://realizationnewestfangs.com https://accounts.google.com https://*.googleapis.com https://*.gstatic.com",
+              "img-src 'self' data: https: blob:",
+              "style-src 'self' 'unsafe-inline'",
+              "connect-src 'self' https://www.highperformanceformat.com https://pl28052492.effectivegatecpm.com https://*.adsterra.com https://*.highperformanceformat.com https://*.effectivegatecpm.com https://*.sourshaped.com https://sourshaped.com https://*.realizationnewestfangs.com https://realizationnewestfangs.com https://*.firebase.googleapis.com https://firebase.googleapis.com https://firestore.googleapis.com https://*.googleapis.com https://www.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googletagmanager.com https://www.google-analytics.com https://accounts.google.com https://*.gstatic.com",
+            ].join('; '),
+          },
+        ],
+      },
+    ]
+  },
   webpack: (config, { isServer, webpack }) => {
     // Fix for undici package parsing issue
     if (!isServer) {
