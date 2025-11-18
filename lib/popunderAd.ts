@@ -22,60 +22,65 @@ export function loadPopunderAd(action: 'logout' | 'order' = 'order') {
   sessionStorage.setItem(popunderKey, 'true')
   console.log(`Popunder ad: Loading for ${action}`)
 
-  // Remove any existing script first
-  const existingScript = document.getElementById('popunder-ad-script')
-  if (existingScript) {
-    existingScript.remove()
+  let scriptInjected = false
+
+  const removeExistingScripts = () => {
+    document.getElementById('popunder-ad-script')?.remove()
+    document.getElementById('popunder-ad-script-fallback')?.remove()
   }
 
-  // Create and load the popunder ad script - Use HTTPS explicitly
-  const script = document.createElement('script')
-  script.type = 'text/javascript'
-  script.src = 'https://pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
-  script.id = 'popunder-ad-script'
-  script.async = true
-  script.crossOrigin = 'anonymous'
-  
-  // Handle script load
-  script.onload = () => {
-    console.log('✅ Popunder ad: Script loaded successfully')
-    console.log('📋 Popunder ad: Script will trigger on user interaction (click, etc.)')
-    // Popunder ads typically trigger on user interaction
-    // Keep script for a short time, then remove it
-    setTimeout(() => {
-      const scriptElement = document.getElementById('popunder-ad-script')
-      if (scriptElement) {
-        scriptElement.remove()
+  const injectScript = () => {
+    if (scriptInjected) return
+    scriptInjected = true
+
+    removeExistingScripts()
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
+    script.id = 'popunder-ad-script'
+    script.async = true
+    script.crossOrigin = 'anonymous'
+    
+    script.onload = () => {
+      console.log('✅ Popunder ad: Script loaded successfully')
+      // Remove after short delay so it can trigger
+      setTimeout(() => {
+        removeExistingScripts()
         console.log('📋 Popunder ad: Script removed after 10 seconds')
-      }
-    }, 10000) // Remove after 10 seconds to give ad time to trigger
-  }
-  
-  script.onerror = (error) => {
-    console.error('❌ Popunder ad: Failed to load script', error)
-    console.error('🔍 Popunder ad: Check Network tab for failed request to effectivegatecpm.com')
-    // Try with different approach as fallback
-    const fallbackScript = document.createElement('script')
-    fallbackScript.type = 'text/javascript'
-    fallbackScript.src = 'https://pl28052492.effectivegatecpm.com/09/f1/b1/09f1b13434062da4189385c5de300627.js'
-    fallbackScript.id = 'popunder-ad-script-fallback'
-    fallbackScript.async = true
-    fallbackScript.defer = false
-    fallbackScript.crossOrigin = 'anonymous'
-    fallbackScript.onload = () => {
-      console.log('Popunder ad: Fallback script loaded successfully')
+      }, 10000)
     }
-    fallbackScript.onerror = () => {
-      console.error('Popunder ad: Both script URLs failed to load')
-      // Reset the flag on error so user can try again
+    
+    script.onerror = (error) => {
+      console.error('❌ Popunder ad: Failed to load script', error)
+      // Reset to allow retry
       sessionStorage.removeItem(popunderKey)
+      scriptInjected = false
     }
-    document.body.appendChild(fallbackScript)
+    
+    document.body.appendChild(script)
+    console.log('Popunder ad: Script appended to body')
   }
-  
-  // Append to body (popunder ads work better when in body, not head)
-  document.body.appendChild(script)
-  console.log('Popunder ad: Script appended to body')
+
+  // Attempt immediate injection
+  injectScript()
+
+  // Also hook into the very next user interaction to ensure browsers treat it as user initiated
+  const interactionEvents: (keyof DocumentEventMap)[] = ['pointerdown', 'keydown', 'touchstart']
+
+  const handleInteraction = () => {
+    interactionEvents.forEach((event) => document.removeEventListener(event, handleInteraction, true))
+    if (!scriptInjected) {
+      injectScript()
+    }
+  }
+
+  interactionEvents.forEach((event) => document.addEventListener(event, handleInteraction, true))
+
+  // Safety timeout to remove listeners after 5 seconds
+  setTimeout(() => {
+    interactionEvents.forEach((event) => document.removeEventListener(event, handleInteraction, true))
+  }, 5000)
 }
 
 /**

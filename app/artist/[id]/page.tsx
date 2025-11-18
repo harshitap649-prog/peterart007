@@ -293,7 +293,7 @@ export default function ArtistProfilePage() {
                       </div>
                     )}
                     <h3 className="font-semibold text-sm mb-1 line-clamp-1">{artwork.title}</h3>
-                    <p className="text-gray-900 font-bold text-base mb-2">₹{artwork.price}</p>
+                    <p className="text-orange-600 font-bold text-base mb-2">₹{artwork.price}</p>
                   </div>
                   <button
                     onClick={(e) => {

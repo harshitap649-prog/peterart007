@@ -263,7 +263,7 @@ export default function CartPage() {
             Continue Shopping
           </button>
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <FiShoppingCart className="text-orange-600" />
+            <FiShoppingCart className="text-gray-900" />
             Shopping Cart
           </h1>
         </div>
@@ -307,7 +307,7 @@ export default function CartPage() {
                       <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                         {item.artworkTitle}
                       </h3>
-                      <p className="text-orange-600 font-bold text-lg md:text-xl mb-4">
+                      <p className="text-gray-900 font-bold text-lg md:text-xl mb-4">
                         ₹{(item.unitPrice || item.price || 0).toFixed(2)}
                       </p>
                     </div>
@@ -402,7 +402,7 @@ export default function CartPage() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-sm md:text-base">
                     <span className="text-gray-600">Items ({cart.length}):</span>
-                    <span className="font-medium">₹{cartTotal.toFixed(2)}</span>
+                    <span className="font-medium text-orange-600">₹{cartTotal.toFixed(2)}</span>
                   </div>
                   {bulkDiscount > 0 && (
                     <div className="flex justify-between text-sm md:text-base text-green-600">
@@ -490,7 +490,7 @@ export default function CartPage() {
                                     {address.fullName}
                                   </span>
                                   {address.isDefault && (
-                                    <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
+                                    <span className="text-xs bg-orange-100 text-gray-900 px-2 py-0.5 rounded-full">
                                       Default
                                     </span>
                                   )}
@@ -507,7 +507,7 @@ export default function CartPage() {
                               setUseSavedAddress(false)
                               setSelectedAddressId(null)
                             }}
-                            className="w-full text-sm text-orange-600 hover:text-orange-700 font-medium py-2"
+                            className="w-full text-sm text-gray-900 hover:text-orange-700 font-medium py-2"
                           >
                             + Use New Address
                           </button>

@@ -117,7 +117,7 @@ export default function GiftCardManagement({ userId, language = 'en' }: GiftCard
             <p className="text-xs md:text-sm text-gray-600">{t.subtitle}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl md:text-3xl font-bold text-orange-600">{giftCards.length}</div>
+            <div className="text-2xl md:text-3xl font-bold text-gray-900">{giftCards.length}</div>
             <div className="text-xs text-gray-500">{language === 'hi' ? 'कुल कार्ड' : 'Total Cards'}</div>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function GiftCardManagement({ userId, language = 'en' }: GiftCard
                     </h3>
                     <button
                       onClick={() => copyToClipboard(card.code)}
-                      className="p-1 text-gray-500 hover:text-orange-600 transition-colors"
+                      className="p-1 text-gray-500 hover:text-gray-900 transition-colors"
                       title={t.copyCode}
                     >
                       <FiCopy className="text-sm" />
@@ -189,7 +189,7 @@ export default function GiftCardManagement({ userId, language = 'en' }: GiftCard
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">{t.amount}:</span>
-                  <span className="font-semibold text-gray-900">₹{card.amount.toFixed(2)}</span>
+                  <span className="font-semibold text-orange-600">₹{card.amount.toFixed(2)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 flex items-center gap-1">
@@ -221,7 +221,7 @@ export default function GiftCardManagement({ userId, language = 'en' }: GiftCard
                         <span className="text-gray-600">
                           {tx.type === 'redeemed' ? (language === 'hi' ? 'उपयोग किया गया' : 'Redeemed') : tx.type}
                         </span>
-                        <span className="font-semibold text-gray-900">-₹{tx.amount.toFixed(2)}</span>
+                        <span className="font-semibold text-orange-600">-₹{tx.amount.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>

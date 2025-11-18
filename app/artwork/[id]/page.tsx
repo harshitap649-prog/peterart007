@@ -574,7 +574,7 @@ export default function ArtworkDetailsPage() {
                 </span>
               )}
               <div className="border-t border-gray-300 pt-4">
-                <p className="text-lg font-bold text-gray-900 mb-6">₹{artwork.price}</p>
+                <p className="text-lg font-bold text-orange-600 mb-6">₹{artwork.price}</p>
 
                 {!showCheckout ? (
                   <>
@@ -605,10 +605,10 @@ export default function ArtworkDetailsPage() {
                     <div className="mb-6 p-4 bg-gray-50 rounded-lg">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-400 text-sm">Total Price:</span>
-                        <span className="text-base font-bold text-gray-900">₹{totalPrice}</span>
+                        <span className="text-base font-bold text-orange-600">₹{totalPrice}</span>
                       </div>
                       <p className="text-xs text-gray-500 mt-2">
-                        {quantity} × ₹{artwork.price} = ₹{totalPrice}
+                        <span className="text-orange-600">{quantity} × ₹{artwork.price} = ₹{totalPrice}</span>
                       </p>
                     </div>
 
@@ -807,12 +807,12 @@ export default function ArtworkDetailsPage() {
                       </div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-gray-400">Unit Price:</span>
-                        <span className="font-medium">₹{artwork.price}</span>
+                        <span className="font-medium text-orange-600">₹{artwork.price}</span>
                       </div>
                       <div className="border-t border-gray-300 pt-2 mt-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-bold">Total:</span>
-                          <span className="text-base font-bold text-gray-900">₹{totalPrice}</span>
+                          <span className="text-base font-bold text-orange-600">₹{totalPrice}</span>
                         </div>
                       </div>
                     </div>

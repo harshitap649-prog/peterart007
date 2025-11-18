@@ -298,7 +298,7 @@ export default function SearchFilters({
           <FiSliders className="text-base md:text-lg" />
           <span className="hidden sm:inline">{t.filters}</span>
           {hasActiveFilters && (
-            <span className="bg-white text-orange-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+            <span className="bg-white text-gray-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
               {[selectedCategories.length, sortBy !== 'newest' ? 1 : 0, priceRange[0] !== priceBounds[0] || priceRange[1] !== priceBounds[1] ? 1 : 0].reduce((a, b) => a + b, 0)}
             </span>
           )}
@@ -313,7 +313,7 @@ export default function SearchFilters({
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className="text-xs md:text-sm text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1 px-2 py-1 hover:bg-orange-50 rounded transition-colors"
+              className="text-xs md:text-sm text-gray-900 hover:text-orange-700 font-medium flex items-center gap-1 px-2 py-1 hover:bg-orange-50 rounded transition-colors"
             >
               <FiX className="text-xs" />
               <span className="hidden sm:inline">{t.clearFilters}</span>
@@ -436,7 +436,7 @@ export default function SearchFilters({
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-2">
                   <span>₹{priceBounds[0].toLocaleString()}</span>
-                  <span className="font-semibold text-orange-600">
+                  <span className="font-semibold text-gray-900">
                     ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
                   </span>
                   <span>₹{priceBounds[1].toLocaleString()}</span>

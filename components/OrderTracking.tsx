@@ -236,7 +236,7 @@ export default function OrderTracking({ order, language = 'en' }: OrderTrackingP
       {/* Delivery Timeline */}
       <div className="card p-4 md:p-6">
         <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <FiClock className="text-orange-600" />
+          <FiClock className="text-gray-900" />
           {t.timeline}
         </h3>
         <div className="space-y-4">
@@ -284,7 +284,7 @@ export default function OrderTracking({ order, language = 'en' }: OrderTrackingP
       {order.address1 && (
         <div className="card p-4 md:p-6">
           <h3 className="text-base md:text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <FiMapPin className="text-orange-600" />
+            <FiMapPin className="text-gray-900" />
             {t.deliveryAddress}
           </h3>
           <div className="text-sm text-gray-700 space-y-1">
@@ -319,14 +319,14 @@ export default function OrderTracking({ order, language = 'en' }: OrderTrackingP
         <div className="space-y-2">
           <div className="flex items-center justify-between p-3 bg-white rounded-lg">
             <div className="flex items-center gap-2">
-              <FiMail className="text-orange-600" />
+              <FiMail className="text-gray-900" />
               <span className="text-sm font-medium text-gray-700">{t.emailNotifications}</span>
             </div>
             <span className="text-xs text-green-600 font-medium">{t.notificationsEnabled}</span>
           </div>
           <div className="flex items-center justify-between p-3 bg-white rounded-lg">
             <div className="flex items-center gap-2">
-              <FiPhone className="text-orange-600" />
+              <FiPhone className="text-gray-900" />
               <span className="text-sm font-medium text-gray-700">{t.smsNotifications}</span>
             </div>
             <span className="text-xs text-green-600 font-medium">{t.notificationsEnabled}</span>

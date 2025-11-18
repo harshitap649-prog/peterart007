@@ -602,7 +602,7 @@ export default function AdminDashboard() {
                   )}
                   <h3 className="font-bold text-xs md:text-base lg:text-lg mb-1 md:mb-1.5 line-clamp-1">{artwork.title}</h3>
                   <p className="text-gray-400 text-xs mb-1 md:mb-2 line-clamp-2 hidden sm:block">{artwork.description}</p>
-                  <p className="text-gray-900 font-bold text-sm md:text-base lg:text-lg mb-2 md:mb-3">₹{artwork.price}</p>
+                  <p className="text-orange-600 font-bold text-sm md:text-base lg:text-lg mb-2 md:mb-3">₹{artwork.price}</p>
                   <div className="flex gap-1 md:gap-1.5 lg:gap-2">
                     <button
                       onClick={() => handleEdit(artwork)}
@@ -710,7 +710,7 @@ export default function AdminDashboard() {
                                 </div>
                                 <div>
                                   <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
-                                  <p className="text-gray-900 font-bold text-sm md:text-base">₹{order.total}</p>
+                                  <p className="text-orange-600 font-bold text-sm md:text-base">₹{order.total}</p>
                                 </div>
                                 <div>
                                   <p className="text-gray-400 text-xs mb-0.5">Payment</p>
@@ -800,7 +800,7 @@ export default function AdminDashboard() {
                                 </div>
                                 <div>
                                   <p className="text-gray-400 text-xs mb-0.5">Total Price</p>
-                                  <p className="text-gray-900 font-bold text-sm md:text-base">₹{order.total}</p>
+                                  <p className="text-orange-600 font-bold text-sm md:text-base">₹{order.total}</p>
                                 </div>
                                 <div>
                                   <p className="text-gray-400 text-xs mb-0.5">Payment</p>
@@ -1263,7 +1263,7 @@ export default function AdminDashboard() {
                         <>
                           <button
                             onClick={() => handleArtistStatusChange(artist.id, 'rejected')}
-                            className="flex-1 btn-secondary text-xs py-2 text-orange-600 hover:text-orange-700"
+                            className="flex-1 btn-secondary text-xs py-2 text-gray-900 hover:text-orange-700"
                           >
                             Disable
                           </button>
@@ -1780,7 +1780,7 @@ export default function AdminDashboard() {
                       <div className="flex items-center justify-between mb-3">
                         <div>
                           <span className="text-xs text-gray-500">Price</span>
-                          <p className="font-bold text-lg text-gray-900">₹{artwork.price?.toFixed(2) || '0.00'}</p>
+                          <p className="font-bold text-lg text-orange-600">₹{artwork.price?.toFixed(2) || '0.00'}</p>
                         </div>
                         {artwork.category && (
                           <div>

@@ -35,8 +35,10 @@ export default function RecommendationSection({
 }: RecommendationSectionProps) {
   const router = useRouter()
   const [artworks, setArtworks] = useState<any[]>([])
+  const [allArtworks, setAllArtworks] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [wishlist, setWishlist] = useState<string[]>([])
+  const [showAll, setShowAll] = useState(false)
 
   const translations = {
     en: {
@@ -47,6 +49,7 @@ export default function RecommendationSection({
       becauseYouLiked: 'Because You Liked',
       becauseYouLikedSubtitle: 'Similar artworks you might enjoy',
       viewAll: 'View All',
+      seeAll: 'See All',
       buy: 'Buy',
       loading: 'Loading recommendations...',
       noResults: 'No recommendations available'
@@ -59,6 +62,7 @@ export default function RecommendationSection({
       becauseYouLiked: 'क्योंकि आपको पसंद आया',
       becauseYouLikedSubtitle: 'समान कलाकृतियां जो आपको पसंद आ सकती हैं',
       viewAll: 'सभी देखें',
+      seeAll: 'सभी देखें',
       buy: 'खरीदें',
       loading: 'सुझाव लोड हो रहे हैं...',
       noResults: 'कोई सुझाव उपलब्ध नहीं'
@@ -79,35 +83,45 @@ export default function RecommendationSection({
     try {
       let recommendations: any[] = []
       
+      // Load all artworks first (use a higher limit for "See All")
+      const allLimit = 50
+      
       switch (type) {
         case 'personalized':
           if (userId) {
-            recommendations = await getPersonalizedRecommendations(userId, limit)
+            recommendations = await getPersonalizedRecommendations(userId, allLimit)
           } else {
-            recommendations = await getTrendingArtworks(limit)
+            recommendations = await getTrendingArtworks(allLimit)
           }
           break
         case 'trending':
-          recommendations = await getTrendingArtworks(limit)
+          recommendations = await getTrendingArtworks(allLimit)
           break
         case 'becauseYouLiked':
           if (userId) {
-            recommendations = await getBecauseYouLiked(userId, limit)
+            recommendations = await getBecauseYouLiked(userId, allLimit)
           }
           break
         case 'similar':
           if (artworkId) {
-            recommendations = await getSimilarArtworks(artworkId, limit)
+            recommendations = await getSimilarArtworks(artworkId, allLimit)
           }
           break
       }
       
-      setArtworks(recommendations)
+      setAllArtworks(recommendations)
+      // Show only first 10 items initially
+      setArtworks(recommendations.slice(0, 10))
     } catch (error) {
       console.error('Error loading recommendations:', error)
     } finally {
       setLoading(false)
     }
+  }
+  
+  const handleSeeAll = () => {
+    setShowAll(true)
+    setArtworks(allArtworks)
   }
 
   const loadWishlist = async () => {
@@ -187,29 +201,48 @@ export default function RecommendationSection({
     return null // Don't show section if no recommendations
   }
 
+  const displayArtworks = showAll ? allArtworks : artworks
+
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            {type === 'trending' && <FiTrendingUp className="text-2xl text-orange-600" />}
-            {type === 'personalized' && <FiHeart className="text-2xl text-orange-600" />}
-            {type === 'becauseYouLiked' && <FiArrowRight className="text-2xl text-orange-600" />}
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{getDisplayTitle()}</h2>
+            {type === 'trending' && <FiTrendingUp className="text-2xl text-gray-900" />}
+            {type === 'personalized' && <FiHeart className="text-2xl text-gray-900" />}
+            {type === 'becauseYouLiked' && <FiArrowRight className="text-2xl text-gray-900" />}
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">{getDisplayTitle()}</h2>
           </div>
           <p className="text-gray-600 text-sm md:text-base">{getDisplaySubtitle()}</p>
         </div>
+        {!showAll && allArtworks.length > 10 && (
+          <button
+            onClick={handleSeeAll}
+            className="text-gray-900 hover:text-orange-700 font-semibold text-sm md:text-base flex items-center gap-1 whitespace-nowrap"
+          >
+            {t.seeAll}
+            <FiArrowRight className="text-sm" />
+          </button>
+        )}
       </div>
 
-      {/* Artworks Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {artworks.map((artwork) => (
+      {/* Artworks Horizontal Scroll (Mobile) or Grid (Desktop) */}
+      {showAll ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          {displayArtworks.map((artwork) => (
           <div
             key={artwork.id}
             className="card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
             onClick={() => router.push(`/artwork/${artwork.id}`)}
           >
+            <div className="p-4 pb-2">
+              {artwork.artistId && (
+                <div className="mb-2">
+                  <ArtistBadge artistId={artwork.artistId} />
+                </div>
+              )}
+            </div>
             <div className="relative h-48 w-full overflow-hidden">
               <img
                 src={artwork.images?.[0] || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage%3C/text%3E%3C/svg%3E'}
@@ -225,7 +258,7 @@ export default function RecommendationSection({
                     e.stopPropagation()
                     handleToggleWishlist(artwork.id)
                   }}
-                  className="text-orange-600 hover:text-orange-700 transition-colors"
+                  className="text-gray-900 hover:text-orange-700 transition-colors"
                   aria-label="Add to wishlist"
                 >
                   {wishlist.includes(artwork.id) ? <FaHeart className="text-lg" /> : <FiHeart className="text-lg" />}
@@ -234,11 +267,6 @@ export default function RecommendationSection({
             </div>
             <div className="p-4">
               <h3 className="font-bold text-gray-900 text-lg mb-1 line-clamp-1">{artwork.title}</h3>
-              {artwork.artistId && (
-                <div className="mb-2">
-                  <ArtistBadge artistId={artwork.artistId} />
-                </div>
-              )}
               <p className="text-gray-600 text-sm mb-3 line-clamp-2">{artwork.description}</p>
               <div className="flex items-center justify-between mb-4">
                 <span className="text-orange-600 font-bold text-xl">₹{artwork.price}</span>
@@ -252,14 +280,74 @@ export default function RecommendationSection({
                   e.stopPropagation()
                   router.push(`/artwork/${artwork.id}`)
                 }}
-                className="btn-primary w-full py-2.5 text-sm"
+                className="btn-primary btn-buy w-full py-2.5 text-sm"
               >
                 {t.buy}
               </button>
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      ) : (
+        <div className="overflow-x-auto -mx-4 px-4">
+          <div className="flex gap-3 md:gap-4" style={{ width: 'max-content' }}>
+            {displayArtworks.map((artwork) => (
+              <div
+                key={artwork.id}
+                className="card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer flex-shrink-0"
+                style={{ width: 'calc(50vw - 1.5rem)', minWidth: '160px', maxWidth: '280px' }}
+                onClick={() => router.push(`/artwork/${artwork.id}`)}
+              >
+                <div className="p-3 pb-2">
+                  {artwork.artistId && (
+                    <div className="mb-2">
+                      <ArtistBadge artistId={artwork.artistId} className="text-xs" />
+                    </div>
+                  )}
+                </div>
+                <div className="relative h-40 w-full overflow-hidden">
+                  <img
+                    src={artwork.images?.[0] || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage%3C/text%3E%3C/svg%3E'}
+                    alt={artwork.title}
+                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage%3C/text%3E%3C/svg%3E'
+                    }}
+                  />
+                  <div className="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1.5 flex items-center justify-center shadow-sm">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleToggleWishlist(artwork.id)
+                      }}
+                      className="text-gray-900 hover:text-orange-700 transition-colors"
+                      aria-label="Add to wishlist"
+                    >
+                      {wishlist.includes(artwork.id) ? <FaHeart className="text-sm" /> : <FiHeart className="text-sm" />}
+                    </button>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <h3 className="font-bold text-gray-900 text-sm mb-1 line-clamp-1">{artwork.title}</h3>
+                  <p className="text-gray-600 text-xs mb-2 line-clamp-2">{artwork.description}</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-orange-600 font-bold text-base">₹{artwork.price}</span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(`/artwork/${artwork.id}`)
+                    }}
+                    className="btn-primary btn-buy w-full py-2 text-xs"
+                  >
+                    {t.buy}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

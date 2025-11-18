@@ -131,7 +131,7 @@ export default function GiftCardPurchase({ user, onSuccess, language = 'en' }: G
                 }}
                 className={`p-3 rounded-lg border-2 transition-all ${
                   amount === preset.toString()
-                    ? 'border-orange-600 bg-orange-50 text-orange-600 font-bold'
+                    ? 'border-orange-600 bg-orange-50 text-gray-900 font-bold'
                     : 'border-gray-200 hover:border-gray-300 text-gray-700'
                 }`}
               >

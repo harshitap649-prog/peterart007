@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getAllArtworks, searchArtworks } from '@/lib/artworks'
 import { getUserOrders, createOrder, cancelOrder, returnOrder } from '@/lib/orders'
@@ -51,13 +51,14 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [language, setLanguage] = useState<'en' | 'hi'>('en')
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null)
   const [isArtist, setIsArtist] = useState(false)
   const [artistProfile, setArtistProfile] = useState<any>(null)
   const [previousArtistStatus, setPreviousArtistStatus] = useState<string | null>(null)
   const [showCongratulations, setShowCongratulations] = useState(false)
   const [followingArtists, setFollowingArtists] = useState<any[]>([])
+  const [isMobileView, setIsMobileView] = useState(false)
+  const userMenuClosingRef = useRef(false)
 
   // Translations
   const translations = {
@@ -269,7 +270,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const changeLanguage = (lang: 'en' | 'hi') => {
     setLanguage(lang)
     localStorage.setItem('language', lang)
-    setShowLanguageMenu(false)
     setUserMenuOpen(false)
     toast.success(lang === 'en' ? 'Language changed to English' : 'भाषा हिंदी में बदली गई')
   }
@@ -322,17 +322,36 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     }
   }, [artistProfile, previousArtistStatus, user])
 
-  // Prevent body scroll when sidebar is open
+  // Track viewport for responsive overlays
   useEffect(() => {
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden'
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        setIsMobileView(window.innerWidth < 768)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Prevent body scroll when sidebar or mobile menu is open
+  useEffect(() => {
+    const overlayActive = sidebarOpen || userMenuOpen
+    if (overlayActive) {
+      document.documentElement.classList.add('overflow-hidden')
+      document.body.classList.add('overflow-hidden')
     } else {
-      document.body.style.overflow = 'unset'
+      document.documentElement.classList.remove('overflow-hidden')
+      document.body.classList.remove('overflow-hidden')
+      // Reset closing ref when menu is closed
+      userMenuClosingRef.current = false
     }
     return () => {
-      document.body.style.overflow = 'unset'
+      document.documentElement.classList.remove('overflow-hidden')
+      document.body.classList.remove('overflow-hidden')
+      userMenuClosingRef.current = false
     }
-  }, [sidebarOpen])
+  }, [sidebarOpen, userMenuOpen, isMobileView])
 
   // Filtered artworks will be updated by SearchFilters component
 
@@ -684,58 +703,127 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               {userMenuOpen && (
                 <>
                   <div
-                    className="fixed inset-0 z-[55]"
-                    onClick={() => {
-                      setUserMenuOpen(false)
-                      setShowLanguageMenu(false)
+                    className="fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (!userMenuClosingRef.current) {
+                        userMenuClosingRef.current = true
+                        setUserMenuOpen(false)
+                      }
                     }}
                   ></div>
-                  <div className="fixed right-2 top-16 md:right-4 md:top-20 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-[100] pointer-events-auto">
-                    <div className="py-2">
-                      <div className="px-4 py-2 border-b border-gray-200 pointer-events-auto">
-                        <p className="text-sm font-medium text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
+                  {isMobileView ? (
+                    <div className="fixed inset-0 z-[130] flex items-end justify-center p-4 pointer-events-none">
+                      <div 
+                        className="w-full max-w-sm bg-white rounded-t-3xl shadow-2xl pointer-events-auto animate-slideUp"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                          <div>
+                            <p className="text-base font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
+                            <p className="text-xs text-gray-500">{user.email}</p>
+                          </div>
+                          <button
+                            onClick={() => setUserMenuOpen(false)}
+                            className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                            aria-label="Close user menu"
+                          >
+                            <FiX className="text-lg" />
+                          </button>
+                        </div>
+                        <div className="p-4 space-y-4">
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 mb-3">{t.changeLanguage}</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                onClick={() => changeLanguage('en')}
+                                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                                  language === 'en'
+                                    ? 'border-orange-500 bg-orange-50 text-orange-600'
+                                    : 'border-gray-200 text-gray-600 hover:border-orange-200'
+                                }`}
+                              >
+                                {t.english}
+                              </button>
+                              <button
+                                onClick={() => changeLanguage('hi')}
+                                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                                  language === 'hi'
+                                    ? 'border-orange-500 bg-orange-50 text-orange-600'
+                                    : 'border-gray-200 text-gray-600 hover:border-orange-200'
+                                }`}
+                              >
+                                {t.hindi}
+                              </button>
+                            </div>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              if (!userMenuClosingRef.current) {
+                                userMenuClosingRef.current = true
+                                setShowLogoutConfirm(true)
+                                setUserMenuOpen(false)
+                              }
+                            }}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-50 text-red-600 font-semibold hover:bg-red-100 transition-colors"
+                          >
+                            <FiLogOut className="text-base" />
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="fixed inset-0 z-[130] flex items-start justify-end p-4 pointer-events-none">
+                      <div 
+                        className="mt-16 mr-4 w-60 bg-white border border-gray-200 rounded-2xl shadow-2xl pointer-events-auto animate-fadeInUp"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
                         <p className="text-xs text-gray-500">{user.email}</p>
                       </div>
-                      <div className="relative pointer-events-auto">
+                      <div className="p-4 space-y-3">
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t.changeLanguage}</p>
+                        <button
+                          onClick={() => changeLanguage('en')}
+                          className={`w-full text-left px-3 py-2 text-sm rounded-lg border transition-colors ${
+                            language === 'en'
+                              ? 'border-orange-500 bg-orange-50 text-orange-600 font-semibold'
+                              : 'border-gray-200 text-gray-600 hover:border-orange-200'
+                          }`}
+                        >
+                          {t.english}
+                        </button>
+                        <button
+                          onClick={() => changeLanguage('hi')}
+                          className={`w-full text-left px-3 py-2 text-sm rounded-lg border transition-colors ${
+                            language === 'hi'
+                              ? 'border-orange-500 bg-orange-50 text-orange-600 font-semibold'
+                              : 'border-gray-200 text-gray-600 hover:border-orange-200'
+                          }`}
+                        >
+                          {t.hindi}
+                        </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
-                            setShowLanguageMenu(!showLanguageMenu)
+                            if (!userMenuClosingRef.current) {
+                              userMenuClosingRef.current = true
+                              setShowLogoutConfirm(true)
+                              setUserMenuOpen(false)
+                            }
                           }}
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between cursor-pointer"
+                          className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2"
                         >
-                          <span>{t.changeLanguage}</span>
-                          <span className="text-xs">{language === 'en' ? 'EN' : 'HI'}</span>
+                          <FiLogOut className="text-base" />
+                          Logout
                         </button>
-                        {showLanguageMenu && (
-                          <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-[101]">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                changeLanguage('en')
-                              }}
-                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${
-                                language === 'en' ? 'bg-gray-50 text-gray-900 font-medium' : 'text-gray-700'
-                              }`}
-                            >
-                              {t.english}
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                changeLanguage('hi')
-                              }}
-                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${
-                                language === 'hi' ? 'bg-gray-50 text-gray-900 font-medium' : 'text-gray-700'
-                              }`}
-                            >
-                              {t.hindi}
-                            </button>
-                          </div>
-                        )}
+                      </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
             </>
@@ -756,26 +844,28 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         <>
           {/* Backdrop with fade effect */}
           <div
-            className="fixed inset-0 bg-black bg-opacity-60 z-[100] transition-opacity duration-300"
+            className="fixed inset-0 bg-black bg-opacity-60 z-[200] transition-opacity duration-300"
             onClick={() => setSidebarOpen(false)}
             style={{ backdropFilter: 'blur(3px)' }}
           ></div>
           
-          {/* Sidebar with slide-in animation */}
-          <div className="fixed left-0 top-0 h-full w-64 md:w-72 bg-white shadow-2xl z-[101] overflow-y-auto animate-slideInLeft">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-orange-50 to-white">
-              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <FiMenu className="text-orange-600" />
-                {t.menu}
-              </h2>
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <FiX className="text-xl" />
-              </button>
-            </div>
-            <nav className="py-4">
+          {/* Floating menu drawer */}
+          <div className="fixed inset-0 z-[201] flex items-start justify-start md:justify-center p-4 md:p-8 pointer-events-none">
+            <div className="w-[88%] max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden pointer-events-auto animate-slideInLeft md:animate-slideInLeft">
+              <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-orange-50/70 to-white sticky top-0">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <FiMenu className="text-gray-900" />
+                  {t.menu}
+                </h2>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label="Close menu"
+                >
+                  <FiX className="text-xl" />
+                </button>
+              </div>
+              <nav className="py-2 max-h-[70vh] overflow-y-auto">
               <button
                 onClick={() => handleNavClick('artworks')}
                 className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
@@ -896,11 +986,12 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               )}
             </nav>
           </div>
+        </div>
         </>
       )}
 
       {/* Main Content */}
-      <div className={sidebarOpen ? 'pointer-events-none' : ''}>
+      <div>
         {/* Logo Image - Only show on artworks tab */}
         {activeTab === 'artworks' && (
           <div className="text-center mb-2">
@@ -956,6 +1047,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               <div className="grid grid-cols-2 gap-1.5">
                 {filteredArtworks.map((artwork: any) => (
                   <div key={artwork.id} className="card p-1.5">
+                    {artwork.artistId && (
+                      <div className="mb-1">
+                        <ArtistBadge artistId={artwork.artistId} className="text-xs" />
+                      </div>
+                    )}
                     {artwork.images && artwork.images[0] ? (
                       <div className="relative w-full h-28 mb-1 rounded overflow-hidden">
                         <img
@@ -973,13 +1069,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </div>
                     )}
                     <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{artwork.title}</h3>
-                    {artwork.artistId && (
-                      <div className="mb-1">
-                        <ArtistBadge artistId={artwork.artistId} className="text-xs" />
-                      </div>
-                    )}
                     <p className="text-gray-600 text-xs mb-1 line-clamp-2">{artwork.description}</p>
-                    <p className="text-gray-900 font-bold text-xs mb-1">₹{artwork.price}</p>
+                    <p className="text-orange-600 font-bold text-xs mb-1">₹{artwork.price}</p>
                     
                     <div className="flex items-center gap-1 mb-1">
                       <div className="flex items-center gap-0.5 text-gray-400">
@@ -1003,7 +1094,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </button>
                       <button
                         onClick={() => handleBuyClick(artwork.id)}
-                        className="flex-1 btn-primary text-xs py-1.5"
+                        className="flex-1 btn-primary btn-buy text-xs py-1.5"
                       >
                         {t.buy}
                       </button>
@@ -1022,13 +1113,13 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                        <RecommendationSection
                          userId={user.uid}
                          type="personalized"
-                         limit={8}
+                         limit={10}
                          language={language}
                        />
                        <RecommendationSection
                          userId={user.uid}
                          type="becauseYouLiked"
-                         limit={6}
+                         limit={10}
                          language={language}
                        />
                      </>
@@ -1060,7 +1151,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl md:text-3xl font-bold text-orange-600">{wishlist.length}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-gray-900">{wishlist.length}</div>
                   <div className="text-xs text-gray-500">{t.totalItems}</div>
                 </div>
               </div>
@@ -1116,7 +1207,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       )}
                       <p className="text-gray-600 text-xs mb-2 line-clamp-2 hidden md:block">{artwork.description}</p>
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-gray-900 font-bold text-base md:text-lg">₹{artwork.price}</p>
+                        <p className="text-orange-600 font-bold text-base md:text-lg">₹{artwork.price}</p>
                         {artwork.likes > 0 && (
                           <div className="flex items-center gap-1 text-gray-500 text-xs">
                             <FiThumbsUp className="text-xs" />

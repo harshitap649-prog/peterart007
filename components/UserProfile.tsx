@@ -332,7 +332,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
           onClick={() => setActiveTab('profile')}
           className={`px-4 py-2 text-sm md:text-base font-medium transition-colors whitespace-nowrap ${
             activeTab === 'profile'
-              ? 'border-b-2 border-orange-600 text-orange-600'
+              ? 'border-b-2 border-orange-600 text-gray-900'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -343,7 +343,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
           onClick={() => setActiveTab('addresses')}
           className={`px-4 py-2 text-sm md:text-base font-medium transition-colors whitespace-nowrap ${
             activeTab === 'addresses'
-              ? 'border-b-2 border-orange-600 text-orange-600'
+              ? 'border-b-2 border-orange-600 text-gray-900'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -354,7 +354,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
           onClick={() => setActiveTab('settings')}
           className={`px-4 py-2 text-sm md:text-base font-medium transition-colors whitespace-nowrap ${
             activeTab === 'settings'
-              ? 'border-b-2 border-orange-600 text-orange-600'
+              ? 'border-b-2 border-orange-600 text-gray-900'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -408,7 +408,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2">
-                <FiUser className="text-orange-600" />
+                <FiUser className="text-gray-900" />
                 {t.personalInformation}
               </h3>
               {!editing && (
@@ -526,7 +526,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2">
-              <FiMapPin className="text-orange-600" />
+              <FiMapPin className="text-gray-900" />
               {t.savedAddresses}
             </h3>
             <button
@@ -618,7 +618,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                       {!address.isDefault && (
                         <button
                           onClick={() => handleSetDefault(address.id)}
-                          className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                          className="text-xs text-gray-900 hover:text-orange-700 font-medium"
                         >
                           {t.setAsDefault}
                         </button>
@@ -816,7 +816,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
           {/* Order History Export */}
           <div className="card p-4 md:p-6">
             <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiDownload className="text-orange-600" />
+              <FiDownload className="text-gray-900" />
               {t.orderHistory}
             </h3>
             <p className="text-sm text-gray-600 mb-4">
@@ -834,13 +834,13 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
           {/* Notifications */}
           <div className="card p-4 md:p-6">
             <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiBell className="text-orange-600" />
+              <FiBell className="text-gray-900" />
               {t.notifications}
             </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <FiMail className="text-orange-600" />
+                  <FiMail className="text-gray-900" />
                   <span className="text-sm font-medium text-gray-700">{t.emailNotifications}</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -850,7 +850,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <FiPhone className="text-orange-600" />
+                  <FiPhone className="text-gray-900" />
                   <span className="text-sm font-medium text-gray-700">{t.smsNotifications}</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -864,13 +864,13 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
           {/* Privacy & Security */}
           <div className="card p-4 md:p-6">
             <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiShield className="text-orange-600" />
+              <FiShield className="text-gray-900" />
               {t.privacy}
             </h3>
             <div className="space-y-3">
               <button className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FiLock className="text-orange-600" />
+                  <FiLock className="text-gray-900" />
                   <span className="text-sm font-medium text-gray-700">{t.changePassword}</span>
                 </div>
                 <FiX className="text-gray-400 text-xs">Coming Soon</FiX>

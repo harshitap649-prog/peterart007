@@ -290,13 +290,13 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
           {/* What Happens Next */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 md:p-8 text-left space-y-4">
             <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-              <FiMailIcon className="text-orange-600" />
+              <FiMailIcon className="text-gray-900" />
               {language === 'hi' ? 'आगे क्या होगा?' : 'What Happens Next?'}
             </h3>
             <ul className="space-y-3 text-gray-700 text-sm md:text-base">
               <li className="flex items-start gap-3">
                 <div className="mt-1 w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-orange-600 font-bold text-xs">1</span>
+                  <span className="text-gray-900 font-bold text-xs">1</span>
                 </div>
                 <span>
                   {language === 'hi' 
@@ -306,7 +306,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-1 w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-orange-600 font-bold text-xs">2</span>
+                  <span className="text-gray-900 font-bold text-xs">2</span>
                 </div>
                 <span>
                   {language === 'hi' 
@@ -316,7 +316,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
               </li>
               <li className="flex items-start gap-3">
                 <div className="mt-1 w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-orange-600 font-bold text-xs">3</span>
+                  <span className="text-gray-900 font-bold text-xs">3</span>
                 </div>
                 <span>
                   {language === 'hi' 

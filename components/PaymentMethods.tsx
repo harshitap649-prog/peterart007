@@ -144,14 +144,14 @@ export default function PaymentMethods({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`font-semibold text-sm md:text-base ${
-                    isSelected ? 'text-orange-600' : 'text-gray-900'
+                    isSelected ? 'text-gray-900' : 'text-gray-900'
                   }`}>
                     {method.name}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">{method.description}</p>
                 </div>
                 {isSelected && (
-                  <FiCheck className="text-orange-600 text-xl flex-shrink-0" />
+                  <FiCheck className="text-gray-900 text-xl flex-shrink-0" />
                 )}
               </div>
             </button>

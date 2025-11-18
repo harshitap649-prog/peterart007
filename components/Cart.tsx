@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/contexts/CartContext'
 import { FiShoppingCart, FiX, FiMinus, FiPlus, FiTrash2, FiAlertTriangle } from 'react-icons/fi'
@@ -10,14 +10,26 @@ export default function Cart() {
   const { cart, cartItemCount, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
   const [showClearConfirm, setShowClearConfirm] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    const handleChange = () => setIsDesktop(mediaQuery.matches)
+    handleChange()
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
 
   const handleCheckout = () => {
     if (cart.length === 0) {
       toast.error('Your cart is empty')
       return
     }
-    setIsOpen(false)
+    if (isDesktop) {
+      setIsOpen(false)
+    }
     router.push('/cart')
   }
 
@@ -25,8 +37,14 @@ export default function Cart() {
     <>
       {/* Cart Icon Button */}
       <button
-        onClick={() => setIsOpen(true)}
-        className="relative p-2 text-gray-700 hover:text-orange-600 transition-colors"
+        onClick={() => {
+          if (isDesktop) {
+            setIsOpen(true)
+          } else {
+            router.push('/cart')
+          }
+        }}
+        className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
         aria-label="Shopping cart"
       >
         <FiShoppingCart className="text-xl md:text-2xl" />
@@ -38,7 +56,7 @@ export default function Cart() {
       </button>
 
       {/* Cart Preview Sidebar */}
-      {isOpen && (
+      {isDesktop && isOpen && (
         <>
           {/* Backdrop */}
           <div
@@ -53,7 +71,7 @@ export default function Cart() {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2">
-                <FiShoppingCart className="text-orange-600" />
+                <FiShoppingCart className="text-gray-900" />
                 Shopping Cart
                 {cartItemCount > 0 && (
                   <span className="text-sm font-normal text-gray-500">({cartItemCount})</span>
@@ -100,7 +118,7 @@ export default function Cart() {
                         <h3 className="font-semibold text-sm md:text-base text-gray-900 truncate mb-1">
                           {item.artworkTitle}
                         </h3>
-                        <p className="text-orange-600 font-bold text-sm md:text-base mb-2">
+                        <p className="text-gray-900 font-bold text-sm md:text-base mb-2">
                           ₹{(item.unitPrice || item.price || 0).toFixed(2)}
                         </p>
 
@@ -177,7 +195,7 @@ export default function Cart() {
                     setIsOpen(false)
                     router.push('/cart')
                   }}
-                  className="w-full text-center text-orange-600 hover:text-orange-700 text-sm font-medium py-2"
+                  className="w-full text-center text-gray-900 hover:text-orange-700 text-sm font-medium py-2"
                 >
                   View Full Cart
                 </button>

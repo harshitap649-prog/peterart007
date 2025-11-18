@@ -369,7 +369,7 @@ export default function HelpSupport({ user, language = 'en' }: { user: any; lang
                 setShowForm(true)
               }}
             >
-              <FiTruck className="text-2xl text-orange-600 mx-auto mb-2" />
+              <FiTruck className="text-2xl text-gray-900 mx-auto mb-2" />
               <p className="text-xs font-semibold text-gray-900">{t.shipping}</p>
             </div>
             <div 
@@ -384,7 +384,7 @@ export default function HelpSupport({ user, language = 'en' }: { user: any; lang
           {/* Frequently Asked Questions */}
           <div className="card p-4 md:p-6">
             <div className="flex items-center gap-2 mb-4">
-              <FiMessageSquare className="text-xl text-orange-600" />
+              <FiMessageSquare className="text-xl text-gray-900" />
               <h3 className="text-lg md:text-xl font-bold text-gray-900">{t.frequentlyAskedQuestions}</h3>
             </div>
             <div className="space-y-2">
@@ -527,7 +527,7 @@ export default function HelpSupport({ user, language = 'en' }: { user: any; lang
               </label>
               <div className="space-y-3">
                 <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition-colors">
-                  <FiImage className="text-lg text-orange-600" />
+                  <FiImage className="text-lg text-gray-900" />
                   <span className="text-sm text-gray-700 font-medium">{t.addImage}</span>
                   <input
                     type="file"

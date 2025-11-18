@@ -919,7 +919,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           onClick={() => setActiveTab('overview')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'overview'
-              ? 'border-orange-600 text-orange-600'
+              ? 'border-orange-600 text-gray-900'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -929,7 +929,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           onClick={() => setActiveTab('portfolio')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'portfolio'
-              ? 'border-orange-600 text-orange-600'
+              ? 'border-orange-600 text-gray-900'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -939,7 +939,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           onClick={() => setActiveTab('analytics')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'analytics'
-              ? 'border-orange-600 text-orange-600'
+              ? 'border-orange-600 text-gray-900'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -949,7 +949,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           onClick={() => setActiveTab('commissions')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'commissions'
-              ? 'border-orange-600 text-orange-600'
+              ? 'border-orange-600 text-gray-900'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -965,7 +965,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
             onClick={() => setActiveTab('payouts')}
             className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
               activeTab === 'payouts'
-                ? 'border-orange-600 text-orange-600'
+                ? 'border-orange-600 text-gray-900'
                 : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -976,7 +976,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           onClick={() => setActiveTab('followers')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'followers'
-              ? 'border-orange-600 text-orange-600'
+              ? 'border-orange-600 text-gray-900'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -986,7 +986,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           onClick={() => setActiveTab('messages')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'messages'
-              ? 'border-orange-600 text-orange-600'
+              ? 'border-orange-600 text-gray-900'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -996,7 +996,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           onClick={() => setActiveTab('profile')}
           className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
             activeTab === 'profile'
-              ? 'border-orange-600 text-orange-600'
+              ? 'border-orange-600 text-gray-900'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
@@ -1011,7 +1011,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="card p-4">
               <div className="flex items-center justify-between mb-2">
-                <FiImage className="text-2xl text-orange-600" />
+                <FiImage className="text-2xl text-gray-900" />
                 <span className="text-xs text-gray-500">{t.totalArtworks}</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">{artworks.length}</p>
@@ -1047,7 +1047,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           <div className="card p-4 md:p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <FiPercent className="text-orange-600" />
+                <FiPercent className="text-gray-900" />
                 {t.commissionRate}
               </h3>
             </div>
@@ -1075,7 +1075,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           {sales && sales.orders && sales.orders.length > 0 && (
             <div className="card p-4 md:p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <FiPackage className="text-orange-600" />
+                <FiPackage className="text-gray-900" />
                 {t.recentSales}
               </h3>
               <div className="overflow-x-auto">
@@ -1226,7 +1226,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
                       </div>
                     )}
                     <h3 className="font-semibold text-sm mb-1 line-clamp-1">{artwork.title}</h3>
-                    <p className="text-gray-900 font-bold text-base mb-2">₹{artwork.price?.toFixed(2) || '0.00'}</p>
+                    <p className="text-orange-600 font-bold text-base mb-2">₹{artwork.price?.toFixed(2) || '0.00'}</p>
                     
                     {/* Engagement Metrics */}
                     <div className="flex items-center gap-3 text-xs text-gray-600 mb-2 pb-2 border-b border-gray-100">
@@ -1308,7 +1308,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="card p-4 md:p-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <FiBarChart2 className="text-orange-600" />
+                      <FiBarChart2 className="text-gray-900" />
                       {t.performance}
                     </h3>
                     <div className="space-y-4">
@@ -1341,7 +1341,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
 
                   <div className="card p-4 md:p-6">
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <FiTrendingUp className="text-orange-600" />
+                      <FiTrendingUp className="text-gray-900" />
                       {t.revenueChart}
                     </h3>
                     <div className="space-y-4">
@@ -1366,7 +1366,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
               {sales && (
                 <div className="card p-4 md:p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <FiPackage className="text-orange-600" />
+                    <FiPackage className="text-gray-900" />
                     {language === 'hi' ? 'ऑर्डर स्थिति' : 'Order Status'}
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
@@ -1386,7 +1386,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
               {artworks.length > 0 && (
                 <div className="card p-4 md:p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <FiTrendingUp className="text-orange-600" />
+                    <FiTrendingUp className="text-gray-900" />
                     {language === 'hi' ? 'शीर्ष प्रदर्शन करने वाली कलाकृतियां' : 'Top Performing Artworks'}
                   </h3>
                   <div className="space-y-3">
@@ -1429,7 +1429,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="font-bold text-gray-900">₹{artwork.price?.toFixed(2) || '0.00'}</p>
+                            <p className="font-bold text-orange-600">₹{artwork.price?.toFixed(2) || '0.00'}</p>
                           </div>
                         </div>
                       ))}
@@ -1488,7 +1488,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
                   <p className="text-sm text-gray-700 mb-2">
                     {t.selectCommissions}: <strong>{selectedCommissions.size}</strong>
                   </p>
-                  <p className="text-sm font-bold text-orange-600">
+                  <p className="text-sm font-bold text-gray-900">
                     {language === 'hi' ? 'कुल राशि' : 'Total Amount'}: ₹
                     {pendingCommissions
                       .filter((c: any) => selectedCommissions.has(c.id))
@@ -1552,7 +1552,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           {/* All Commissions */}
           <div className="card p-4 md:p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiDollarSign className="text-orange-600" />
+              <FiDollarSign className="text-gray-900" />
               {language === 'hi' ? 'सभी कमीशन' : 'All Commissions'}
             </h3>
             
@@ -1612,7 +1612,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
       {activeTab === 'followers' && (
         <div className="card p-4 md:p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <FiUsers className="text-orange-600" />
+            <FiUsers className="text-gray-900" />
             {t.myFollowers}
           </h3>
 
@@ -1668,7 +1668,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
         <div className="card p-4 md:p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <FiMessageCircle className="text-orange-600" />
+              <FiMessageCircle className="text-gray-900" />
               {t.myMessages}
             </h3>
             <button
@@ -1739,7 +1739,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           {/* Bank Details Section */}
           <div className="card p-4 md:p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiCreditCard className="text-orange-600" />
+              <FiCreditCard className="text-gray-900" />
               {t.bankDetails}
             </h3>
             <p className="text-xs text-gray-600 mb-4">
@@ -1801,7 +1801,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
           {/* Payout History */}
           <div className="card p-4 md:p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiDollarSign className="text-orange-600" />
+              <FiDollarSign className="text-gray-900" />
               {t.payoutHistory}
             </h3>
 

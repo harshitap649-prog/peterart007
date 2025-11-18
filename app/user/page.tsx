@@ -6,8 +6,6 @@ import { getCurrentUser } from '@/lib/auth'
 import UserDashboard from '@/components/UserDashboard'
 import LogoutButton from '@/components/LogoutButton'
 
-export const dynamic = 'force-dynamic'
-
 export default function UserPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)

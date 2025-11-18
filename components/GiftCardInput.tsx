@@ -116,7 +116,7 @@ export default function GiftCardInput({
   return (
     <div className="card p-4">
       <div className="flex items-center gap-2 mb-3">
-        <FiGift className="text-orange-600 text-lg" />
+        <FiGift className="text-gray-900 text-lg" />
         <h3 className="font-semibold text-gray-900">{t.title}</h3>
       </div>
       

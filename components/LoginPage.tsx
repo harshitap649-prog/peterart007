@@ -260,7 +260,7 @@ export default function LoginPage() {
             Already selling?{' '}
             <button
               onClick={() => router.push('/artist/apply')}
-              className="text-orange-600 hover:underline font-medium"
+              className="text-gray-900 hover:underline font-medium"
             >
               Go to artist portal
             </button>

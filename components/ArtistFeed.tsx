@@ -89,6 +89,11 @@ export default function ArtistFeed({ userId, language = 'en' }: ArtistFeedProps)
       <div className="grid grid-cols-2 gap-3">
         {artworks.map((artwork: any) => (
           <div key={artwork.id} className="card p-3 hover:shadow-lg transition-shadow">
+            {artwork.artistId && (
+              <div className="mb-2">
+                <ArtistBadge artistId={artwork.artistId} className="text-xs" />
+              </div>
+            )}
             {artwork.images && artwork.images[0] ? (
               <div className="relative w-full h-32 mb-2 rounded-lg overflow-hidden">
                 <img
@@ -103,12 +108,7 @@ export default function ArtistFeed({ userId, language = 'en' }: ArtistFeedProps)
               </div>
             )}
             <h3 className="font-semibold text-sm mb-1 line-clamp-1">{artwork.title}</h3>
-            {artwork.artistId && (
-              <div className="mb-1">
-                <ArtistBadge artistId={artwork.artistId} className="text-xs" />
-              </div>
-            )}
-            <p className="text-gray-900 font-bold text-sm">₹{artwork.price}</p>
+            <p className="text-orange-600 font-bold text-sm">₹{artwork.price}</p>
             {artwork.createdAt && (
               <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
                 <FiCalendar className="text-xs" />
