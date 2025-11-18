@@ -12,17 +12,31 @@ export default function BannerAd() {
     if (typeof window === 'undefined') return
     if (adLoadedRef.current) return
 
+    let mounted = true
+    let timeoutId: NodeJS.Timeout | null = null
+
     const injectIframe = () => {
-      // Remove any previously injected floating ad containers
-      const strayAds = document.querySelectorAll('iframe[src*="highperformanceformat"], div[id^="at-"]')
-      strayAds.forEach((node) => {
-        if (containerRef.current && !containerRef.current.contains(node)) {
-          node.parentElement?.removeChild(node)
-        }
-      })
+      if (!mounted) return
+
+      // Safely remove any previously injected floating ad containers
+      // Use remove() instead of removeChild to avoid React conflicts
+      try {
+        const strayAds = document.querySelectorAll('iframe[src*="highperformanceformat"], div[id^="at-"]')
+        strayAds.forEach((node) => {
+          if (containerRef.current && !containerRef.current.contains(node) && node.parentElement) {
+            // Check if node is actually a child before removing
+            if (node.parentElement.contains(node)) {
+              node.remove() // Use remove() instead of removeChild()
+            }
+          }
+        })
+      } catch (error) {
+        // Silently ignore DOM manipulation errors
+        console.warn('BannerAd: Error cleaning up stray ads', error)
+      }
 
       const container = containerRef.current
-      if (!container) return
+      if (!container || !mounted) return
 
       container.innerHTML = ''
       const iframe = document.createElement('iframe')
@@ -38,19 +52,21 @@ export default function BannerAd() {
       iframe.style.height = '50px'
       iframe.allow = 'autoplay'
       iframe.onload = () => {
+        if (!mounted) return
         adLoadedRef.current = true
         setAdReady(true)
         setAdError(false)
       }
       iframe.onerror = () => {
+        if (!mounted) return
         setAdError(true)
       }
 
       container.appendChild(iframe)
 
       // Fallback: if iframe still not rendered after 3s, show error notice
-      setTimeout(() => {
-        if (!adLoadedRef.current) {
+      timeoutId = setTimeout(() => {
+        if (mounted && !adLoadedRef.current) {
           setAdError(true)
         }
       }, 3000)
@@ -67,6 +83,10 @@ export default function BannerAd() {
     initializeAd()
 
     return () => {
+      mounted = false
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
       window.removeEventListener('load', injectIframe)
     }
   }, [])
