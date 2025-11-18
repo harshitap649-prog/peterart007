@@ -105,8 +105,8 @@ export async function GET(request: NextRequest) {
           
           // Get user views from artworks (views are stored per artwork)
           const views = artworks
-            .filter(a => a.views && a.views > 0)
-            .map(a => ({ artworkId: a.id, count: a.views || 0 }))
+            .filter((a: any) => a.views && a.views > 0)
+            .map((a: any) => ({ artworkId: a.id, count: a.views || 0 }))
           
           recommendations = getPersonalizedRecommendations(
             userId, 

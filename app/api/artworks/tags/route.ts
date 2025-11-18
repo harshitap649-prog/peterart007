@@ -81,12 +81,12 @@ export async function GET(request: NextRequest) {
       tagCounts[t.tag] = (tagCounts[t.tag] || 0) + 1
     })
     
-    const uniqueTags = Object.keys(tagCounts).map(tag => ({
+    const uniqueTags = Object.keys(tagCounts).map((tag: string) => ({
       tag,
       count: tagCounts[tag]
     }))
     
-    return NextResponse.json(uniqueTags.sort((a, b) => b.count - a.count))
+    return NextResponse.json(uniqueTags.sort((a: any, b: any) => b.count - a.count))
   } catch (error) {
     console.error('Error reading tags:', error)
     return NextResponse.json({ error: 'Failed to read tags' }, { status: 500 })
