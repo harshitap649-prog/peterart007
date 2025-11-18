@@ -79,10 +79,10 @@ export async function GET(request: NextRequest) {
     const coupons = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    }))
+    })) as any[]
     
     const now = new Date()
-    const activeCoupons = coupons.filter(coupon => {
+    const activeCoupons = coupons.filter((coupon: any) => {
       if (!coupon.isActive) return false
       if (coupon.validFrom && new Date(coupon.validFrom) > now) return false
       if (coupon.validUntil && new Date(coupon.validUntil) < now) return false
