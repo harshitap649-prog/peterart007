@@ -21,7 +21,8 @@ export async function GET(request: NextRequest) {
       }
       
       const couponDoc = snapshot.docs[0]
-      const coupon = { id: couponDoc.id, ...couponDoc.data() }
+      const couponData = couponDoc.data()
+      const coupon = { id: couponDoc.id, ...couponData } as any
       
       // Validation checks
       if (!coupon.isActive) {

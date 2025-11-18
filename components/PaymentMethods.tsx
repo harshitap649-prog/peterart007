@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FiCreditCard, FiSmartphone, FiWallet, FiGlobe, FiCheck } from 'react-icons/fi'
+import { FiCreditCard, FiSmartphone, FiDollarSign, FiGlobe, FiCheck } from 'react-icons/fi'
 import { processPayment } from '@/lib/payment'
 import toast from 'react-hot-toast'
 
@@ -74,7 +74,7 @@ export default function PaymentMethods({
     {
       id: 'wallets',
       name: t.wallets,
-      icon: FiWallet,
+      icon: FiDollarSign,
       description: 'Paytm, PhonePe, Amazon Pay',
       popular: false
     },
