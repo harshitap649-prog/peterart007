@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     // If this is the first address or marked as default, set it as default
     if (addresses.length === 0 || address.isDefault) {
       newAddress.isDefault = true
-      addresses.forEach(addr => {
+      addresses.forEach((addr: any) => {
         addr.isDefault = false
       })
     }
@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest) {
     
     const currentData = userDoc.data()
     const addresses = currentData.addresses || []
-    const index = addresses.findIndex(addr => addr.id === addressId)
+    const index = addresses.findIndex((addr: any) => addr.id === addressId)
     
     if (index === -1) {
       return NextResponse.json({ error: 'Address not found' }, { status: 404 })
@@ -100,7 +100,7 @@ export async function PUT(request: NextRequest) {
     
     // If setting as default, remove default from others
     if (addressData.isDefault) {
-      addresses.forEach(addr => {
+      addresses.forEach((addr: any) => {
         if (addr.id !== addressId) {
           addr.isDefault = false
         }
@@ -144,7 +144,7 @@ export async function DELETE(request: NextRequest) {
     }
     
     const currentData = userDoc.data()
-    const addresses = (currentData.addresses || []).filter(addr => addr.id !== addressId)
+    const addresses = (currentData.addresses || []).filter((addr: any) => addr.id !== addressId)
     
     await updateDoc(userRef, {
       addresses,
