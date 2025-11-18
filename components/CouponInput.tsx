@@ -60,8 +60,8 @@ export default function CouponInput({
       
       if (result.valid) {
         setAppliedCoupon(result.coupon)
-        setDiscount(result.discount)
-        onCouponApplied(result.coupon, result.discount)
+        setDiscount(result.discount || 0)
+        onCouponApplied(result.coupon, result.discount || 0)
         toast.success(t.applied)
       } else {
         toast.error(result.error || t.invalidCoupon)
