@@ -178,7 +178,7 @@ export default function ArtworkDetailsPage() {
       return
     }
     setReviewImages([...reviewImages, ...files])
-    files.forEach(file => {
+    files.forEach((file: File) => {
       const reader = new FileReader()
       reader.onload = (e) => {
         setReviewImagePreviews(prev => [...prev, e.target?.result as string])

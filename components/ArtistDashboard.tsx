@@ -695,7 +695,7 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
     const newFiles: File[] = []
     const newPreviews: string[] = []
 
-    files.forEach(file => {
+    files.forEach((file: File) => {
       if (file.type.startsWith('image/')) {
         newFiles.push(file)
         const reader = new FileReader()

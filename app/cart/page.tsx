@@ -211,7 +211,7 @@ export default function CartPage() {
         try {
           const { redeemGiftCard } = await import('@/lib/giftcards')
           // Redeem for the first order (or split across orders if needed)
-          await redeemGiftCard(appliedGiftCard.code, createdOrderIds[0], giftCardDiscount)
+          await redeemGiftCard(appliedGiftCard.code, createdOrderIds[0] as any, giftCardDiscount as any)
         } catch (error) {
           console.error('Error redeeming gift card:', error)
           // Continue even if gift card redemption fails

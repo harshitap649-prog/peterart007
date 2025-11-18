@@ -220,7 +220,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
     const newFiles = Array.from(files)
     const newPreviews: string[] = []
     
-    newFiles.forEach(file => {
+    newFiles.forEach((file: File) => {
       if (file.type.startsWith('image/')) {
         updated[artworkIndex].images.push(file)
         const reader = new FileReader()

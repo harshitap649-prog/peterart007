@@ -96,7 +96,7 @@ export default function MessagesPage() {
         
         // Convert to array and sort by last message time
         const conversationsList = Array.from(conversationMap.values())
-          .map(conv => {
+          .map((conv: any) => {
             // Get user info for each conversation
             return {
               ...conv,
@@ -170,7 +170,7 @@ export default function MessagesPage() {
     }
   }
 
-  const filteredConversations = conversations.filter(conv =>
+  const filteredConversations = conversations.filter((conv: any) =>
     conv.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     conv.userEmail?.toLowerCase().includes(searchQuery.toLowerCase())
   )
