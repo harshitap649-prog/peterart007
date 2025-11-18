@@ -3,9 +3,21 @@ import fs from 'fs'
 import path from 'path'
 
 const followsFilePath = path.join(process.cwd(), 'data', 'follows.json')
+const dataDir = path.join(process.cwd(), 'data')
+
+// Ensure data directory exists
+function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
 
 function readFollows() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(followsFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(followsFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {
@@ -14,7 +26,12 @@ function readFollows() {
 }
 
 function writeFollows(follows: any[]) {
-  fs.writeFileSync(followsFilePath, JSON.stringify(follows, null, 2))
+  try {
+    ensureDataDir()
+    fs.writeFileSync(followsFilePath, JSON.stringify(follows, null, 2))
+  } catch (error) {
+    console.error('Error writing follows:', error)
+  }
 }
 
 // GET - Get follows (check if user follows artist, get followers/following)

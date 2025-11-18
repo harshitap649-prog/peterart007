@@ -3,9 +3,20 @@ import fs from 'fs'
 import path from 'path'
 
 const collectionsFilePath = path.join(process.cwd(), 'data', 'collections.json')
+const dataDir = path.join(process.cwd(), 'data')
+
+function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
 
 function readCollections() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(collectionsFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(collectionsFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {
@@ -14,7 +25,12 @@ function readCollections() {
 }
 
 function writeCollections(collections: any[]) {
-  fs.writeFileSync(collectionsFilePath, JSON.stringify(collections, null, 2))
+  try {
+    ensureDataDir()
+    fs.writeFileSync(collectionsFilePath, JSON.stringify(collections, null, 2))
+  } catch (error) {
+    console.error('Error writing collections:', error)
+  }
 }
 
 // GET - Get collections

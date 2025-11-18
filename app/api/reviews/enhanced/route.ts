@@ -4,9 +4,20 @@ import path from 'path'
 
 const reviewsFilePath = path.join(process.cwd(), 'data', 'enhanced-reviews.json')
 const ordersFilePath = path.join(process.cwd(), 'data', 'orders.json')
+const dataDir = path.join(process.cwd(), 'data')
+
+function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
 
 function readReviews() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(reviewsFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(reviewsFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {
@@ -15,11 +26,20 @@ function readReviews() {
 }
 
 function writeReviews(reviews: any[]) {
-  fs.writeFileSync(reviewsFilePath, JSON.stringify(reviews, null, 2))
+  try {
+    ensureDataDir()
+    fs.writeFileSync(reviewsFilePath, JSON.stringify(reviews, null, 2))
+  } catch (error) {
+    console.error('Error writing reviews:', error)
+  }
 }
 
 function readOrders() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(ordersFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(ordersFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {

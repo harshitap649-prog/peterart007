@@ -3,9 +3,21 @@ import fs from 'fs'
 import path from 'path'
 
 const messagesFilePath = path.join(process.cwd(), 'data', 'messages.json')
+const dataDir = path.join(process.cwd(), 'data')
+
+// Ensure data directory exists
+function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
 
 function readMessages() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(messagesFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(messagesFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {
@@ -14,7 +26,12 @@ function readMessages() {
 }
 
 function writeMessages(messages: any[]) {
-  fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2))
+  try {
+    ensureDataDir()
+    fs.writeFileSync(messagesFilePath, JSON.stringify(messages, null, 2))
+  } catch (error) {
+    console.error('Error writing messages:', error)
+  }
 }
 
 // GET - Get messages (conversations)

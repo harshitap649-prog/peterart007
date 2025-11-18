@@ -4,9 +4,21 @@ import path from 'path'
 
 const affiliatesFilePath = path.join(process.cwd(), 'data', 'affiliates.json')
 const ordersFilePath = path.join(process.cwd(), 'data', 'orders.json')
+const dataDir = path.join(process.cwd(), 'data')
+
+// Ensure data directory exists
+function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
 
 function readAffiliates() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(affiliatesFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(affiliatesFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {
@@ -15,11 +27,20 @@ function readAffiliates() {
 }
 
 function writeAffiliates(affiliates: any[]) {
-  fs.writeFileSync(affiliatesFilePath, JSON.stringify(affiliates, null, 2))
+  try {
+    ensureDataDir()
+    fs.writeFileSync(affiliatesFilePath, JSON.stringify(affiliates, null, 2))
+  } catch (error) {
+    console.error('Error writing affiliates:', error)
+  }
 }
 
 function readOrders() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(ordersFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(ordersFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {

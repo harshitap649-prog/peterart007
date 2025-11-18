@@ -4,9 +4,20 @@ import path from 'path'
 
 const tagsFilePath = path.join(process.cwd(), 'data', 'artwork-tags.json')
 const artworksFilePath = path.join(process.cwd(), 'data', 'artworks.json')
+const dataDir = path.join(process.cwd(), 'data')
+
+function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
 
 function readTags() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(tagsFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(tagsFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {
@@ -15,11 +26,20 @@ function readTags() {
 }
 
 function writeTags(tags: any[]) {
-  fs.writeFileSync(tagsFilePath, JSON.stringify(tags, null, 2))
+  try {
+    ensureDataDir()
+    fs.writeFileSync(tagsFilePath, JSON.stringify(tags, null, 2))
+  } catch (error) {
+    console.error('Error writing tags:', error)
+  }
 }
 
 function readArtworks() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(artworksFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(artworksFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {

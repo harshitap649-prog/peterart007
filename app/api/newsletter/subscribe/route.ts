@@ -3,9 +3,21 @@ import fs from 'fs'
 import path from 'path'
 
 const subscribersFilePath = path.join(process.cwd(), 'data', 'newsletter-subscribers.json')
+const dataDir = path.join(process.cwd(), 'data')
+
+// Ensure data directory exists
+function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+}
 
 function readSubscribers() {
   try {
+    ensureDataDir()
+    if (!fs.existsSync(subscribersFilePath)) {
+      return []
+    }
     const data = fs.readFileSync(subscribersFilePath, 'utf-8')
     return JSON.parse(data)
   } catch (error) {
@@ -14,7 +26,12 @@ function readSubscribers() {
 }
 
 function writeSubscribers(subscribers: any[]) {
-  fs.writeFileSync(subscribersFilePath, JSON.stringify(subscribers, null, 2))
+  try {
+    ensureDataDir()
+    fs.writeFileSync(subscribersFilePath, JSON.stringify(subscribers, null, 2))
+  } catch (error) {
+    console.error('Error writing subscribers:', error)
+  }
 }
 
 // POST - Subscribe to newsletter
