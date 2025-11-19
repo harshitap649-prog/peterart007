@@ -2,7 +2,12 @@
 const nextConfig = {
   images: {
     domains: ['firebasestorage.googleapis.com', 'png.pngtree.com', 'icon2.cleanpng.com', 'static.vecteezy.com'],
+    unoptimized: false,
   },
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true,
   async headers() {
     return [
       {
