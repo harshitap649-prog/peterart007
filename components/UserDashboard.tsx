@@ -46,9 +46,9 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [commentText, setCommentText] = useState('')
   const [showComments, setShowComments] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [language, setLanguage] = useState<'en' | 'hi'>('en')
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null)
@@ -58,7 +58,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [showCongratulations, setShowCongratulations] = useState(false)
   const [followingArtists, setFollowingArtists] = useState<any[]>([])
   const [isMobileView, setIsMobileView] = useState(false)
-  const userMenuClosingRef = useRef(false)
 
   // Translations
   const translations = {
@@ -270,7 +269,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const changeLanguage = (lang: 'en' | 'hi') => {
     setLanguage(lang)
     localStorage.setItem('language', lang)
-    setUserMenuOpen(false)
     toast.success(lang === 'en' ? 'Language changed to English' : 'भाषा हिंदी में बदली गई')
   }
 
@@ -336,22 +334,19 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   // Prevent body scroll when sidebar or mobile menu is open
   useEffect(() => {
-    const overlayActive = sidebarOpen || userMenuOpen
+    const overlayActive = sidebarOpen
     if (overlayActive) {
       document.documentElement.classList.add('overflow-hidden')
       document.body.classList.add('overflow-hidden')
     } else {
       document.documentElement.classList.remove('overflow-hidden')
       document.body.classList.remove('overflow-hidden')
-      // Reset closing ref when menu is closed
-      userMenuClosingRef.current = false
     }
     return () => {
       document.documentElement.classList.remove('overflow-hidden')
       document.body.classList.remove('overflow-hidden')
-      userMenuClosingRef.current = false
     }
-  }, [sidebarOpen, userMenuOpen, isMobileView])
+  }, [sidebarOpen, isMobileView])
 
   // Filtered artworks will be updated by SearchFilters component
 
@@ -686,144 +681,35 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         <h1 className="text-lg font-bold text-gray-900">{t.peterArt}</h1>
 
         {/* Right Side - Cart and User Icon */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative">
           <Cart />
-          {/* User Icon / Settings */}
-          <div className="relative z-[60]">
           {user ? (
             <>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative z-[61]"
+                aria-label="User menu"
               >
                 <FiUser className="text-xl" />
               </button>
-
-              {/* User Menu Dropdown */}
+              
+              {/* User Menu Dropdown - Only Email/User Info */}
               {userMenuOpen && (
                 <>
+                  {/* Backdrop */}
                   <div
-                    className="fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (!userMenuClosingRef.current) {
-                        userMenuClosingRef.current = true
-                        setUserMenuOpen(false)
-                      }
-                    }}
+                    className="fixed inset-0 z-[120]"
+                    onClick={() => setUserMenuOpen(false)}
                   ></div>
-                  {isMobileView ? (
-                    <div className="fixed inset-0 z-[130] flex items-end justify-center p-4 pointer-events-none">
-                      <div 
-                        className="w-full max-w-sm bg-white rounded-t-3xl shadow-2xl pointer-events-auto animate-slideUp"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                          <div>
-                            <p className="text-base font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
-                            <p className="text-xs text-gray-500">{user.email}</p>
-                          </div>
-                          <button
-                            onClick={() => setUserMenuOpen(false)}
-                            className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                            aria-label="Close user menu"
-                          >
-                            <FiX className="text-lg" />
-                          </button>
-                        </div>
-                        <div className="p-4 space-y-4">
-                          <div>
-                            <p className="text-sm font-medium text-gray-900 mb-3">{t.changeLanguage}</p>
-                            <div className="grid grid-cols-2 gap-2">
-                              <button
-                                onClick={() => changeLanguage('en')}
-                                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                                  language === 'en'
-                                    ? 'border-orange-500 bg-orange-50 text-orange-600'
-                                    : 'border-gray-200 text-gray-600 hover:border-orange-200'
-                                }`}
-                              >
-                                {t.english}
-                              </button>
-                              <button
-                                onClick={() => changeLanguage('hi')}
-                                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                                  language === 'hi'
-                                    ? 'border-orange-500 bg-orange-50 text-orange-600'
-                                    : 'border-gray-200 text-gray-600 hover:border-orange-200'
-                                }`}
-                              >
-                                {t.hindi}
-                              </button>
-                            </div>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              if (!userMenuClosingRef.current) {
-                                userMenuClosingRef.current = true
-                                setShowLogoutConfirm(true)
-                                setUserMenuOpen(false)
-                              }
-                            }}
-                            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-50 text-red-600 font-semibold hover:bg-red-100 transition-colors"
-                          >
-                            <FiLogOut className="text-base" />
-                            Logout
-                          </button>
-                        </div>
-                      </div>
+                  
+                  {/* Dropdown Menu - Only User Info */}
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-[130]">
+                    {/* User Info */}
+                    <div className="px-4 py-3">
+                      <p className="text-sm font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
-                  ) : (
-                    <div className="fixed inset-0 z-[130] flex items-start justify-end p-4 pointer-events-none">
-                      <div 
-                        className="mt-16 mr-4 w-60 bg-white border border-gray-200 rounded-2xl shadow-2xl pointer-events-auto animate-fadeInUp"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t.changeLanguage}</p>
-                        <button
-                          onClick={() => changeLanguage('en')}
-                          className={`w-full text-left px-3 py-2 text-sm rounded-lg border transition-colors ${
-                            language === 'en'
-                              ? 'border-orange-500 bg-orange-50 text-orange-600 font-semibold'
-                              : 'border-gray-200 text-gray-600 hover:border-orange-200'
-                          }`}
-                        >
-                          {t.english}
-                        </button>
-                        <button
-                          onClick={() => changeLanguage('hi')}
-                          className={`w-full text-left px-3 py-2 text-sm rounded-lg border transition-colors ${
-                            language === 'hi'
-                              ? 'border-orange-500 bg-orange-50 text-orange-600 font-semibold'
-                              : 'border-gray-200 text-gray-600 hover:border-orange-200'
-                          }`}
-                        >
-                          {t.hindi}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            if (!userMenuClosingRef.current) {
-                              userMenuClosingRef.current = true
-                              setShowLogoutConfirm(true)
-                              setUserMenuOpen(false)
-                            }
-                          }}
-                          className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2"
-                        >
-                          <FiLogOut className="text-base" />
-                          Logout
-                        </button>
-                      </div>
-                      </div>
-                    </div>
-                  )}
+                  </div>
                 </>
               )}
             </>
@@ -831,11 +717,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
             <button
               onClick={() => setLoginModalOpen(true)}
               className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Login"
             >
               <FiUser className="text-xl" />
             </button>
           )}
-          </div>
         </div>
       </div>
 
@@ -853,10 +739,19 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           <div className="fixed inset-0 z-[201] flex items-start justify-start md:justify-center p-4 md:p-8 pointer-events-none">
             <div className="w-[88%] max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden pointer-events-auto animate-slideInLeft md:animate-slideInLeft">
               <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-orange-50/70 to-white sticky top-0">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <FiMenu className="text-gray-900" />
-                  {t.menu}
-                </h2>
+                <div className="flex-1">
+                  {user ? (
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</h2>
+                      <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
+                    </div>
+                  ) : (
+                    <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                      <FiMenu className="text-gray-900" />
+                      {t.menu}
+                    </h2>
+                  )}
+                </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
                   className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
@@ -973,16 +868,45 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 </button>
               )}
               {user && (
-                <button
-                  onClick={() => {
-                    setShowLogoutConfirm(true)
-                    setSidebarOpen(false)
-                  }}
-                  className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
-                >
-                  <FiLogOut className="text-base" />
-                  Logout
-                </button>
+                <>
+                  {/* Language Selection */}
+                  <div className="px-4 py-2 border-t border-gray-200 mt-2">
+                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{t.changeLanguage}</p>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => changeLanguage('en')}
+                        className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                          language === 'en'
+                            ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
+                            : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
+                        }`}
+                      >
+                        {t.english}
+                      </button>
+                      <button
+                        onClick={() => changeLanguage('hi')}
+                        className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                          language === 'hi'
+                            ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
+                            : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
+                        }`}
+                      >
+                        {t.hindi}
+                      </button>
+                    </div>
+                  </div>
+                  {/* Logout */}
+                  <button
+                    onClick={() => {
+                      setShowLogoutConfirm(true)
+                      setSidebarOpen(false)
+                    }}
+                    className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                  >
+                    <FiLogOut className="text-base" />
+                    Logout
+                  </button>
+                </>
               )}
             </nav>
           </div>

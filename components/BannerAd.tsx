@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 export default function BannerAd() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
   const adLoadedRef = useRef(false)
   const [adReady, setAdReady] = useState(false)
   const [adError, setAdError] = useState(false)
@@ -18,15 +19,22 @@ export default function BannerAd() {
     const injectIframe = () => {
       if (!mounted) return
 
+      const container = containerRef.current
+      if (!container || !mounted) return
+
       // Safely remove any previously injected floating ad containers
-      // Use remove() instead of removeChild to avoid React conflicts
+      // Only remove nodes that are NOT children of our container
       try {
         const strayAds = document.querySelectorAll('iframe[src*="highperformanceformat"], div[id^="at-"]')
         strayAds.forEach((node) => {
-          if (containerRef.current && !containerRef.current.contains(node) && node.parentElement) {
-            // Check if node is actually a child before removing
-            if (node.parentElement.contains(node)) {
-              node.remove() // Use remove() instead of removeChild()
+          if (container && !container.contains(node) && node.parentElement) {
+            try {
+              // Double check the node is still in the DOM before removing
+              if (node.parentElement && node.parentElement.contains(node)) {
+                node.remove()
+              }
+            } catch (e) {
+              // Ignore errors when removing stray nodes
             }
           }
         })
@@ -35,10 +43,29 @@ export default function BannerAd() {
         console.warn('BannerAd: Error cleaning up stray ads', error)
       }
 
-      const container = containerRef.current
-      if (!container || !mounted) return
+      // Only inject if we haven't already injected
+      if (iframeRef.current && container.contains(iframeRef.current)) {
+        return
+      }
 
-      container.innerHTML = ''
+      // Clear any existing iframes in the container safely
+      try {
+        const existingIframes = container.querySelectorAll('iframe')
+        existingIframes.forEach((iframe) => {
+          try {
+            if (container.contains(iframe)) {
+              // Use remove() instead of removeChild() to avoid React conflicts
+              iframe.remove()
+            }
+          } catch (e) {
+            // Ignore if already removed
+          }
+        })
+      } catch (error) {
+        // If React is managing this, just continue
+        console.warn('BannerAd: Could not clear container', error)
+      }
+
       const iframe = document.createElement('iframe')
       iframe.src = 'https://www.highperformanceformat.com/0fbc6e323c9390d9ca4f10e36841673e/invoke.html'
       iframe.width = '320'
@@ -51,18 +78,31 @@ export default function BannerAd() {
       iframe.style.width = '320px'
       iframe.style.height = '50px'
       iframe.allow = 'autoplay'
+      
+      iframeRef.current = iframe
+
       iframe.onload = () => {
         if (!mounted) return
         adLoadedRef.current = true
         setAdReady(true)
         setAdError(false)
+        console.log('✅ Banner Ad: Iframe loaded successfully')
       }
       iframe.onerror = () => {
         if (!mounted) return
         setAdError(true)
+        console.error('❌ Banner Ad: Iframe failed to load')
       }
 
-      container.appendChild(iframe)
+      // Safely append iframe
+      try {
+        if (container && container.parentElement) {
+          container.appendChild(iframe)
+        }
+      } catch (error) {
+        console.warn('BannerAd: Error appending iframe', error)
+        setAdError(true)
+      }
 
       // Fallback: if iframe still not rendered after 3s, show error notice
       timeoutId = setTimeout(() => {
@@ -72,11 +112,18 @@ export default function BannerAd() {
       }, 3000)
     }
 
+    const loadHandler = () => {
+      setTimeout(injectIframe, 100)
+    }
+
     const initializeAd = () => {
       if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        injectIframe()
+        // Small delay to ensure React has finished rendering
+        console.log('Banner Ad: Initializing ad...')
+        setTimeout(injectIframe, 100)
       } else {
-        window.addEventListener('load', injectIframe, { once: true })
+        console.log('Banner Ad: Waiting for page load...')
+        window.addEventListener('load', loadHandler, { once: true })
       }
     }
 
@@ -87,13 +134,36 @@ export default function BannerAd() {
       if (timeoutId) {
         clearTimeout(timeoutId)
       }
-      window.removeEventListener('load', injectIframe)
+      
+      // Clean up iframe reference safely
+      if (iframeRef.current && containerRef.current) {
+        try {
+          const iframe = iframeRef.current
+          const container = containerRef.current
+          
+          // Only remove if both elements are still in the DOM
+          if (document.body.contains(container) && container.contains(iframe)) {
+            // Use remove() instead of removeChild() to avoid React conflicts
+            iframe.remove()
+          }
+        } catch (error) {
+          // Ignore cleanup errors - React may have already removed it
+        }
+        iframeRef.current = null
+      }
+      
+      // Remove event listener if it exists
+      try {
+        window.removeEventListener('load', loadHandler)
+      } catch (error) {
+        // Ignore
+      }
     }
   }, [])
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[9999] py-2"
+      className="fixed bottom-0 left-0 right-0 z-[10000] py-2"
       style={{
         display: 'flex',
         justifyContent: 'center',
@@ -105,7 +175,7 @@ export default function BannerAd() {
         left: 0,
         right: 0,
         backgroundColor: 'transparent',
-        zIndex: 9999
+        zIndex: 10000
       }}
     >
       <div 
@@ -128,7 +198,7 @@ export default function BannerAd() {
           padding: '0',
           background: 'transparent',
           pointerEvents: 'auto',
-          zIndex: 10000,
+          zIndex: 10001,
           visibility: 'visible',
           opacity: 1
         }}

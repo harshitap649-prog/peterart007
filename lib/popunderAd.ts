@@ -66,20 +66,30 @@ export function loadPopunderAd(action: 'logout' | 'order' = 'order') {
   injectScript()
 
   // Also hook into the very next user interaction to ensure browsers treat it as user initiated
-  const interactionEvents: (keyof DocumentEventMap)[] = ['pointerdown', 'keydown', 'touchstart']
+  const interactionEvents: (keyof DocumentEventMap)[] = ['pointerdown', 'keydown', 'touchstart', 'click']
 
   const handleInteraction = () => {
+    console.log('Popunder ad: User interaction detected, injecting script...')
     interactionEvents.forEach((event) => document.removeEventListener(event, handleInteraction, true))
     if (!scriptInjected) {
       injectScript()
     }
   }
 
-  interactionEvents.forEach((event) => document.addEventListener(event, handleInteraction, true))
+  // Add interaction listeners
+  interactionEvents.forEach((event) => {
+    document.addEventListener(event, handleInteraction, { once: true, capture: true })
+  })
 
   // Safety timeout to remove listeners after 5 seconds
   setTimeout(() => {
-    interactionEvents.forEach((event) => document.removeEventListener(event, handleInteraction, true))
+    interactionEvents.forEach((event) => {
+      try {
+        document.removeEventListener(event, handleInteraction, true)
+      } catch (e) {
+        // Ignore errors
+      }
+    })
   }, 5000)
 }
 

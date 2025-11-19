@@ -22,28 +22,35 @@ export default function Cart() {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [])
 
+  // Prevent body scroll when cart is open on mobile
+  useEffect(() => {
+    if (isOpen && !isDesktop) {
+      document.documentElement.classList.add('overflow-hidden')
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.documentElement.classList.remove('overflow-hidden')
+      document.body.classList.remove('overflow-hidden')
+    }
+    return () => {
+      document.documentElement.classList.remove('overflow-hidden')
+      document.body.classList.remove('overflow-hidden')
+    }
+  }, [isOpen, isDesktop])
+
   const handleCheckout = () => {
     if (cart.length === 0) {
       toast.error('Your cart is empty')
       return
     }
-    if (isDesktop) {
-      setIsOpen(false)
-    }
+    setIsOpen(false)
     router.push('/cart')
   }
 
   return (
     <>
-      {/* Cart Icon Button */}
+      {/* Cart Icon Button - Directly navigate to cart page */}
       <button
-        onClick={() => {
-          if (isDesktop) {
-            setIsOpen(true)
-          } else {
-            router.push('/cart')
-          }
-        }}
+        onClick={() => router.push('/cart')}
         className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
         aria-label="Shopping cart"
       >
@@ -55,18 +62,21 @@ export default function Cart() {
         )}
       </button>
 
-      {/* Cart Preview Sidebar */}
-      {isDesktop && isOpen && (
+      {/* Cart Full Page Overlay (Mobile) / Sidebar (Desktop) - Not used anymore, kept for backward compatibility */}
+      {false && isOpen && (
         <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-            onClick={() => setIsOpen(false)}
-          />
+          {/* Backdrop - Only on Desktop */}
+          {isDesktop && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-60 z-[9998] transition-opacity duration-300"
+              onClick={() => setIsOpen(false)}
+              style={{ backdropFilter: 'blur(3px)' }}
+            />
+          )}
           
-          {/* Cart Sidebar */}
-          <div className={`fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl z-50 flex flex-col transform transition-transform duration-300 ${
-            isOpen ? 'translate-x-0' : 'translate-x-full'
+          {/* Cart - Full Page on Mobile, Sidebar on Desktop */}
+          <div className={`fixed inset-0 md:inset-y-0 md:right-0 md:left-auto md:w-96 h-full w-full bg-white shadow-2xl z-[9999] flex flex-col ${
+            isOpen ? 'animate-slideInRight' : ''
           }`}>
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
