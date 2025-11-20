@@ -68,6 +68,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       peterArt: 'Peter Art',
       fallInLove: 'Fall in love with art',
       turnEmptyWalls: 'Turn Empty Walls into Expressions',
+      securePayment: 'Trusted payments & same-day order tracking',
       searchArtworks: 'Search artworks...',
       menu: 'Menu',
       artworks: 'Artworks',
@@ -164,6 +165,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       peterArt: 'पीटर आर्ट',
       fallInLove: 'कला से प्यार करें',
       turnEmptyWalls: 'खाली दीवारों को अभिव्यक्ति में बदलें',
+      securePayment: 'विश्वसनीय भुगतान और उसी दिन ऑर्डर ट्रैकिंग',
       searchArtworks: 'कलाकृतियां खोजें...',
       menu: 'मेनू',
       artworks: 'कलाकृतियां',
@@ -253,7 +255,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       message: 'संदेश',
       artworksFromFollowing: 'आपके फॉलो किए गए कलाकारों की कलाकृतियां',
     },
-  }
+  } as const
 
   const t = translations[language]
 
@@ -665,10 +667,95 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     }
   }
 
+  const insightCards = [
+    {
+      label: t.totalItems,
+      value: filteredArtworks.length,
+      helper: t.browseArtworks,
+      accent: 'from-orange-50/80 to-white',
+      border: 'border-orange-100'
+    },
+    {
+      label: t.totalOrders,
+      value: orders.length,
+      helper: t.myOrders,
+      accent: 'from-blue-50/80 to-white',
+      border: 'border-blue-100'
+    },
+    {
+      label: t.itemsInWishlist,
+      value: wishlist.length,
+      helper: t.wishlist,
+      accent: 'from-pink-50/80 to-white',
+      border: 'border-pink-100'
+    },
+    {
+      label: t.totalReviews,
+      value: myReviews.length,
+      helper: t.yourReviews,
+      accent: 'from-purple-50/80 to-white',
+      border: 'border-purple-100'
+    }
+  ]
+
+  const quickActions = [
+    {
+      id: 'artworks',
+      title: t.artworks,
+      description: t.startShopping,
+      accent: 'from-orange-500 to-pink-500',
+      icon: FiArrowRight
+    },
+    {
+      id: 'wishlist',
+      title: t.wishlist,
+      description: t.addToWishlist,
+      accent: 'from-pink-500 to-rose-500',
+      icon: FiHeart
+    },
+    {
+      id: 'orders',
+      title: t.myOrders,
+      description: t.orderStatus,
+      accent: 'from-blue-500 to-indigo-500',
+      icon: FiPackage
+    },
+    {
+      id: 'support',
+      title: t.helpSupport,
+      description: t.helpSupport,
+      accent: 'from-violet-500 to-purple-500',
+      icon: FiHelpCircle
+    },
+    ...(isArtist
+      ? [
+          {
+            id: 'artist' as const,
+            title: t.artistDashboard,
+            description: t.viewDashboard,
+            accent: 'from-emerald-500 to-teal-500',
+            icon: FiTrendingUp
+          }
+        ]
+      : [])
+  ]
+
+  const navTabs = [
+    { id: 'artworks', label: t.artworks, icon: FiSearch },
+    { id: 'wishlist', label: t.wishlist, icon: FiHeart },
+    { id: 'following', label: t.following, icon: FiUser, hidden: !user },
+    { id: 'orders', label: t.myOrders, icon: FiShoppingCart },
+    { id: 'reviews', label: t.myReviews, icon: FiStar },
+    { id: 'support', label: t.helpSupport, icon: FiHelpCircle },
+    { id: 'profile', label: t.myProfile, icon: FiSettings, hidden: !user },
+    { id: 'giftcards', label: t.myGiftCards, icon: FiDollarSign, hidden: !user },
+    { id: 'artist', label: t.artistDashboard, icon: FiTrendingUp, hidden: !isArtist },
+  ].filter(tab => !tab.hidden)
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Top Bar */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200 px-2 py-2 flex items-center justify-between relative">
+    <div className="space-y-6 pb-24">
+      {/* Mobile Top Bar */}
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white/95 px-2 py-2 md:hidden">
         {/* Hamburger Menu */}
         <button
           onClick={() => setSidebarOpen(true)}
@@ -914,43 +1001,127 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         </>
       )}
 
+      {/* Quick Tabs */}
+      <div className="sticky top-12 z-30 -mx-4 mb-2 bg-gradient-to-b from-[#fff3eb] via-white/95 to-white px-4 pb-3 pt-2 md:relative md:top-0 md:mx-0">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {navTabs.map((tab) => {
+            const Icon = tab.icon
+            const isActiveTab = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleNavClick(tab.id)}
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  isActiveTab ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/30' : 'bg-white text-gray-600 border border-gray-200'
+                }`}
+              >
+                <Icon className="text-base" />
+                {tab.label}
+              </button>
+            )
+          })}
+          {user && (
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className="flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+            >
+              <FiLogOut className="text-base" />
+              {t.logout}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Hero + Insights */}
+      <div className="rounded-3xl bg-white/95 p-4 shadow-xl shadow-orange-500/10 sm:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-gray-400">
+              {t.peterArt}
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">{t.fallInLove}</h2>
+            <p className="text-sm text-gray-500 sm:text-base">{t.turnEmptyWalls}</p>
+          </div>
+          <div className="flex flex-col gap-2 text-sm text-gray-600">
+            <span className="font-semibold text-gray-900">{t.securePayment}</span>
+            <button
+              onClick={() => handleNavClick('artworks')}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-gray-900/30 transition hover:-translate-y-0.5 hover:bg-black"
+            >
+              <FiArrowRight className="text-base" />
+              {t.startShopping}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {insightCards.map((card) => (
+            <div
+              key={card.label}
+              className={`rounded-2xl border ${card.border} bg-gradient-to-br ${card.accent} p-4 shadow-sm`}
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{card.label}</p>
+              <p className="mt-2 text-3xl font-bold text-gray-900">{card.value}</p>
+              <p className="text-xs text-gray-500">{card.helper}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="-mx-1 mt-5 overflow-x-auto pb-2">
+          <div className="flex min-w-max gap-3 px-1">
+            {quickActions.map((action) => {
+              const Icon = action.icon
+              return (
+                <button
+                  key={action.id}
+                  onClick={() => handleNavClick(action.id)}
+                  type="button"
+                  className={`flex min-w-[180px] flex-1 items-center justify-between rounded-2xl bg-gradient-to-br ${action.accent} text-left text-white shadow-lg shadow-gray-900/30 transition hover:-translate-y-0.5`}
+                >
+                  <div className="flex flex-col gap-1 px-4 py-3">
+                    <span className="text-xs uppercase tracking-wide text-white/70">{action.title}</span>
+                    <span className="text-sm font-semibold">{action.description}</span>
+                  </div>
+                  <div className="mr-2 flex h-full items-center rounded-2xl bg-white/20 px-4 py-3 text-xl text-white">
+                    <Icon className="text-2xl" />
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
-      <div>
-        {/* Logo Image - Only show on artworks tab */}
+      <div className="space-y-6">
         {activeTab === 'artworks' && (
-          <div className="text-center mb-2">
-            <div className="relative w-24 h-24 mx-auto mb-1 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
-              <img
-                src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-                alt="Logo"
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none'
-                }}
+          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
+            <div className="mb-4 text-center">
+              <div className="relative mx-auto mb-2 h-24 w-24 overflow-hidden rounded-b-[50%]">
+                <img
+                  src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+                  alt="Logo"
+                  className="h-full w-full object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none'
+                  }}
+                />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">{t.fallInLove}</h3>
+              <p className="text-xs text-gray-500">{t.turnEmptyWalls}</p>
+            </div>
+
+            <div className="mb-6 rounded-2xl border border-gray-100 bg-white/90 p-3 shadow-sm">
+              <SearchFilters
+                artworks={artworks}
+                onFilterChange={setFilteredArtworks}
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                language={language}
+                filteredCount={filteredArtworks.length}
               />
             </div>
-            <h1 className="text-lg font-bold text-gray-900 mb-0.5">{t.fallInLove}</h1>
-            <p className="text-gray-600 text-xs">{t.turnEmptyWalls}</p>
-          </div>
-        )}
 
-        {/* Advanced Search and Filters - Only show on artworks tab */}
-        {activeTab === 'artworks' && (
-          <div className="mb-4">
-            <SearchFilters
-              artworks={artworks}
-              onFilterChange={setFilteredArtworks}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              language={language}
-              filteredCount={filteredArtworks.length}
-            />
-          </div>
-        )}
-
-        {/* Artworks Tab */}
-        {activeTab === 'artworks' && (
-          <div>
             {loading ? (
               <div className="text-center py-12">
                 <div className="w-12 h-12 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -968,16 +1139,16 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-gray-400 text-sm">{t.loadingArtworks}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
                 {filteredArtworks.map((artwork: any) => (
-                  <div key={artwork.id} className="card p-1.5">
+                  <div key={artwork.id} className="card rounded-2xl p-2">
                     {artwork.artistId && (
                       <div className="mb-1">
                         <ArtistBadge artistId={artwork.artistId} className="text-xs" />
                       </div>
                     )}
                     {artwork.images && artwork.images[0] ? (
-                      <div className="relative w-full h-28 mb-1 rounded overflow-hidden">
+                      <div className="relative mb-1 h-32 w-full overflow-hidden rounded-xl">
                         <img
                           src={artwork.images[0]}
                           alt={artwork.title}
@@ -1007,10 +1178,10 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </div>
                     </div>
 
-                    <div className="flex gap-1">
+                    <div className="flex gap-1.5">
                       <button
                         onClick={() => handleWishlist(artwork.id)}
-                        className={`flex-1 flex items-center justify-center gap-0.5 btn-secondary text-xs py-1.5 ${
+                        className={`btn-secondary flex flex-1 items-center justify-center gap-0.5 rounded-xl text-xs py-1.5 ${
                           wishlist.includes(artwork.id) ? 'text-red-400' : ''
                         }`}
                       >
@@ -1018,7 +1189,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                       </button>
                       <button
                         onClick={() => handleBuyClick(artwork.id)}
-                        className="flex-1 btn-primary btn-buy text-xs py-1.5"
+                        className="btn-primary btn-buy flex-1 rounded-xl text-xs py-1.5"
                       >
                         {t.buy}
                       </button>
@@ -1029,39 +1200,34 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                  </div>
                )}
 
-               {/* Recommendations Section - Show after main artworks */}
-               {filteredArtworks.length > 0 && (
-                 <>
-                   {user ? (
-                     <>
-                       <RecommendationSection
-                         userId={user.uid}
-                         type="personalized"
-                         limit={10}
-                         language={language}
-                       />
-                       <RecommendationSection
-                         userId={user.uid}
-                         type="becauseYouLiked"
-                         limit={10}
-                         language={language}
-                       />
-                     </>
-                   ) : (
-                     <RecommendationSection
-                       type="trending"
-                       limit={8}
-                       language={language}
-                     />
-                   )}
-                 </>
-               )}
-             </div>
-           )}
+            {filteredArtworks.length > 0 && (
+              <div className="mt-6 space-y-4">
+                {user ? (
+                  <>
+                    <RecommendationSection
+                      userId={user.uid}
+                      type="personalized"
+                      limit={10}
+                      language={language}
+                    />
+                    <RecommendationSection
+                      userId={user.uid}
+                      type="becauseYouLiked"
+                      limit={10}
+                      language={language}
+                    />
+                  </>
+                ) : (
+                  <RecommendationSection type="trending" limit={8} language={language} />
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
            {/* Wishlist Tab */}
         {activeTab === 'wishlist' && (
-          <div className="space-y-4">
+          <div className="space-y-4 rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
             {/* Header with Statistics */}
             <div className="card p-4 bg-gradient-to-br from-orange-50 via-white to-red-50 border-2 border-orange-100">
               <div className="flex items-center gap-3 mb-3">
@@ -1154,7 +1320,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
-          <div className="space-y-4">
+          <div className="space-y-4 rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
             {/* Header with Statistics */}
             <div className="card p-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50 border-2 border-blue-100">
               <div className="flex items-center gap-3 mb-3">
@@ -1323,7 +1489,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
         {/* My Reviews Tab */}
         {activeTab === 'reviews' && (
-          <div className="space-y-4">
+          <div className="space-y-4 rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
             {/* Header with Statistics */}
             <div className="card p-4 bg-gradient-to-br from-purple-50 via-white to-orange-50 border-2 border-purple-100">
               <div className="flex items-center gap-3 mb-3">
@@ -1494,31 +1660,35 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
         {/* Help & Support Tab */}
         {activeTab === 'support' && (
-          <div>
+          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
             <HelpSupport user={user} language={language} />
           </div>
         )}
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div>
+          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
             <UserProfile user={user} onProfileUpdate={onUserUpdate} language={language} />
           </div>
         )}
 
         {/* Gift Cards Tab */}
         {activeTab === 'giftcards' && user && (
-          <GiftCardManagement userId={user.uid} language={language} />
+          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
+            <GiftCardManagement userId={user.uid} language={language} />
+          </div>
         )}
 
         {/* Artist Dashboard Tab */}
         {activeTab === 'artist' && isArtist && user && (
-          <ArtistDashboard userId={user.uid} language={language} />
+          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
+            <ArtistDashboard userId={user.uid} language={language} />
+          </div>
         )}
 
         {/* Following Tab */}
         {activeTab === 'following' && user && (
-          <div className="space-y-4">
+          <div className="space-y-4 rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">{t.followingArtists}</h2>
             
             {followingArtists.length === 0 ? (
@@ -1598,62 +1768,51 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (
-        <div 
-          className="fixed inset-0 flex items-center justify-center z-[9999] p-4"
-          style={{ 
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100vw',
-            height: '100vh',
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: 0,
-            padding: '1rem'
-          }}
-        >
-          {/* Backdrop overlay to fade out background */}
-          <div 
-            className="absolute inset-0 bg-black bg-opacity-50"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 1
-            }}
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"
             onClick={() => setShowLogoutConfirm(false)}
           />
-          
-          {/* Modal content */}
-          <div 
-            className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative z-10"
-            style={{ 
-              border: 'none',
-              margin: 'auto',
-              transform: 'none'
-            }}
-          >
-            <h3 className="text-xl font-bold mb-4 text-gray-900">{t.confirmLogout}</h3>
-            <p className="text-gray-600 mb-6">{t.areYouSureLogout}</p>
-            <div className="flex gap-4">
-              <button
-                onClick={confirmLogout}
-                className="btn-primary flex-1"
-              >
-                {t.yesLogout}
-              </button>
-              <button
-                onClick={() => setShowLogoutConfirm(false)}
-                className="btn-secondary flex-1"
-              >
-                {t.cancel}
-              </button>
+          <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border border-white/40 bg-white/95 shadow-[0_35px_120px_-45px_rgba(15,23,42,0.8)]">
+            <div className="absolute -top-16 right-10 h-32 w-32 rounded-full bg-orange-100 blur-3xl" />
+            <div className="absolute -bottom-16 left-10 h-32 w-32 rounded-full bg-pink-100 blur-3xl" />
+            <div className="relative grid gap-6 p-6 sm:p-8">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg shadow-gray-900/40">
+                  <FiLogOut className="text-2xl" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">
+                    {t.logout}
+                  </p>
+                  <h3 className="text-2xl font-bold text-gray-900">{t.confirmLogout}</h3>
+                </div>
+              </div>
+              <p className="text-sm leading-relaxed text-gray-600">
+                {t.areYouSureLogout}
+              </p>
+              <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-sm text-gray-500">
+                <p className="font-semibold text-gray-900">{user?.email}</p>
+                <p className="mt-1">
+                  {language === 'hi'
+                    ? 'आप पुनः लॉग इन करके कभी भी वापस आ सकते हैं।'
+                    : 'You can sign back in at any time to continue exploring Peter Art.'}
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  onClick={confirmLogout}
+                  className="flex-1 rounded-2xl bg-gray-900 py-3 text-sm font-semibold text-white shadow-lg shadow-gray-900/40 transition hover:-translate-y-0.5 hover:bg-black"
+                >
+                  {t.yesLogout}
+                </button>
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 rounded-2xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+                  {t.cancel}
+                </button>
+              </div>
             </div>
           </div>
         </div>

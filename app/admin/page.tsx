@@ -8,7 +8,7 @@ import AdminDashboard from '@/components/AdminDashboard'
 
 export default function AdminPage() {
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -59,12 +59,30 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen p-3 md:p-4">
-      <div className="container mx-auto">
-        <div className="flex justify-end items-center mb-4 md:mb-6">
-          <LogoutButton />
+    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:py-10">
+        <div className="rounded-3xl border border-white/70 bg-white/95 p-6 shadow-[0_45px_120px_-60px_rgba(15,23,42,0.7)] backdrop-blur">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-gray-400">Admin Console</p>
+              <h1 className="mt-2 text-3xl font-bold text-gray-900">Operational Control Center</h1>
+              <p className="mt-2 max-w-2xl text-sm text-gray-600">
+                Monitor orders, artists, users, and support requests in one streamlined surface optimised for desktop and mobile.
+              </p>
+            </div>
+            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+              <div className="rounded-2xl border border-gray-100 bg-gray-50/70 px-4 py-3 text-sm text-gray-600">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Logged in as</p>
+                <p className="text-sm font-semibold text-gray-900">{user?.email || 'Admin'}</p>
+              </div>
+              <LogoutButton className="px-5 py-3" />
+            </div>
+          </div>
         </div>
-        <AdminDashboard />
+
+        <div className="rounded-3xl border border-white/70 bg-white/95 p-4 shadow-[0_45px_120px_-60px_rgba(15,23,42,0.55)] backdrop-blur md:p-6">
+          <AdminDashboard />
+        </div>
       </div>
     </div>
   )

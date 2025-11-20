@@ -4,6 +4,9 @@ import { Toaster } from 'react-hot-toast'
 import BannerAd from '@/components/BannerAd'
 import { CartProvider } from '@/contexts/CartContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import SiteHeader from '@/components/SiteHeader'
+import SiteFooter from '@/components/SiteFooter'
+import MobileDock from '@/components/MobileDock'
 
 export const metadata: Metadata = {
   title: 'Peter Art - Artwork Shop',
@@ -35,10 +38,19 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>
+      <body className="bg-[#fefaf4] text-gray-900">
         <ThemeProvider>
           <CartProvider>
-            {children}
+            <div className="relative flex min-h-screen flex-col bg-gradient-to-b from-[#fff3eb] via-white to-white">
+              <SiteHeader />
+              <main className="flex-1 w-full">
+                <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                  {children}
+                </div>
+              </main>
+              <SiteFooter />
+            </div>
+            <MobileDock />
           </CartProvider>
         </ThemeProvider>
         <Toaster 
