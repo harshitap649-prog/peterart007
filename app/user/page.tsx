@@ -39,24 +39,26 @@ export default function UserPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-900 text-lg">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--page-bg)] px-4">
+        <div className="text-center text-[var(--text-primary)]">
+          <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-black/10 border-t-transparent"></div>
+          <p className="text-lg font-semibold text-[var(--text-secondary)]">Loading dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white p-3 md:p-4">
+    <div className="min-h-screen px-2 py-4 text-[var(--text-primary)] md:px-4">
       <div className="container mx-auto">
-        <Suspense fallback={
-          <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="py-12 text-center text-[var(--text-secondary)]">
+              <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-black/10 border-t-transparent"></div>
+              <p>Loading...</p>
+            </div>
+          }
+        >
           <UserDashboard user={user} onUserUpdate={setUser} />
         </Suspense>
       </div>

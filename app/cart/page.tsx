@@ -241,41 +241,45 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-900 text-lg">Loading...</p>
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 font-semibold text-lg">Loading cart...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
       <div className="container mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => router.push('/user')}
-            className="btn-secondary flex items-center gap-2 text-sm md:text-base"
+            className="btn-secondary flex items-center gap-2 text-sm md:text-base px-5 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105"
           >
             <FiArrowLeft />
             Continue Shopping
           </button>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <FiShoppingCart className="text-gray-900" />
-            Shopping Cart
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+              <FiShoppingCart className="text-white text-xl" />
+            </div>
+            <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Shopping Cart</span>
           </h1>
         </div>
 
         {cart.length === 0 ? (
-          <div className="card p-8 md:p-12 text-center">
-            <FiShoppingCart className="text-6xl md:text-8xl text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
-            <p className="text-gray-500 mb-6">Add some items to get started!</p>
+          <div className="glass-panel p-12 md:p-16 text-center rounded-2xl">
+            <div className="w-32 h-32 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <FiShoppingCart className="text-6xl md:text-7xl text-orange-600" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">Your cart is empty</h2>
+            <p className="text-gray-600 text-lg mb-8">Add some items to get started!</p>
             <button
               onClick={() => router.push('/user')}
-              className="btn-primary text-sm md:text-base py-2.5 px-6"
+              className="btn-primary text-base md:text-lg py-3 px-8 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             >
               Browse Artworks
             </button>
@@ -287,33 +291,35 @@ export default function CartPage() {
               {cart.map((item) => (
                 <div
                   key={item.artworkId}
-                  className="card p-4 md:p-6 flex flex-col md:flex-row gap-4"
+                  className="glass-panel p-5 md:p-6 flex flex-col md:flex-row gap-5 rounded-xl hover:shadow-xl transition-all"
                 >
                   {/* Image */}
                   <div className="flex-shrink-0">
+                    <div className="w-full md:w-36 h-36 rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-gray-100 to-gray-200">
                     <img
                       src={item.artworkImage}
                       alt={item.artworkTitle}
-                      className="w-full md:w-32 h-32 md:h-32 object-cover rounded-lg"
+                        className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage%3C/text%3E%3C/svg%3E'
                       }}
                     />
+                    </div>
                   </div>
 
                   {/* Details */}
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">
                         {item.artworkTitle}
                       </h3>
-                      <p className="text-gray-900 font-bold text-lg md:text-xl mb-4">
+                      <p className="text-orange-600 font-bold text-xl md:text-2xl mb-4">
                         ₹{(item.unitPrice || item.price || 0).toFixed(2)}
                       </p>
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => {
@@ -324,26 +330,26 @@ export default function CartPage() {
                               toast.success('Item removed from cart')
                             }
                           }}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+                          className="w-10 h-10 rounded-xl hover:bg-gray-100 transition-all border-2 border-gray-200 hover:border-orange-300 flex items-center justify-center shadow-sm hover:shadow-md"
                           aria-label="Decrease quantity"
                         >
-                          <FiMinus className="text-lg" />
+                          <FiMinus className="text-lg text-gray-700" />
                         </button>
-                        <span className="text-lg font-semibold text-gray-900 min-w-[3rem] text-center">
+                        <span className="text-xl font-bold text-gray-900 min-w-[3rem] text-center">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateQuantity(item.artworkId, item.quantity + 1)}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+                          className="w-10 h-10 rounded-xl hover:bg-gray-100 transition-all border-2 border-gray-200 hover:border-orange-300 flex items-center justify-center shadow-sm hover:shadow-md"
                           aria-label="Increase quantity"
                         >
-                          <FiPlus className="text-lg" />
+                          <FiPlus className="text-lg text-gray-700" />
                         </button>
                       </div>
 
                       <div className="text-right">
-                        <p className="text-gray-500 text-sm mb-1">Subtotal</p>
-                        <p className="text-lg font-bold text-gray-900">
+                        <p className="text-gray-600 text-sm mb-1 font-medium">Subtotal</p>
+                        <p className="text-xl font-bold text-orange-600">
                           ₹{((item.unitPrice || item.price || 0) * item.quantity).toFixed(2)}
                         </p>
                       </div>
@@ -353,7 +359,7 @@ export default function CartPage() {
                           removeFromCart(item.artworkId)
                           toast.success('Item removed from cart')
                         }}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        className="w-10 h-10 rounded-xl text-red-500 hover:bg-red-50 transition-all border-2 border-red-200 hover:border-red-300 flex items-center justify-center shadow-sm hover:shadow-md"
                         aria-label="Remove item"
                       >
                         <FiTrash2 className="text-lg" />
@@ -366,8 +372,11 @@ export default function CartPage() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="card p-4 md:p-6 sticky top-4">
-                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+              <div className="glass-panel p-5 md:p-6 sticky top-4 rounded-2xl">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="w-1 h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
+                  Order Summary
+                </h2>
                 
                 {/* Coupon Input */}
                 {user && (
@@ -439,13 +448,16 @@ export default function CartPage() {
                 {!showCheckout ? (
                   <button
                     onClick={handleCheckout}
-                    className="btn-primary w-full text-sm md:text-base py-3 mb-3"
+                    className="btn-primary w-full text-base md:text-lg py-4 mb-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                   >
                     Proceed to Checkout
                   </button>
                 ) : (
                   <form onSubmit={handleOrderSubmit} className="space-y-4">
-                    <h3 className="text-lg font-bold mb-4 text-gray-900">Checkout</h3>
+                    <h3 className="text-xl md:text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                      <span className="w-1 h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
+                      Checkout
+                    </h3>
 
                     {/* Saved Addresses */}
                     {savedAddresses.length > 0 && (

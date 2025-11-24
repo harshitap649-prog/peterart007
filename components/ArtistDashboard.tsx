@@ -74,13 +74,22 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false)
   const [showArtworkForm, setShowArtworkForm] = useState(false)
   const [editingArtwork, setEditingArtwork] = useState<any>(null)
-  const [artworkFormData, setArtworkFormData] = useState({
+  const [artworkFormData, setArtworkFormData] = useState<{
+    title: string
+    description: string
+    price: string
+    category: string
+    images: File[]
+    imagePreviews: string[]
+    existingImages?: string[] // Track existing image URLs when editing
+  }>({
     title: '',
     description: '',
     price: '',
     category: '',
-    images: [] as File[],
-    imagePreviews: [] as string[]
+    images: [],
+    imagePreviews: [],
+    existingImages: []
   })
   const [submittingArtwork, setSubmittingArtwork] = useState(false)
   const [deletingArtwork, setDeletingArtwork] = useState<string | null>(null)
@@ -715,25 +724,60 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
       ...prev,
       images: [...prev.images, ...newFiles]
     }))
+    
+    // Reset file input to allow selecting same file again
+    if (e.target) {
+      e.target.value = ''
+    }
   }
 
   const removeImage = (index: number) => {
-    setArtworkFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-      imagePreviews: prev.imagePreviews.filter((_, i) => i !== index)
-    }))
+    setArtworkFormData(prev => {
+      const preview = prev.imagePreviews[index]
+      const isExistingImage = prev.existingImages?.includes(preview) || false
+      
+      // Remove from previews
+      const newImagePreviews = prev.imagePreviews.filter((_, i) => i !== index)
+      
+      // If it's a new file, remove from images array
+      // Calculate the index in the images array (new files come after existing images)
+      let newImages = [...prev.images]
+      if (!isExistingImage) {
+        // Count existing images before this index
+        const existingCountBeforeIndex = prev.imagePreviews.slice(0, index).filter(
+          (p) => prev.existingImages?.includes(p)
+        ).length
+        // The file index is: index - existingCountBeforeIndex
+        const fileIndex = index - existingCountBeforeIndex
+        if (fileIndex >= 0 && fileIndex < newImages.length) {
+          newImages = newImages.filter((_, i) => i !== fileIndex)
+        }
+      }
+      
+      // Update existingImages to remove the deleted one
+      const newExistingImages = prev.existingImages?.filter(img => img !== preview) || []
+      
+      return {
+        ...prev,
+        images: newImages,
+        imagePreviews: newImagePreviews,
+        existingImages: newExistingImages
+      }
+    })
   }
 
   const handleEditArtwork = async (artwork: any) => {
     setEditingArtwork(artwork)
+    // Store existing image URLs separately for tracking
+    const existingImages = artwork.images || []
     setArtworkFormData({
       title: artwork.title || '',
       description: artwork.description || '',
       price: artwork.price?.toString() || '',
       category: artwork.category || '',
-      images: [],
-      imagePreviews: artwork.images || []
+      images: [], // New files only
+      imagePreviews: [...existingImages], // Start with existing images
+      existingImages: existingImages // Track which images are existing
     })
     setShowArtworkForm(true)
   }
@@ -791,12 +835,17 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
     setSubmittingArtwork(true)
     try {
       if (editingArtwork) {
+        // When editing, send the images to keep (from imagePreviews that are URLs)
+        const imagesToKeep = artworkFormData.imagePreviews.filter(
+          (preview) => typeof preview === 'string' && (preview.startsWith('http') || preview.startsWith('/'))
+        )
         await updateArtwork(editingArtwork.id, {
           title: artworkFormData.title.trim(),
           description: artworkFormData.description.trim(),
           price: parseFloat(artworkFormData.price),
           category: artworkFormData.category.trim(),
-          artistId: artist.id
+          artistId: artist.id,
+          imagesToKeep: imagesToKeep // Send list of existing images to keep
         }, artworkFormData.images)
         toast.success(t.artworkUpdated)
       } else {
@@ -819,7 +868,8 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
         price: '',
         category: '',
         images: [],
-        imagePreviews: []
+        imagePreviews: [],
+        existingImages: []
       })
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
@@ -1873,7 +1923,8 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
                     price: '',
                     category: '',
                     images: [],
-                    imagePreviews: []
+                    imagePreviews: [],
+                    existingImages: []
                   })
                   if (fileInputRef.current) {
                     fileInputRef.current.value = ''
@@ -2013,7 +2064,8 @@ export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashb
                       price: '',
                       category: '',
                       images: [],
-                      imagePreviews: []
+                      imagePreviews: [],
+                      existingImages: []
                     })
                     if (fileInputRef.current) {
                       fileInputRef.current.value = ''

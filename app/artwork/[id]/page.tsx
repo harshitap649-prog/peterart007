@@ -436,10 +436,10 @@ export default function ArtworkDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-900 text-lg">Loading...</p>
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 font-semibold text-lg">Loading artwork...</p>
         </div>
       </div>
     )
@@ -452,12 +452,12 @@ export default function ArtworkDetailsPage() {
   const totalPrice = (artwork.price * quantity).toFixed(2)
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => router.push('/user')}
-            className="btn-secondary flex items-center gap-2"
+            className="btn-secondary flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105"
           >
             <FiArrowLeft />
             Back to Artworks
@@ -465,13 +465,13 @@ export default function ArtworkDetailsPage() {
           <Cart />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* Artwork Images */}
           <div className="space-y-4">
             {artwork.images && artwork.images.length > 0 ? (
-              <div className="card p-4">
+              <div className="glass-panel p-4 md:p-6 rounded-2xl">
                 <div 
-                  className="relative w-full h-96 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center"
+                  className="relative w-full h-80 md:h-96 rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center shadow-xl"
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
@@ -544,16 +544,16 @@ export default function ArtworkDetailsPage() {
 
           {/* Artwork Details */}
           <div className="space-y-6">
-            <div className="card p-6">
-              <div className="flex items-start justify-between mb-3">
+            <div className="glass-panel p-6 md:p-8 rounded-2xl">
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h1 className="text-xl font-bold mb-4 text-gray-900">{artwork.title}</h1>
+                  <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{artwork.title}</h1>
                   {artwork.artistId && (
-                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                    <div className="mb-4 p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border-2 border-orange-200 hover:border-orange-300 transition-colors shadow-sm">
                       <ArtistBadge artistId={artwork.artistId} />
                     </div>
                   )}
-                  <p className="text-gray-600 mb-4 whitespace-pre-wrap text-sm">{artwork.description}</p>
+                  <p className="text-gray-600 mb-4 whitespace-pre-wrap text-base md:text-lg leading-relaxed">{artwork.description}</p>
                 </div>
                 <button
                   onClick={handleLike}
@@ -569,46 +569,46 @@ export default function ArtworkDetailsPage() {
                 </button>
               </div>
               {artwork.category && (
-                <span className="inline-block px-3 py-1 bg-gray-100 text-gray-900 rounded-full text-xs mb-4">
+                <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-100 to-orange-200 text-gray-900 rounded-xl text-sm font-semibold mb-4 shadow-sm">
                   {artwork.category}
                 </span>
               )}
-              <div className="border-t border-gray-300 pt-4">
-                <p className="text-lg font-bold text-orange-600 mb-6">₹{artwork.price}</p>
+              <div className="border-t border-gray-200 pt-6 mt-6">
+                <p className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">₹{artwork.price}</p>
 
                 {!showCheckout ? (
                   <>
                     {/* Quantity Selector */}
                     <div className="mb-6">
-                      <label className="block text-xs font-medium mb-2 text-gray-600">
+                      <label className="block text-sm font-semibold mb-3 text-gray-700">
                         Quantity (Max 5)
                       </label>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-4">
                         <button
                           onClick={() => handleQuantityChange(-1)}
                           disabled={quantity <= 1}
-                          className="w-10 h-10 rounded-full border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-400 transition-colors"
+                          className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-orange-400 hover:bg-orange-50 transition-all shadow-sm hover:shadow-md"
                         >
-                          <FiMinus className="text-lg" />
+                          <FiMinus className="text-xl" />
                         </button>
-                        <span className="text-lg font-bold w-10 text-center">{quantity}</span>
+                        <span className="text-2xl font-bold w-12 text-center text-gray-900">{quantity}</span>
                         <button
                           onClick={() => handleQuantityChange(1)}
                           disabled={quantity >= 5}
-                          className="w-10 h-10 rounded-full border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-400 transition-colors"
+                          className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-orange-400 hover:bg-orange-50 transition-all shadow-sm hover:shadow-md"
                         >
-                          <FiPlus className="text-lg" />
+                          <FiPlus className="text-xl" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Total Price:</span>
-                        <span className="text-base font-bold text-orange-600">₹{totalPrice}</span>
+                    <div className="mb-6 p-5 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border-2 border-orange-200 shadow-sm">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-700 text-base font-medium">Total Price:</span>
+                        <span className="text-2xl font-bold text-orange-600">₹{totalPrice}</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        <span className="text-orange-600">{quantity} × ₹{artwork.price} = ₹{totalPrice}</span>
+                      <p className="text-sm text-gray-600 mt-2">
+                        <span className="font-semibold">{quantity} × ₹{artwork.price} = ₹{totalPrice}</span>
                       </p>
                     </div>
 
@@ -629,14 +629,14 @@ export default function ArtworkDetailsPage() {
                           })
                           toast.success('Added to cart!')
                         }}
-                        className="btn-secondary flex-1 flex items-center justify-center gap-2 text-lg py-4"
+                        className="btn-secondary flex-1 flex items-center justify-center gap-2 text-base md:text-lg py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105"
                       >
                         <FiShoppingCart />
                         Add to Cart
                       </button>
                       <button
                         onClick={handleBuyNow}
-                        className="btn-primary flex-1 flex items-center justify-center gap-2 text-lg py-4"
+                        className="btn-primary flex-1 flex items-center justify-center gap-2 text-base md:text-lg py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                       >
                         <FiShoppingCart />
                         Buy Now
@@ -839,8 +839,11 @@ export default function ArtworkDetailsPage() {
             </div>
 
             {/* Reviews Section */}
-            <div className="card p-6 mt-6">
-              <h2 className="text-xl font-bold mb-4 text-gray-900">Reviews</h2>
+            <div className="glass-panel p-6 md:p-8 mt-6 rounded-2xl">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                <span className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
+                Reviews
+              </h2>
               
               {/* Average Rating */}
               {artwork.averageRating && (

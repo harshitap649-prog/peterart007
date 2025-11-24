@@ -107,10 +107,10 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-900 text-lg">Loading...</p>
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 font-semibold text-lg">Loading...</p>
         </div>
       </div>
     )
@@ -123,10 +123,10 @@ export default function Home() {
 
   // If user is authenticated, show loading while redirecting
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-900 text-lg">Redirecting...</p>
+        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-700 font-semibold text-lg">Redirecting...</p>
       </div>
     </div>
   )

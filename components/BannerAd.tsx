@@ -2,184 +2,226 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+declare global {
+  interface Window {
+    atOptions?: Record<string, unknown>
+  }
+}
+
 export default function BannerAd() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const iframeRef = useRef<HTMLIFrameElement | null>(null)
-  const adLoadedRef = useRef(false)
+  const slotRef = useRef<HTMLDivElement>(null)
+  const scriptRef = useRef<HTMLScriptElement | null>(null)
+  const observerRef = useRef<MutationObserver | null>(null)
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [adReady, setAdReady] = useState(false)
   const [adError, setAdError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const maxRetries = 3
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    if (adLoadedRef.current) return
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
+    const slot = slotRef.current
+    if (!slot) return
 
     let mounted = true
-    let timeoutId: NodeJS.Timeout | null = null
+    let currentRetryCount = 0
 
-    const injectIframe = () => {
+    const loadAd = () => {
       if (!mounted) return
 
-      const container = containerRef.current
-      if (!container || !mounted) return
+      // Clean previous script/ad
+      const existingScript = document.getElementById('adsterra-banner-script')
+      if (existingScript && existingScript.parentNode) {
+        existingScript.parentNode.removeChild(existingScript)
+      }
+      if (scriptRef.current && scriptRef.current.parentNode) {
+        scriptRef.current.parentNode.removeChild(scriptRef.current)
+      }
+      slot.innerHTML = ''
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
+      }
 
-      // Safely remove any previously injected floating ad containers
-      // Only remove nodes that are NOT children of our container
-      try {
-        const strayAds = document.querySelectorAll('iframe[src*="highperformanceformat"], div[id^="at-"]')
-        strayAds.forEach((node) => {
-          if (container && !container.contains(node) && node.parentElement) {
-            try {
-              // Double check the node is still in the DOM before removing
-              if (node.parentElement && node.parentElement.contains(node)) {
-                node.remove()
-              }
-            } catch (e) {
-              // Ignore errors when removing stray nodes
-            }
+      // Use the existing slot div as the target container
+      const placeholderId = 'banner-ad-slot'
+      const placeholder = document.getElementById(placeholderId) || slot
+      placeholder.innerHTML = ''
+      placeholder.style.width = '320px'
+      placeholder.style.height = '50px'
+      placeholder.style.margin = '0 auto'
+      placeholder.style.minHeight = '50px'
+      placeholder.style.minWidth = '320px'
+      placeholder.style.position = 'relative'
+      placeholder.style.zIndex = '100'
+      placeholder.style.visibility = 'visible'
+      placeholder.style.opacity = '1'
+      placeholder.style.display = 'block'
+
+      // Observe for iframe insertion to mark ad ready
+      observerRef.current = new MutationObserver((mutations) => {
+        const iframe = slot.querySelector('iframe')
+        const adSlot = document.getElementById(placeholderId)
+        if (iframe || (adSlot && adSlot.innerHTML.trim() && adSlot.innerHTML.includes('iframe'))) {
+          console.log('✅ Banner ad: Iframe detected!')
+          setAdReady(true)
+          setAdError(false)
+          // Hide overlay immediately
+          const overlay = slot.parentElement?.querySelector('.absolute.inset-0')
+          if (overlay) {
+            (overlay as HTMLElement).style.display = 'none'
           }
-        })
-      } catch (error) {
-        // Silently ignore DOM manipulation errors
-        console.warn('BannerAd: Error cleaning up stray ads', error)
-      }
-
-      // Only inject if we haven't already injected
-      if (iframeRef.current && container.contains(iframeRef.current)) {
-        return
-      }
-
-      // Clear any existing iframes in the container safely
-      try {
-        const existingIframes = container.querySelectorAll('iframe')
-        existingIframes.forEach((iframe) => {
-          try {
-            if (container.contains(iframe)) {
-              // Use remove() instead of removeChild() to avoid React conflicts
-              iframe.remove()
-            }
-          } catch (e) {
-            // Ignore if already removed
+          if (observerRef.current) {
+            observerRef.current.disconnect()
+            observerRef.current = null
           }
-        })
-      } catch (error) {
-        // If React is managing this, just continue
-        console.warn('BannerAd: Could not clear container', error)
+        }
+      })
+      observerRef.current.observe(slot, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src', 'style', 'display', 'visibility']
+      })
+
+      // Set Adsterra options BEFORE loading script
+      window.atOptions = {
+        key: '0fbc6e323c9390d9ca4f10e36841673e',
+        format: 'iframe',
+        height: 50,
+        width: 320,
+        params: {}
       }
 
-      const iframe = document.createElement('iframe')
-      iframe.src = 'https://www.highperformanceformat.com/0fbc6e323c9390d9ca4f10e36841673e/invoke.html'
-      iframe.width = '320'
-      iframe.height = '50'
-      iframe.frameBorder = '0'
-      iframe.scrolling = 'no'
-      iframe.style.border = 'none'
-      iframe.style.display = 'block'
-      iframe.style.margin = '0 auto'
-      iframe.style.width = '320px'
-      iframe.style.height = '50px'
-      iframe.allow = 'autoplay'
+      // Create and load script - Load in document body, not in slot
+      const script = document.createElement('script')
+      script.id = 'adsterra-banner-script'
+      script.src = 'https://www.highperformanceformat.com/0fbc6e323c9390d9ca4f10e36841673e/invoke.js'
+      script.async = true
+      script.defer = false
+      script.crossOrigin = 'anonymous'
       
-      iframeRef.current = iframe
-
-      iframe.onload = () => {
+      script.onload = () => {
         if (!mounted) return
-        adLoadedRef.current = true
+        console.log('✅ Banner ad: Script loaded successfully')
+        
+        // Check multiple times for ad content
+        let checkCount = 0
+        const maxChecks = 10
+        const checkInterval = setInterval(() => {
+          if (!mounted || checkCount >= maxChecks) {
+            clearInterval(checkInterval)
+            return
+          }
+          checkCount++
+          
+          const adSlotElement = document.getElementById(placeholderId)
+          const iframeElement = slot.querySelector('iframe')
+          const hasAdContent = !!(adSlotElement && adSlotElement.innerHTML.trim() && 
+            (adSlotElement.innerHTML.includes('iframe') || adSlotElement.innerHTML.includes('img') || adSlotElement.innerHTML.length > 100))
+          
+          if (iframeElement || hasAdContent) {
+            clearInterval(checkInterval)
         setAdReady(true)
         setAdError(false)
-        console.log('✅ Banner Ad: Iframe loaded successfully')
+            // Hide overlay
+            const overlay = slot.parentElement?.querySelector('.absolute.inset-0')
+            if (overlay) {
+              (overlay as HTMLElement).style.display = 'none'
+            }
+            console.log('✅ Banner ad: Ad content detected and visible')
+          } else if (checkCount >= maxChecks) {
+            clearInterval(checkInterval)
+            console.warn('⚠️ Banner ad: Script loaded but no ad content detected after checks')
+            if (currentRetryCount < maxRetries) {
+              currentRetryCount++
+              setRetryCount(currentRetryCount)
+              console.log(`🔄 Banner ad: Retrying... (${currentRetryCount}/${maxRetries})`)
+              retryTimeoutRef.current = setTimeout(() => {
+                if (mounted) loadAd()
+              }, 3000 * currentRetryCount)
+            } else {
+        setAdError(true)
+              console.error('❌ Banner ad: Max retries reached')
+            }
+          }
+        }, 500) // Check every 500ms
       }
-      iframe.onerror = () => {
+      
+      script.onerror = (error) => {
         if (!mounted) return
-        setAdError(true)
-        console.error('❌ Banner Ad: Iframe failed to load')
-      }
-
-      // Safely append iframe
-      try {
-        if (container && container.parentElement) {
-          container.appendChild(iframe)
-        }
-      } catch (error) {
-        console.warn('BannerAd: Error appending iframe', error)
-        setAdError(true)
-      }
-
-      // Fallback: if iframe still not rendered after 3s, show error notice
-      timeoutId = setTimeout(() => {
-        if (mounted && !adLoadedRef.current) {
+        console.error('❌ Banner ad: Script failed to load', error)
+        if (currentRetryCount < maxRetries) {
+          currentRetryCount++
+          setRetryCount(currentRetryCount)
+          console.log(`🔄 Banner ad: Retrying... (${currentRetryCount}/${maxRetries})`)
+          retryTimeoutRef.current = setTimeout(() => {
+            if (mounted) loadAd()
+          }, 3000 * currentRetryCount)
+        } else {
           setAdError(true)
+          setAdReady(false)
+          console.error('❌ Banner ad: Max retries reached, giving up')
         }
-      }, 3000)
-    }
-
-    const loadHandler = () => {
-      setTimeout(injectIframe, 100)
-    }
-
-    const initializeAd = () => {
-      if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        // Small delay to ensure React has finished rendering
-        console.log('Banner Ad: Initializing ad...')
-        setTimeout(injectIframe, 100)
-      } else {
-        console.log('Banner Ad: Waiting for page load...')
-        window.addEventListener('load', loadHandler, { once: true })
       }
+      
+      // Append script inside the slot so the ad renders in place
+      slot.appendChild(script)
+      scriptRef.current = script
+      console.log('📝 Banner ad: Script appended to slot')
     }
 
-    initializeAd()
+    // Initial load with small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      if (mounted) {
+        console.log('🚀 Banner ad: Starting ad load...')
+        loadAd()
+      }
+    }, 1000)
 
     return () => {
       mounted = false
-      if (timeoutId) {
-        clearTimeout(timeoutId)
+      clearTimeout(timer)
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current)
       }
-      
-      // Clean up iframe reference safely
-      if (iframeRef.current && containerRef.current) {
-        try {
-          const iframe = iframeRef.current
-          const container = containerRef.current
-          
-          // Only remove if both elements are still in the DOM
-          if (document.body.contains(container) && container.contains(iframe)) {
-            // Use remove() instead of removeChild() to avoid React conflicts
-            iframe.remove()
-          }
-        } catch (error) {
-          // Ignore cleanup errors - React may have already removed it
-        }
-        iframeRef.current = null
+      const existingScript = document.getElementById('adsterra-banner-script')
+      if (existingScript && existingScript.parentNode) {
+        existingScript.parentNode.removeChild(existingScript)
       }
-      
-      // Remove event listener if it exists
-      try {
-        window.removeEventListener('load', loadHandler)
-      } catch (error) {
-        // Ignore
+      if (scriptRef.current && scriptRef.current.parentNode) {
+        scriptRef.current.parentNode.removeChild(scriptRef.current)
+      }
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+        observerRef.current = null
+      }
+      if (slot) {
+        slot.innerHTML = ''
       }
     }
   }, [])
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 z-[10000] py-2"
+      ref={containerRef}
+      className="fixed bottom-0 left-0 right-0 z-[10000] py-2 bg-transparent"
       style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        pointerEvents: 'none',
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         backgroundColor: 'transparent',
-        zIndex: 10000
+        zIndex: 10000,
+        pointerEvents: 'none'
       }}
     >
       <div 
-        ref={containerRef}
         id="banner-ad-container"
         className="banner-ad-container"
         style={{ 
@@ -203,19 +245,52 @@ export default function BannerAd() {
           opacity: 1
         }}
       >
-        {/* Fallback message */}
-        {(!adReady || adError) && (
-          <div className="text-xs text-gray-500 absolute inset-0 flex items-center justify-center pointer-events-none bg-gray-50 border border-dashed border-gray-300 rounded z-10">
+        <div
+          ref={slotRef}
+          id="banner-ad-slot"
+          style={{
+            width: '320px',
+            height: '50px',
+            minWidth: '320px',
+            minHeight: '50px',
+            position: 'relative',
+            display: 'block',
+            zIndex: 100,
+            visibility: 'visible',
+            opacity: 1
+          }}
+        />
+        {(!adReady && !adError) && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center pointer-events-none bg-gray-50 border border-dashed border-gray-300 rounded"
+            style={{
+              zIndex: 1,
+              backgroundColor: 'rgba(249, 250, 251, 0.95)',
+              display: adReady ? 'none' : 'flex'
+            }}
+          >
             <div className="text-center p-2 leading-tight">
-              <div className="font-semibold mb-1">Banner Ad</div>
-              <div className="text-[10px]">320 x 50</div>
-              <div className="text-[10px] mt-1 text-gray-700">
-                {adError ? 'Unable to load ad. Disable ad blockers to support us.' : 'Loading ad...'}
+              <div className="text-xs font-semibold text-gray-700 mb-1">Banner Ad</div>
+              <div className="text-[10px] text-gray-500">320 x 50</div>
+              <div className="text-[10px] mt-1 text-gray-600">Loading ad...</div>
+            </div>
               </div>
+        )}
+        {adError && !adReady && (
+          <div 
+            className="absolute inset-0 flex items-center justify-center pointer-events-none bg-gray-50 border border-dashed border-gray-300 rounded"
+            style={{
+              zIndex: 1,
+              backgroundColor: 'rgba(249, 250, 251, 0.95)'
+            }}
+          >
+            <div className="text-center p-2 leading-tight">
+              <div className="text-xs font-semibold text-gray-700 mb-1">Banner Ad</div>
+              <div className="text-[10px] text-gray-500">320 x 50</div>
+              <div className="text-[10px] mt-1 text-red-600">Unable to load ad. Disable ad blockers to support us.</div>
             </div>
           </div>
         )}
-        {/* Adsterra will inject iframe ad here */}
       </div>
     </div>
   )

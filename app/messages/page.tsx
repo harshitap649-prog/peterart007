@@ -177,93 +177,98 @@ export default function MessagesPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-700 font-semibold text-lg">Loading messages...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 mb-4">
+      <div className="glass-panel border-b border-white/20 backdrop-blur-xl bg-white/60 sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 py-5">
+          <div className="flex items-center gap-4 mb-5">
             <button
               onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2.5 hover:bg-white/50 rounded-xl transition-all transform hover:scale-110"
             >
               <FiArrowLeft className="text-xl text-gray-700" />
             </button>
-            <h1 className="text-2xl font-bold text-gray-900 flex-1">
-              {artist ? 'Messages' : 'Messages'}
-            </h1>
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                <FiMessageCircle className="text-white text-xl" />
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Messages
+              </h1>
+            </div>
           </div>
           
           {/* Search Bar */}
           <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-100 border-0 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+              className="w-full pl-12 pr-4 py-3.5 bg-white/80 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-500 shadow-sm transition-all"
             />
           </div>
         </div>
       </div>
 
       {/* Conversations List */}
-      <div className="max-w-4xl mx-auto px-4 py-4">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-500">Loading conversations...</p>
+          <div className="text-center py-16">
+            <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600 font-medium">Loading conversations...</p>
           </div>
         ) : filteredConversations.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FiMessageCircle className="text-4xl text-blue-500" />
+            <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <FiMessageCircle className="text-5xl text-orange-600" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
               {searchQuery ? 'No conversations found' : 'No messages yet'}
             </h3>
-            <p className="text-gray-500">
+            <p className="text-gray-600 text-lg">
               {searchQuery 
                 ? 'Try a different search term' 
                 : 'Start a conversation by messaging an artist or user!'}
             </p>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-3">
             {filteredConversations.map((conv) => (
               <div
                 key={conv.userId}
                 onClick={() => router.push(`/chat/${conv.userId}`)}
-                className="bg-white rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors border border-gray-200 shadow-sm hover:shadow-md"
+                className="glass-panel p-5 rounded-xl hover:shadow-xl cursor-pointer transition-all transform hover:scale-[1.02] border border-white/20"
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-4">
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
                     {conv.profileImage ? (
                       <img
                         src={conv.profileImage}
                         alt={conv.userName}
-                        className="w-14 h-14 rounded-full object-cover border-2 border-gray-100"
+                        className="w-16 h-16 rounded-xl object-cover border-4 border-white shadow-lg ring-2 ring-orange-100"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center border-2 border-gray-100">
-                        <span className="text-white text-lg font-semibold">
+                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center border-4 border-white shadow-lg ring-2 ring-orange-100">
+                        <span className="text-white text-xl font-bold">
                           {conv.userName[0]?.toUpperCase() || 'U'}
                         </span>
                       </div>
                     )}
                     {conv.unreadCount > 0 && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center border-2 border-white">
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
                         <span className="text-white text-xs font-bold">{conv.unreadCount}</span>
                       </div>
                     )}
@@ -271,16 +276,16 @@ export default function MessagesPage() {
                   
                   {/* Conversation Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-1">
-                      <h3 className="font-semibold text-gray-900 truncate">{conv.userName}</h3>
-                      <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-bold text-lg text-gray-900 truncate">{conv.userName}</h3>
+                      <span className="text-xs text-gray-500 flex-shrink-0 ml-3 font-medium">
                         {formatTime(conv.lastMessage.createdAt)}
                       </span>
                     </div>
                     {conv.userEmail && (
-                      <p className="text-xs text-gray-500 truncate mb-1">{conv.userEmail}</p>
+                      <p className="text-sm text-gray-500 truncate mb-2">{conv.userEmail}</p>
                     )}
-                    <p className={`text-sm truncate ${
+                    <p className={`text-base truncate ${
                       conv.unreadCount > 0 ? 'font-semibold text-gray-900' : 'text-gray-600'
                     }`}>
                       {conv.lastMessage.message || 'No message text'}

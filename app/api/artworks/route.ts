@@ -257,8 +257,24 @@ export async function PUT(request: NextRequest) {
     }
     
     const existingArtwork = artworks[index]
-    // Start with existing images - they will be preserved if no new images are uploaded
-    let imageUrls = [...(existingArtwork.images || [])]
+    
+    // Get images to keep from form data (if provided)
+    const imagesToKeepStr = formData.get('imagesToKeep') as string
+    let imageUrls: string[] = []
+    
+    if (imagesToKeepStr) {
+      try {
+        // Use the provided list of images to keep
+        imageUrls = JSON.parse(imagesToKeepStr)
+      } catch (error) {
+        console.error('Error parsing imagesToKeep:', error)
+        // Fallback to keeping all existing images
+        imageUrls = [...(existingArtwork.images || [])]
+      }
+    } else {
+      // If no imagesToKeep provided, preserve all existing images (backward compatibility)
+      imageUrls = [...(existingArtwork.images || [])]
+    }
     
     // Handle new image uploads - Use Imgur
     const imageFiles = formData.getAll('images') as File[]

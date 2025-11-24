@@ -752,6 +752,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     { id: 'artist', label: t.artistDashboard, icon: FiTrendingUp, hidden: !isArtist },
   ].filter(tab => !tab.hidden)
 
+  const heroGreeting = user?.displayName || user?.email?.split('@')[0] || (language === 'hi' ? 'मित्र' : 'Collector')
+
   return (
     <div className="space-y-6 pb-24">
       {/* Mobile Top Bar */}
@@ -822,178 +824,156 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
             style={{ backdropFilter: 'blur(3px)' }}
           ></div>
           
-          {/* Floating menu drawer */}
-          <div className="fixed inset-0 z-[201] flex items-start justify-start md:justify-center p-4 md:p-8 pointer-events-none">
-            <div className="w-[88%] max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden pointer-events-auto animate-slideInLeft md:animate-slideInLeft">
-              <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-orange-50/70 to-white sticky top-0">
-                <div className="flex-1">
+          {/* Compact Professional Left Sidebar Menu */}
+          <div className="fixed inset-0 z-[201] flex items-start justify-start md:justify-center p-0 md:p-8 pointer-events-none">
+            <div className="w-[260px] bg-white h-full md:h-auto md:rounded-xl md:max-h-[90vh] shadow-xl overflow-hidden pointer-events-auto animate-slideInLeft border-r border-gray-200 md:border-r-0 md:border md:border-gray-200">
+              {/* Compact Header */}
+              <div className="p-4 border-b border-gray-200 bg-white">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
                   {user ? (
-                    <div>
-                      <h2 className="text-base font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</h2>
-                      <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
+                          {(user.displayName || user.email?.split('@')[0] || 'U')[0].toUpperCase()}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-sm font-semibold text-gray-900 truncate">{user.displayName || user.email?.split('@')[0]}</h2>
+                          <p className="text-[10px] text-gray-500 truncate">{user.email}</p>
+                        </div>
                     </div>
                   ) : (
-                    <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                      <FiMenu className="text-gray-900" />
-                      {t.menu}
-                    </h2>
+                      <h2 className="text-base font-semibold text-gray-900">Menu</h2>
                   )}
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                   aria-label="Close menu"
                 >
-                  <FiX className="text-xl" />
+                    <FiX className="text-lg" />
                 </button>
               </div>
-              <nav className="py-2 max-h-[70vh] overflow-y-auto">
+              </div>
+              
+              {/* Compact Navigation Menu */}
+              <nav className="py-2 max-h-[calc(100vh-180px)] overflow-y-auto">
+                {navTabs.map((tab) => {
+                  const Icon = tab.icon
+                  const isActiveTab = activeTab === tab.id
+                  
+                  // Colorful icon colors based on tab type
+                  const iconColors: Record<string, string> = {
+                    artworks: isActiveTab ? 'text-white' : 'text-blue-600',
+                    wishlist: isActiveTab ? 'text-white' : 'text-pink-600',
+                    following: isActiveTab ? 'text-white' : 'text-purple-600',
+                    orders: isActiveTab ? 'text-white' : 'text-orange-600',
+                    reviews: isActiveTab ? 'text-white' : 'text-amber-600',
+                    support: isActiveTab ? 'text-white' : 'text-green-600',
+                    profile: isActiveTab ? 'text-white' : 'text-indigo-600',
+                    giftcards: isActiveTab ? 'text-white' : 'text-emerald-600',
+                    artist: isActiveTab ? 'text-white' : 'text-cyan-600',
+                  }
+                  
+                  // Unique gradient backgrounds for active state matching icon colors
+                  const activeBackgrounds: Record<string, string> = {
+                    artworks: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30',
+                    wishlist: 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg shadow-pink-500/30',
+                    following: 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30',
+                    orders: 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30',
+                    reviews: 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/30',
+                    support: 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30',
+                    profile: 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30',
+                    giftcards: 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30',
+                    artist: 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30',
+                  }
+                  
+                  return (
               <button
-                onClick={() => handleNavClick('artworks')}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                  activeTab === 'artworks'
-                    ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                }`}
-              >
-                {t.artworks}
+                      key={tab.id}
+                      onClick={() => {
+                        handleNavClick(tab.id)
+                        setSidebarOpen(false)
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all duration-200 mx-2 rounded-lg mb-0.5 relative overflow-hidden ${
+                        isActiveTab
+                          ? `${activeBackgrounds[tab.id] || 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg'}`
+                          : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                      }`}
+                    >
+                      {/* Subtle shine effect for active items */}
+                      {isActiveTab && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shimmer"></div>
+                      )}
+                      <Icon className={`text-base flex-shrink-0 relative z-10 ${iconColors[tab.id] || (isActiveTab ? 'text-white' : 'text-gray-600')}`} />
+                      <span className="flex-1 text-left relative z-10">{tab.label}</span>
+                      {isActiveTab && (
+                        <div className="w-2 h-2 bg-white/90 rounded-full flex-shrink-0 relative z-10 shadow-sm"></div>
+                      )}
               </button>
-              <button
-                onClick={() => handleNavClick('wishlist')}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                  activeTab === 'wishlist'
-                    ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                }`}
-              >
-                {t.wishlist}
-              </button>
+                  )
+                })}
+                {/* Messages Link */}
               {user && (
-                <button
-                  onClick={() => handleNavClick('following')}
-                  className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                    activeTab === 'following'
-                      ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                      : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                  }`}
-                >
-                  {t.following}
-                </button>
-              )}
-              <button
-                onClick={() => handleNavClick('orders')}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                  activeTab === 'orders'
-                    ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                }`}
-              >
-                {t.myOrders}
-              </button>
-              <button
-                onClick={() => handleNavClick('reviews')}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                  activeTab === 'reviews'
-                    ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                }`}
-              >
-                {t.myReviews}
-              </button>
-              <button
-                onClick={() => handleNavClick('support')}
-                className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                  activeTab === 'support'
-                    ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                }`}
-              >
-                {t.helpSupport}
-              </button>
+                  <button
+                    onClick={() => {
+                      router.push('/messages')
+                      setSidebarOpen(false)
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all mx-2 rounded-lg mb-0.5"
+                  >
+                    <FiMessageCircle className="text-base text-blue-600 flex-shrink-0" />
+                    <span className="flex-1 text-left">{language === 'hi' ? 'संदेश' : 'Messages'}</span>
+                  </button>
+                )}
+
+                {/* Divider */}
               {user && (
-                <>
-                  <button
-                    onClick={() => handleNavClick('profile')}
-                    className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                      activeTab === 'profile'
-                        ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                        : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                    }`}
-                  >
-                    {t.myProfile}
-                  </button>
-                  <button
-                    onClick={() => handleNavClick('giftcards')}
-                    className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                      activeTab === 'giftcards'
-                        ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                        : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                    }`}
-                  >
-                    {t.myGiftCards}
-                  </button>
-                  <button
-                    onClick={() => router.push('/messages')}
-                    className="w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300"
-                  >
-                    <FiMessageCircle className="inline mr-2 text-base" />
-                    {language === 'hi' ? 'संदेश' : 'Messages'}
-                  </button>
-                </>
-              )}
-              {isArtist && user && (
-                <button
-                  onClick={() => handleNavClick('artist')}
-                  className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                    activeTab === 'artist'
-                      ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                      : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
-                  }`}
-                >
-                  <FiTrendingUp className="inline mr-2 text-base" />
-                  {t.artistDashboard}
-                </button>
-              )}
-              {user && (
-                <>
+                  <div className="border-t border-gray-200 my-3 mx-3"></div>
+                )}
+
                   {/* Language Selection */}
-                  <div className="px-4 py-2 border-t border-gray-200 mt-2">
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{t.changeLanguage}</p>
-                    <div className="space-y-1">
+                {user && (
+                  <div className="px-4 py-3">
+                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2.5">{t.changeLanguage}</p>
+                    <div className="flex gap-2">
                       <button
                         onClick={() => changeLanguage('en')}
-                        className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
                           language === 'en'
-                            ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                            : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
+                            ? 'bg-gray-900 text-white shadow-md'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
                         {t.english}
                       </button>
                       <button
                         onClick={() => changeLanguage('hi')}
-                        className={`w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 ${
+                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
                           language === 'hi'
-                            ? 'bg-gradient-to-r from-orange-50 to-white text-gray-900 border-l-4 border-orange-600 font-semibold'
-                            : 'text-gray-700 hover:bg-gray-50 hover:border-l-4 hover:border-gray-300'
+                            ? 'bg-gray-900 text-white shadow-md'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
                         {t.hindi}
                       </button>
                     </div>
                   </div>
+                )}
+
                   {/* Logout */}
+                {user && (
+                  <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
                   <button
                     onClick={() => {
                       setShowLogoutConfirm(true)
                       setSidebarOpen(false)
                     }}
-                    className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-lg transition-all shadow-md hover:shadow-lg"
                   >
                     <FiLogOut className="text-base" />
-                    Logout
+                      <span>Logout</span>
                   </button>
-                </>
+                  </div>
               )}
             </nav>
           </div>
@@ -1001,126 +981,138 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         </>
       )}
 
-      {/* Quick Tabs */}
-      <div className="sticky top-12 z-30 -mx-4 mb-2 bg-gradient-to-b from-[#fff3eb] via-white/95 to-white px-4 pb-3 pt-2 md:relative md:top-0 md:mx-0">
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {navTabs.map((tab) => {
-            const Icon = tab.icon
-            const isActiveTab = activeTab === tab.id
+      {/* Compact Professional Menu Button */}
+      <div className="mb-4 flex items-center gap-2.5">
+        {/* Menu Button - Compact */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-900 text-white shadow-md hover:bg-gray-800 hover:shadow-lg transition-all font-medium active:scale-95 z-10"
+        >
+          <FiMenu className="text-base" />
+          <span className="hidden sm:inline text-xs">Menu</span>
+        </button>
+
+        {/* Current Tab Display - Compact Badge */}
+        {navTabs.find(tab => tab.id === activeTab) && (
+          <div className="flex items-center gap-2.5 flex-1 bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:shadow transition-all">
+            {(() => {
+              const currentTab = navTabs.find(tab => tab.id === activeTab)
+              const Icon = currentTab?.icon
+              
+              // Colorful icon colors for current tab badge
+              const badgeIconColors: Record<string, string> = {
+                artworks: 'text-blue-600',
+                wishlist: 'text-pink-600',
+                following: 'text-purple-600',
+                orders: 'text-orange-600',
+                reviews: 'text-amber-600',
+                support: 'text-green-600',
+                profile: 'text-indigo-600',
+                giftcards: 'text-emerald-600',
+                artist: 'text-cyan-600',
+              }
+              
+              return Icon ? (
+                <div className={`flex items-center justify-center w-7 h-7 rounded-md bg-gray-100`}>
+                  <Icon className={`text-sm ${badgeIconColors[currentTab?.id || ''] || 'text-gray-700'}`} />
+                </div>
+              ) : null
+            })()}
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] text-gray-500 font-medium">Current</p>
+              <p className="text-xs font-semibold text-gray-900 truncate">
+                {navTabs.find(tab => tab.id === activeTab)?.label}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Overview Hero */}
+      <div className="rounded-[32px] border border-black/5 bg-gradient-to-br from-white via-[#fff7ef] to-[#f1f5ff] p-6 md:p-8 shadow-lg">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
+          <div className="flex-1 space-y-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-[var(--text-secondary)]">
+              {language === 'hi' ? 'आपका कला डैशबोर्ड' : 'Your art console'}
+            </p>
+            <div>
+              <h1 className="text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
+                {language === 'hi' ? `${heroGreeting}, रचनात्मक हो जाएं।` : `Welcome back, ${heroGreeting}.`}
+              </h1>
+              <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl">
+                {language === 'hi'
+                  ? 'नई कलाकृतियां खोजें, कलाकारों से जुड़ें और हर आदेश या कमीशन को यहीं से प्रबंधित करें।'
+                  : 'Discover new drops, brief artists, and orchestrate every wishlist, order, or commission from one refined workspace.'}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => handleNavClick('artworks')}
+                className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold shadow-lg shadow-orange-400/30"
+              >
+                {language === 'hi' ? 'कलाकृतियां देखें' : 'Browse artworks'}
+              </button>
+              <button
+                onClick={() => handleNavClick('support')}
+                className="btn-secondary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold"
+              >
+                {language === 'hi' ? 'मदद चाहिए' : 'Need support'}
+              </button>
+              <button
+                onClick={() => handleNavClick(isArtist ? 'artist' : 'wishlist')}
+                className="btn-ghost flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-[var(--text-primary)]"
+              >
+                {isArtist ? (language === 'hi' ? 'कलाकार पैनल' : 'Artist dashboard') : (language === 'hi' ? 'Wishlist खोलें' : 'Open wishlist')}
+              </button>
+            </div>
+          </div>
+          <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
+            {insightCards.map((card) => (
+              <div key={card.label} className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">{card.label}</p>
+                <p className="mt-2 text-3xl font-bold text-[var(--text-primary)]">{card.value}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{card.helper}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {quickActions.slice(0, 4).map((action) => {
+            const Icon = action.icon
             return (
               <button
-                key={tab.id}
-                onClick={() => handleNavClick(tab.id)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  isActiveTab ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/30' : 'bg-white text-gray-600 border border-gray-200'
-                }`}
+                key={action.id}
+                onClick={() => handleNavClick(action.id)}
+                className="flex items-center justify-between rounded-2xl border border-black/5 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <Icon className="text-base" />
-                {tab.label}
+                <div>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{action.title}</p>
+                  <p className="text-xs text-[var(--text-secondary)] leading-tight">{action.description}</p>
+                </div>
+                <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${action.accent} text-white flex items-center justify-center text-base`}>
+                  <Icon />
+                </div>
               </button>
             )
           })}
-          {user && (
-            <button
-              onClick={() => setShowLogoutConfirm(true)}
-              className="flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
-            >
-              <FiLogOut className="text-base" />
-              {t.logout}
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Hero + Insights */}
-      <div className="rounded-3xl bg-white/95 p-4 shadow-xl shadow-orange-500/10 sm:p-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-gray-400">
-              {t.peterArt}
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">{t.fallInLove}</h2>
-            <p className="text-sm text-gray-500 sm:text-base">{t.turnEmptyWalls}</p>
-          </div>
-          <div className="flex flex-col gap-2 text-sm text-gray-600">
-            <span className="font-semibold text-gray-900">{t.securePayment}</span>
-            <button
-              onClick={() => handleNavClick('artworks')}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-gray-900/30 transition hover:-translate-y-0.5 hover:bg-black"
-            >
-              <FiArrowRight className="text-base" />
-              {t.startShopping}
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {insightCards.map((card) => (
-            <div
-              key={card.label}
-              className={`rounded-2xl border ${card.border} bg-gradient-to-br ${card.accent} p-4 shadow-sm`}
-            >
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{card.label}</p>
-              <p className="mt-2 text-3xl font-bold text-gray-900">{card.value}</p>
-              <p className="text-xs text-gray-500">{card.helper}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="-mx-1 mt-5 overflow-x-auto pb-2">
-          <div className="flex min-w-max gap-3 px-1">
-            {quickActions.map((action) => {
-              const Icon = action.icon
-              return (
-                <button
-                  key={action.id}
-                  onClick={() => handleNavClick(action.id)}
-                  type="button"
-                  className={`flex min-w-[180px] flex-1 items-center justify-between rounded-2xl bg-gradient-to-br ${action.accent} text-left text-white shadow-lg shadow-gray-900/30 transition hover:-translate-y-0.5`}
-                >
-                  <div className="flex flex-col gap-1 px-4 py-3">
-                    <span className="text-xs uppercase tracking-wide text-white/70">{action.title}</span>
-                    <span className="text-sm font-semibold">{action.description}</span>
-                  </div>
-                  <div className="mr-2 flex h-full items-center rounded-2xl bg-white/20 px-4 py-3 text-xl text-white">
-                    <Icon className="text-2xl" />
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="space-y-6">
+      {/* Main Content - Mobile Optimized */}
+      <div className="space-y-4 md:space-y-6">
         {activeTab === 'artworks' && (
-          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
-            <div className="mb-4 text-center">
-              <div className="relative mx-auto mb-2 h-24 w-24 overflow-hidden rounded-b-[50%]">
-                <img
-                  src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-                  alt="Logo"
-                  className="h-full w-full object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none'
-                  }}
-                />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900">{t.fallInLove}</h3>
-              <p className="text-xs text-gray-500">{t.turnEmptyWalls}</p>
-            </div>
-
-            <div className="mb-6 rounded-2xl border border-gray-100 bg-white/90 p-3 shadow-sm">
-              <SearchFilters
-                artworks={artworks}
-                onFilterChange={setFilteredArtworks}
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                language={language}
-                filteredCount={filteredArtworks.length}
-              />
-            </div>
+          <div className="space-y-6">
+            {/* Premium Search Section */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-5 md:p-6 shadow-sm">
+            <SearchFilters
+              artworks={artworks}
+              onFilterChange={setFilteredArtworks}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              language={language}
+              filteredCount={filteredArtworks.length}
+            />
+          </div>
 
             {loading ? (
               <div className="text-center py-12">
@@ -1139,57 +1131,59 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-gray-400 text-sm">{t.loadingArtworks}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {filteredArtworks.map((artwork: any) => (
-                  <div key={artwork.id} className="card rounded-2xl p-2">
+                  <div key={artwork.id} className="group bg-white rounded-2xl border border-gray-100 p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
                     {artwork.artistId && (
-                      <div className="mb-1">
+                      <div className="mb-2">
                         <ArtistBadge artistId={artwork.artistId} className="text-xs" />
                       </div>
                     )}
                     {artwork.images && artwork.images[0] ? (
-                      <div className="relative mb-1 h-32 w-full overflow-hidden rounded-xl">
+                      <div className="relative mb-3 h-40 w-full overflow-hidden rounded-xl bg-gray-100">
                         <img
                           src={artwork.images[0]}
                           alt={artwork.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
                           }}
                         />
                       </div>
                     ) : (
-                      <div className="w-full h-28 mb-1 rounded bg-gray-200 flex items-center justify-center">
+                      <div className="w-full h-40 mb-3 rounded-xl bg-gray-100 flex items-center justify-center">
                         <span className="text-gray-400 text-xs">{t.noImage}</span>
                       </div>
                     )}
-                    <h3 className="font-semibold text-xs mb-0.5 line-clamp-1">{artwork.title}</h3>
-                    <p className="text-gray-600 text-xs mb-1 line-clamp-2">{artwork.description}</p>
-                    <p className="text-orange-600 font-bold text-xs mb-1">₹{artwork.price}</p>
+                    <h3 className="font-semibold text-sm mb-1 line-clamp-1 text-gray-900">{artwork.title}</h3>
+                    <p className="text-gray-600 text-xs mb-2 line-clamp-2 min-h-[2.5rem]">{artwork.description}</p>
+                    <p className="text-gray-900 font-bold text-base mb-3">₹{artwork.price}</p>
                     
-                    <div className="flex items-center gap-1 mb-1">
-                      <div className="flex items-center gap-0.5 text-gray-400">
-                        <FiThumbsUp className={`text-xs ${artwork.likedBy?.includes(user?.uid) ? 'text-gray-900' : ''}`} />
+                    <div className="flex items-center gap-3 mb-3 text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <FiThumbsUp className={`text-sm ${artwork.likedBy?.includes(user?.uid) ? 'text-gray-900 fill-current' : ''}`} />
                         <span className="text-xs">{artwork.likes || 0}</span>
                       </div>
-                      <div className="flex items-center gap-0.5 text-gray-400">
-                        <FiMessageCircle className="text-xs" />
+                      <div className="flex items-center gap-1">
+                        <FiMessageCircle className="text-sm" />
                         <span className="text-xs">{artwork.comments?.length || 0}</span>
                       </div>
                     </div>
 
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => handleWishlist(artwork.id)}
-                        className={`btn-secondary flex flex-1 items-center justify-center gap-0.5 rounded-xl text-xs py-1.5 ${
-                          wishlist.includes(artwork.id) ? 'text-red-400' : ''
+                        className={`flex-1 flex items-center justify-center gap-1 rounded-xl py-2.5 text-xs font-semibold transition-all border ${
+                          wishlist.includes(artwork.id) 
+                            ? 'bg-red-50 text-red-600 border-red-200' 
+                            : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                         }`}
                       >
-                        {wishlist.includes(artwork.id) ? <FaHeart className="text-xs" /> : <FiHeart className="text-xs" />}
+                        {wishlist.includes(artwork.id) ? <FaHeart className="text-sm" /> : <FiHeart className="text-sm" />}
                       </button>
                       <button
                         onClick={() => handleBuyClick(artwork.id)}
-                        className="btn-primary btn-buy flex-1 rounded-xl text-xs py-1.5"
+                        className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
                       >
                         {t.buy}
                       </button>
@@ -1200,30 +1194,30 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                  </div>
                )}
 
-            {filteredArtworks.length > 0 && (
+               {filteredArtworks.length > 0 && (
               <div className="mt-6 space-y-4">
-                {user ? (
-                  <>
-                    <RecommendationSection
-                      userId={user.uid}
-                      type="personalized"
-                      limit={10}
-                      language={language}
-                    />
-                    <RecommendationSection
-                      userId={user.uid}
-                      type="becauseYouLiked"
-                      limit={10}
-                      language={language}
-                    />
-                  </>
-                ) : (
+                   {user ? (
+                     <>
+                       <RecommendationSection
+                         userId={user.uid}
+                         type="personalized"
+                         limit={10}
+                         language={language}
+                       />
+                       <RecommendationSection
+                         userId={user.uid}
+                         type="becauseYouLiked"
+                         limit={10}
+                         language={language}
+                       />
+                     </>
+                   ) : (
                   <RecommendationSection type="trending" limit={8} language={language} />
                 )}
               </div>
-            )}
-          </div>
-        )}
+               )}
+             </div>
+           )}
 
            {/* Wishlist Tab */}
         {activeTab === 'wishlist' && (
@@ -1675,14 +1669,14 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         {/* Gift Cards Tab */}
         {activeTab === 'giftcards' && user && (
           <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
-            <GiftCardManagement userId={user.uid} language={language} />
+          <GiftCardManagement userId={user.uid} language={language} />
           </div>
         )}
 
         {/* Artist Dashboard Tab */}
         {activeTab === 'artist' && isArtist && user && (
           <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
-            <ArtistDashboard userId={user.uid} language={language} />
+          <ArtistDashboard userId={user.uid} language={language} />
           </div>
         )}
 
@@ -1800,18 +1794,18 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <button
-                  onClick={confirmLogout}
+              <button
+                onClick={confirmLogout}
                   className="flex-1 rounded-2xl bg-gray-900 py-3 text-sm font-semibold text-white shadow-lg shadow-gray-900/40 transition hover:-translate-y-0.5 hover:bg-black"
-                >
-                  {t.yesLogout}
-                </button>
-                <button
-                  onClick={() => setShowLogoutConfirm(false)}
+              >
+                {t.yesLogout}
+              </button>
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
                   className="flex-1 rounded-2xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-                >
-                  {t.cancel}
-                </button>
+              >
+                {t.cancel}
+              </button>
               </div>
             </div>
           </div>
