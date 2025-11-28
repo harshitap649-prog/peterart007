@@ -102,13 +102,44 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4">
-      <div className="absolute inset-0 -z-10 opacity-60 blur-3xl">
-        <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-orange-200/60" />
-        <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-200/50" />
+    <div className="min-h-screen flex flex-col">
+      {/* Hero Section with Image and Quote */}
+      <div className="relative w-full py-12 md:py-16 px-4 bg-gradient-to-br from-orange-50 via-white to-pink-50">
+        <div className="mx-auto max-w-4xl text-center">
+          {/* Image */}
+          <div className="mb-6 flex justify-center">
+            <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-2xl border-4 border-white">
+              <img
+                src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+                alt="Peter Art"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/logoo.png'
+                }}
+              />
+            </div>
+          </div>
+          
+          {/* Title and Subtitle */}
+          <div className="space-y-3">
+            <h1 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight">
+              Fall in love with art — take one home today.
+            </h1>
+            <p className="text-lg md:text-xl text-slate-600 font-medium">
+              Turn Empty Walls into Expressions
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+      {/* Login Form Section */}
+      <div className="flex-1 relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4">
+        <div className="absolute inset-0 -z-10 opacity-60 blur-3xl">
+          <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-orange-200/60" />
+          <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-200/50" />
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="surface-card rounded-[32px] border border-black/5 p-6 shadow-lift sm:p-8 text-[var(--text-primary)]">
           <div className="mb-6 flex rounded-full border border-black/10 bg-white p-1 text-sm font-semibold text-[var(--text-secondary)] shadow">
             <button
@@ -294,6 +325,7 @@ export default function LoginPage() {
               </div>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </div>

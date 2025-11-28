@@ -7,6 +7,7 @@ import SiteHeader from '@/components/SiteHeader'
 import SiteFooter from '@/components/SiteFooter'
 import MobileDock from '@/components/MobileDock'
 import BannerAd from '@/components/BannerAd'
+import ConditionalLayout from '@/components/ConditionalLayout'
 
 export const metadata: Metadata = {
   title: 'Peter Art - Artwork Shop',
@@ -41,17 +42,9 @@ export default function RootLayout({
       <body className="bg-[var(--page-bg)] text-[var(--text-primary)] antialiased">
         <ThemeProvider>
           <CartProvider>
-            <div className="app-shell">
-              <div className="app-content">
-                <SiteHeader />
-                <main className="app-main pb-20 md:pb-8">
-                  <div className="mx-auto w-full max-w-6xl space-y-6">{children}</div>
-                </main>
-                <SiteFooter />
-              </div>
-              <MobileDock />
-              <BannerAd />
-            </div>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
           </CartProvider>
         </ThemeProvider>
         <Toaster
