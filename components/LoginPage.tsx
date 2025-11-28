@@ -108,24 +108,22 @@ export default function LoginPage() {
         <div className="mx-auto max-w-4xl text-center">
           {/* Image */}
           <div className="mb-6 flex justify-center">
-            <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-2xl border-4 border-white">
-              <img
-                src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-                alt="Peter Art"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/logoo.png'
-                }}
-              />
-            </div>
+            <img
+              src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+              alt="Peter Art"
+              className="w-48 h-auto md:w-64 object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/logoo.png'
+              }}
+            />
           </div>
           
           {/* Title and Subtitle */}
-          <div className="space-y-3">
-            <h1 className="text-3xl md:text-5xl font-bold text-slate-900 leading-tight">
+          <div className="space-y-2">
+            <h1 className="text-xl md:text-4xl font-bold text-slate-900 leading-tight whitespace-nowrap">
               Fall in love with art — take one home today.
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 font-medium">
+            <p className="text-sm md:text-lg text-slate-600 font-medium whitespace-nowrap">
               Turn Empty Walls into Expressions
             </p>
           </div>
@@ -139,21 +137,25 @@ export default function LoginPage() {
           <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-200/50" />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="surface-card rounded-[32px] border border-black/5 p-6 shadow-lift sm:p-8 text-[var(--text-primary)]">
-          <div className="mb-6 flex rounded-full border border-black/10 bg-white p-1 text-sm font-semibold text-[var(--text-secondary)] shadow">
+        <div className="grid gap-4 md:gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 shadow-lift sm:p-6 md:p-8 text-[var(--text-primary)]">
+          <div className="mb-4 md:mb-6 flex rounded-full border border-black/10 bg-white p-0.5 md:p-1 text-xs md:text-sm font-semibold text-[var(--text-secondary)] shadow">
             <button
               onClick={() => setActiveTab('signin')}
-              className={`flex-1 rounded-full px-4 py-2 transition ${
-                activeTab === 'signin' ? 'bg-white text-gray-900 shadow' : ''
+              className={`flex-1 rounded-full px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
+                activeTab === 'signin' 
+                  ? 'bg-black text-white shadow-lg shadow-black/30' 
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Sign In
             </button>
             <button
               onClick={() => setActiveTab('signup')}
-              className={`flex-1 rounded-full px-4 py-2 transition ${
-                activeTab === 'signup' ? 'bg-white text-gray-900 shadow' : ''
+              className={`flex-1 rounded-full px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
+                activeTab === 'signup' 
+                  ? 'bg-black text-white shadow-lg shadow-black/30' 
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Create account
@@ -161,7 +163,7 @@ export default function LoginPage() {
           </div>
 
           {activeTab === 'signin' ? (
-            <form onSubmit={handleSignIn} className="space-y-4">
+            <form onSubmit={handleSignIn} className="space-y-3 md:space-y-4">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-secondary)]">
                   Email
@@ -188,12 +190,12 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
+              <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-base md:text-lg font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-3 disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-3 md:space-y-4">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-secondary)]">
                   Full Name
@@ -234,15 +236,15 @@ export default function LoginPage() {
                   minLength={6}
                 />
               </div>
-              <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
+              <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-base md:text-lg font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-3 disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Creating account...' : 'Sign Up'}
               </button>
             </form>
           )}
 
-          <div className="relative py-5">
+          <div className="relative py-3 md:py-5">
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t border-black/5" />
-            <div className="relative mx-auto w-max rounded-full border border-black/10 bg-white px-3 text-[11px] font-semibold uppercase tracking-[0.4em] text-[var(--text-secondary)]">
+            <div className="relative mx-auto w-max rounded-full border border-black/10 bg-white px-2 md:px-3 text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.3em] md:tracking-[0.4em] text-[var(--text-secondary)]">
               Or
             </div>
           </div>
@@ -250,20 +252,20 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="mb-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white py-3 text-sm font-semibold text-[var(--text-primary)] transition hover:border-black/20"
+            className="mb-3 md:mb-4 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl border border-black/10 bg-white py-2 md:py-3 text-xs md:text-sm font-semibold text-[var(--text-primary)] transition hover:border-black/20"
           >
-            <FcGoogle className="text-xl" />
+            <FcGoogle className="text-lg md:text-xl" />
             Continue with Google
           </button>
 
-          <div className="rounded-3xl border border-black/5 bg-white p-4 text-sm text-[var(--text-secondary)] shadow-inner">
-            <p className="font-semibold text-[var(--text-primary)]">Creator or gallery?</p>
-            <p className="mb-3 text-sm">
+          <div className="rounded-2xl md:rounded-3xl border border-black/5 bg-white p-3 md:p-4 text-xs md:text-sm text-[var(--text-secondary)] shadow-inner">
+            <p className="font-semibold text-[var(--text-primary)] text-sm md:text-base">Creator or gallery?</p>
+            <p className="mb-2 md:mb-3 text-xs md:text-sm">
               Launch your storefront, manage commissions, and access premium marketing tools.
             </p>
             <button
               onClick={() => router.push('/artist/apply')}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] transition hover:bg-black/5"
+              className="flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl bg-black px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm font-bold text-white shadow-lg shadow-black/30 transition-all hover:shadow-xl hover:shadow-black/40 hover:bg-gray-900"
             >
               Become an artist partner
             </button>

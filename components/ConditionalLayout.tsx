@@ -8,30 +8,28 @@ import BannerAd from '@/components/BannerAd'
 
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const isLoginPage = pathname === '/'
+  const isUserPage = pathname === '/user'
 
-  if (isLoginPage) {
-    // Login page - no header, footer, or mobile dock
+  // All pages - no header or footer, but show mobile dock
+  if (isUserPage) {
+    // User page - full width on mobile
     return (
       <div className="app-shell">
-        <main className="min-h-screen">
-          {children}
+        <main className="app-main pb-20 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
         </main>
+        <MobileDock />
         <BannerAd />
       </div>
     )
   }
 
-  // All other pages - show header, footer, mobile dock
+  // All other pages - no header or footer, show mobile dock
   return (
     <div className="app-shell">
-      <div className="app-content">
-        <SiteHeader />
-        <main className="app-main pb-20 md:pb-8">
-          <div className="mx-auto w-full max-w-6xl space-y-6">{children}</div>
-        </main>
-        <SiteFooter />
-      </div>
+      <main className="app-main pb-20 md:pb-8">
+        <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+      </main>
       <MobileDock />
       <BannerAd />
     </div>

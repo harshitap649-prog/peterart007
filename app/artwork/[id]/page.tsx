@@ -52,6 +52,7 @@ export default function ArtworkDetailsPage() {
   const [touchEnd, setTouchEnd] = useState(0)
   const [showDeleteReviewConfirm, setShowDeleteReviewConfirm] = useState(false)
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null)
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -60,6 +61,9 @@ export default function ArtworkDetailsPage() {
 
   const checkAuth = async () => {
     try {
+      // Add a small delay to ensure Firebase is initialized
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
       const currentUser = await getCurrentUser()
       if (currentUser) {
         setUser(currentUser)
@@ -69,8 +73,11 @@ export default function ArtworkDetailsPage() {
           fullName: currentUser.displayName || currentUser.email?.split('@')[0] || ''
         }))
       }
+      setAuthChecked(true)
     } catch (error) {
+      console.error('Auth check error:', error)
       // Allow guest viewing
+      setAuthChecked(true)
     }
   }
 
@@ -194,11 +201,7 @@ export default function ArtworkDetailsPage() {
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user) {
-      setLoginModalOpen(true)
-      toast.error('Please sign in to submit a review')
-      return
-    }
+    
     if (!reviewText.trim()) {
       toast.error('Please enter your review')
       return
@@ -212,9 +215,9 @@ export default function ArtworkDetailsPage() {
     try {
       const formData = new FormData()
       formData.append('artworkId', artwork.id)
-      formData.append('userId', user.uid)
-      formData.append('userName', user.displayName || user.email?.split('@')[0] || 'User')
-      formData.append('userEmail', user.email || '')
+      formData.append('userId', user?.uid || `guest_${Date.now()}`)
+      formData.append('userName', user?.displayName || user?.email?.split('@')[0] || 'Guest User')
+      formData.append('userEmail', user?.email || '')
       formData.append('text', reviewText)
       formData.append('rating', reviewRating.toString())
       
@@ -436,10 +439,10 @@ export default function ArtworkDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-700 font-semibold text-lg">Loading artwork...</p>
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-black rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium text-sm md:text-base">Loading artwork...</p>
         </div>
       </div>
     )
@@ -452,26 +455,29 @@ export default function ArtworkDetailsPage() {
   const totalPrice = (artwork.price * quantity).toFixed(2)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
+    <div className="min-h-screen bg-white">
+      {/* Sticky Top Bar - Mobile Optimized */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-3 py-3 md:px-4 md:py-4">
+        <div className="flex justify-between items-center max-w-6xl mx-auto">
           <button
             onClick={() => router.push('/user')}
-            className="btn-secondary flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-100 transition-all"
           >
-            <FiArrowLeft />
-            Back to Artworks
+            <FiArrowLeft className="text-lg" />
+            <span className="hidden sm:inline">Back</span>
           </button>
           <Cart />
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+      <div className="max-w-6xl mx-auto px-0 md:px-4 py-4 md:py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
           {/* Artwork Images */}
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {artwork.images && artwork.images.length > 0 ? (
-              <div className="glass-panel p-4 md:p-6 rounded-2xl">
+              <div className="bg-white rounded-none md:rounded-2xl overflow-hidden">
                 <div 
-                  className="relative w-full h-80 md:h-96 rounded-xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center shadow-xl"
+                  className="relative w-full h-64 sm:h-80 md:h-96 rounded-none md:rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center"
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
@@ -525,11 +531,11 @@ export default function ArtworkDetailsPage() {
                   {/* Share Button */}
                   <button
                     onClick={handleShare}
-                    className="absolute top-2 right-2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white rounded-full p-2 transition-all z-10"
+                    className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 md:p-2.5 transition-all z-10 backdrop-blur-sm"
                     aria-label="Share artwork"
                     title="Share this artwork"
                   >
-                    <FiShare2 className="text-lg" />
+                    <FiShare2 className="text-base md:text-lg" />
                   </button>
                 </div>
               </div>
@@ -543,76 +549,78 @@ export default function ArtworkDetailsPage() {
           </div>
 
           {/* Artwork Details */}
-          <div className="space-y-6">
-            <div className="glass-panel p-6 md:p-8 rounded-2xl">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{artwork.title}</h1>
+          <div className="space-y-4 md:space-y-6 px-3 md:px-0">
+            <div className="bg-white rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8">
+              <div className="flex items-start justify-between mb-3 md:mb-4">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2 md:mb-3 text-gray-900 leading-tight">{artwork.title}</h1>
                   {artwork.artistId && (
-                    <div className="mb-4 p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border-2 border-orange-200 hover:border-orange-300 transition-colors shadow-sm">
+                    <div className="mb-3 md:mb-4">
                       <ArtistBadge artistId={artwork.artistId} />
                     </div>
                   )}
-                  <p className="text-gray-600 mb-4 whitespace-pre-wrap text-base md:text-lg leading-relaxed">{artwork.description}</p>
+                  <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4 whitespace-pre-wrap leading-relaxed">{artwork.description}</p>
                 </div>
                 <button
                   onClick={handleLike}
                   disabled={liking}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors ${
+                  className={`flex items-center gap-1 px-2 py-2 rounded-lg transition-colors flex-shrink-0 ml-2 ${
                     artwork.likedBy?.includes(user?.uid)
-                      ? 'bg-gray-100 text-gray-900'
+                      ? 'bg-red-50 text-red-600'
                       : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
                   }`}
                 >
-                  <FiThumbsUp className={`text-sm ${artwork.likedBy?.includes(user?.uid) ? 'fill-current' : ''}`} />
-                  <span className="text-sm font-medium">{artwork.likes || 0}</span>
+                  <FiThumbsUp className={`text-base ${artwork.likedBy?.includes(user?.uid) ? 'fill-current' : ''}`} />
+                  <span className="text-xs font-medium hidden sm:inline">{artwork.likes || 0}</span>
                 </button>
               </div>
               {artwork.category && (
-                <span className="inline-block px-4 py-2 bg-gradient-to-r from-orange-100 to-orange-200 text-gray-900 rounded-xl text-sm font-semibold mb-4 shadow-sm">
+                <span className="inline-block px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs md:text-sm font-semibold mb-3 md:mb-4">
                   {artwork.category}
                 </span>
               )}
-              <div className="border-t border-gray-200 pt-6 mt-6">
-                <p className="text-3xl md:text-4xl font-bold text-orange-600 mb-6">₹{artwork.price}</p>
+              <div className="border-t border-gray-200 pt-4 md:pt-6 mt-4 md:mt-6">
+                <div className="flex items-center justify-between mb-4 md:mb-6">
+                  <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">₹{artwork.price}</p>
+                </div>
 
                 {!showCheckout ? (
                   <>
                     {/* Quantity Selector */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-semibold mb-3 text-gray-700">
+                    <div className="mb-4 md:mb-6">
+                      <label className="block text-xs md:text-sm font-semibold mb-2 md:mb-3 text-gray-700">
                         Quantity (Max 5)
                       </label>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3 md:gap-4">
                         <button
                           onClick={() => handleQuantityChange(-1)}
                           disabled={quantity <= 1}
-                          className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-orange-400 hover:bg-orange-50 transition-all shadow-sm hover:shadow-md"
+                          className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-400 hover:bg-gray-50 transition-all"
                         >
-                          <FiMinus className="text-xl" />
+                          <FiMinus className="text-lg md:text-xl" />
                         </button>
-                        <span className="text-2xl font-bold w-12 text-center text-gray-900">{quantity}</span>
+                        <span className="text-xl md:text-2xl font-bold w-8 md:w-12 text-center text-gray-900">{quantity}</span>
                         <button
                           onClick={() => handleQuantityChange(1)}
                           disabled={quantity >= 5}
-                          className="w-12 h-12 rounded-xl border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-orange-400 hover:bg-orange-50 transition-all shadow-sm hover:shadow-md"
+                          className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl border-2 border-gray-300 bg-white text-gray-900 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-400 hover:bg-gray-50 transition-all"
                         >
-                          <FiPlus className="text-xl" />
+                          <FiPlus className="text-lg md:text-xl" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="mb-6 p-5 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border-2 border-orange-200 shadow-sm">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-700 text-base font-medium">Total Price:</span>
-                        <span className="text-2xl font-bold text-orange-600">₹{totalPrice}</span>
+                    <div className="mb-4 md:mb-6 p-3 md:p-5 bg-gray-50 rounded-lg md:rounded-xl border border-gray-200">
+                      <div className="flex justify-between items-center mb-1 md:mb-2">
+                        <span className="text-gray-700 text-sm md:text-base font-medium">Total Price:</span>
+                        <span className="text-xl md:text-2xl font-bold text-gray-900">₹{totalPrice}</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-2">
-                        <span className="font-semibold">{quantity} × ₹{artwork.price} = ₹{totalPrice}</span>
+                      <p className="text-xs md:text-sm text-gray-600">
+                        <span className="font-medium">{quantity} × ₹{artwork.price} = ₹{totalPrice}</span>
                       </p>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 md:gap-3">
                       <button
                         onClick={() => {
                           if (!user) {
@@ -629,16 +637,17 @@ export default function ArtworkDetailsPage() {
                           })
                           toast.success('Added to cart!')
                         }}
-                        className="btn-secondary flex-1 flex items-center justify-center gap-2 text-base md:text-lg py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+                        className="flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-3 md:py-4 rounded-lg md:rounded-xl font-semibold bg-white border-2 border-gray-300 text-gray-900 hover:bg-gray-50 transition-all"
                       >
-                        <FiShoppingCart />
-                        Add to Cart
+                        <FiShoppingCart className="text-base md:text-lg" />
+                        <span className="hidden sm:inline">Add to Cart</span>
+                        <span className="sm:hidden">Cart</span>
                       </button>
                       <button
                         onClick={handleBuyNow}
-                        className="btn-primary flex-1 flex items-center justify-center gap-2 text-base md:text-lg py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                        className="flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-3 md:py-4 rounded-lg md:rounded-xl font-bold bg-black text-white hover:bg-gray-900 transition-all shadow-lg"
                       >
-                        <FiShoppingCart />
+                        <FiShoppingCart className="text-base md:text-lg" />
                         Buy Now
                       </button>
                     </div>
@@ -817,18 +826,18 @@ export default function ArtworkDetailsPage() {
                       </div>
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex gap-3">
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="btn-primary flex-1"
+                        className="flex-1 bg-black text-white py-3 md:py-4 rounded-lg md:rounded-xl font-semibold hover:bg-gray-900 transition-all disabled:opacity-50"
                       >
                         {submitting ? 'Placing Order...' : 'Confirm Order'}
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowCheckout(false)}
-                        className="btn-secondary flex-1"
+                        className="flex-1 bg-white border-2 border-gray-300 text-gray-900 py-3 md:py-4 rounded-lg md:rounded-xl font-semibold hover:bg-gray-50 transition-all"
                       >
                         Cancel
                       </button>
@@ -839,9 +848,8 @@ export default function ArtworkDetailsPage() {
             </div>
 
             {/* Reviews Section */}
-            <div className="glass-panel p-6 md:p-8 mt-6 rounded-2xl">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                <span className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
+            <div className="bg-white rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8 mt-4 md:mt-6">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-900">
                 Reviews
               </h2>
               
@@ -869,8 +877,8 @@ export default function ArtworkDetailsPage() {
                 </div>
               )}
 
-              {/* Review Form */}
-              {user ? (
+              {/* Review Form - Available to Everyone */}
+              {authChecked && (
                 <form onSubmit={handleSubmitReview} className="mb-6 pb-6 border-b border-gray-200">
                   <div className="mb-3">
                     <label className="block text-xs font-medium mb-1.5 text-gray-700">Rating *</label>
@@ -947,21 +955,11 @@ export default function ArtworkDetailsPage() {
                   <button
                     type="submit"
                     disabled={submittingReview}
-                    className="btn-primary text-xs py-2 px-4"
+                    className="bg-black text-white text-xs md:text-sm py-2.5 px-4 md:px-6 rounded-lg font-semibold hover:bg-gray-900 transition-all disabled:opacity-50"
                   >
                     {submittingReview ? 'Submitting...' : 'Submit Review'}
                   </button>
                 </form>
-              ) : (
-                <div className="mb-6 pb-6 border-b border-gray-200 text-center">
-                  <p className="text-xs text-gray-600 mb-2">Sign in to write a review</p>
-                  <button
-                    onClick={() => setLoginModalOpen(true)}
-                    className="btn-primary text-xs py-2 px-4"
-                  >
-                    Sign In
-                  </button>
-                </div>
               )}
 
               {/* Reviews List */}

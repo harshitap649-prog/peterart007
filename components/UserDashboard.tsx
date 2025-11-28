@@ -755,7 +755,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const heroGreeting = user?.displayName || user?.email?.split('@')[0] || (language === 'hi' ? 'मित्र' : 'Collector')
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-4 md:space-y-6 pb-24">
       {/* Mobile Top Bar */}
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white/95 px-2 py-2 md:hidden">
         {/* Hamburger Menu */}
@@ -1028,82 +1028,12 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         )}
       </div>
 
-      {/* Overview Hero */}
-      <div className="rounded-[32px] border border-black/5 bg-gradient-to-br from-white via-[#fff7ef] to-[#f1f5ff] p-6 md:p-8 shadow-lg">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
-          <div className="flex-1 space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.4em] text-[var(--text-secondary)]">
-              {language === 'hi' ? 'आपका कला डैशबोर्ड' : 'Your art console'}
-            </p>
-            <div>
-              <h1 className="text-2xl font-semibold text-[var(--text-primary)] sm:text-3xl">
-                {language === 'hi' ? `${heroGreeting}, रचनात्मक हो जाएं।` : `Welcome back, ${heroGreeting}.`}
-              </h1>
-              <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl">
-                {language === 'hi'
-                  ? 'नई कलाकृतियां खोजें, कलाकारों से जुड़ें और हर आदेश या कमीशन को यहीं से प्रबंधित करें।'
-                  : 'Discover new drops, brief artists, and orchestrate every wishlist, order, or commission from one refined workspace.'}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => handleNavClick('artworks')}
-                className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold shadow-lg shadow-orange-400/30"
-              >
-                {language === 'hi' ? 'कलाकृतियां देखें' : 'Browse artworks'}
-              </button>
-              <button
-                onClick={() => handleNavClick('support')}
-                className="btn-secondary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold"
-              >
-                {language === 'hi' ? 'मदद चाहिए' : 'Need support'}
-              </button>
-              <button
-                onClick={() => handleNavClick(isArtist ? 'artist' : 'wishlist')}
-                className="btn-ghost flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-[var(--text-primary)]"
-              >
-                {isArtist ? (language === 'hi' ? 'कलाकार पैनल' : 'Artist dashboard') : (language === 'hi' ? 'Wishlist खोलें' : 'Open wishlist')}
-              </button>
-            </div>
-          </div>
-          <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
-            {insightCards.map((card) => (
-              <div key={card.label} className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">{card.label}</p>
-                <p className="mt-2 text-3xl font-bold text-[var(--text-primary)]">{card.value}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{card.helper}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {quickActions.slice(0, 4).map((action) => {
-            const Icon = action.icon
-            return (
-              <button
-                key={action.id}
-                onClick={() => handleNavClick(action.id)}
-                className="flex items-center justify-between rounded-2xl border border-black/5 bg-white px-4 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <div>
-                  <p className="text-sm font-semibold text-[var(--text-primary)]">{action.title}</p>
-                  <p className="text-xs text-[var(--text-secondary)] leading-tight">{action.description}</p>
-                </div>
-                <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${action.accent} text-white flex items-center justify-center text-base`}>
-                  <Icon />
-                </div>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
       {/* Main Content - Mobile Optimized */}
       <div className="space-y-4 md:space-y-6">
         {activeTab === 'artworks' && (
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {/* Premium Search Section */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 md:p-6 shadow-sm">
+            <div className="bg-white rounded-none md:rounded-2xl border-0 md:border border-gray-100 p-3 md:p-6 shadow-sm">
             <SearchFilters
               artworks={artworks}
               onFilterChange={setFilteredArtworks}
@@ -1131,16 +1061,16 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-gray-400 text-sm">{t.loadingArtworks}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 {filteredArtworks.map((artwork: any) => (
-                  <div key={artwork.id} className="group bg-white rounded-2xl border border-gray-100 p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
+                  <div key={artwork.id} className="group bg-white rounded-lg md:rounded-2xl border border-gray-100 p-1.5 md:p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
                     {artwork.artistId && (
-                      <div className="mb-2">
-                        <ArtistBadge artistId={artwork.artistId} className="text-xs" />
+                      <div className="mb-1 md:mb-2">
+                        <ArtistBadge artistId={artwork.artistId} className="text-[10px] md:text-xs" />
                       </div>
                     )}
                     {artwork.images && artwork.images[0] ? (
-                      <div className="relative mb-3 h-40 w-full overflow-hidden rounded-xl bg-gray-100">
+                      <div className="relative mb-2 md:mb-3 h-24 md:h-40 w-full overflow-hidden rounded-lg md:rounded-xl bg-gray-100">
                         <img
                           src={artwork.images[0]}
                           alt={artwork.title}
@@ -1151,39 +1081,34 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                         />
                       </div>
                     ) : (
-                      <div className="w-full h-40 mb-3 rounded-xl bg-gray-100 flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">{t.noImage}</span>
+                      <div className="w-full h-24 md:h-40 mb-2 md:mb-3 rounded-lg md:rounded-xl bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-400 text-[10px] md:text-xs">{t.noImage}</span>
                       </div>
                     )}
-                    <h3 className="font-semibold text-sm mb-1 line-clamp-1 text-gray-900">{artwork.title}</h3>
-                    <p className="text-gray-600 text-xs mb-2 line-clamp-2 min-h-[2.5rem]">{artwork.description}</p>
-                    <p className="text-gray-900 font-bold text-base mb-3">₹{artwork.price}</p>
-                    
-                    <div className="flex items-center gap-3 mb-3 text-gray-500">
+                    <h3 className="font-semibold text-[11px] md:text-sm mb-0.5 md:mb-1 line-clamp-1 text-gray-900">{artwork.title}</h3>
+                    <p className="text-gray-600 text-[10px] md:text-xs mb-1.5 md:mb-2 line-clamp-1 md:line-clamp-2 min-h-[1rem] md:min-h-[2.5rem]">{artwork.description}</p>
+                    <div className="flex items-center justify-between mb-2 md:mb-3">
+                      <p className="text-gray-900 font-bold text-xs md:text-base">₹{artwork.price}</p>
                       <div className="flex items-center gap-1">
-                        <FiThumbsUp className={`text-sm ${artwork.likedBy?.includes(user?.uid) ? 'text-gray-900 fill-current' : ''}`} />
-                        <span className="text-xs">{artwork.likes || 0}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <FiMessageCircle className="text-sm" />
-                        <span className="text-xs">{artwork.comments?.length || 0}</span>
+                        <FiThumbsUp className={`text-xs md:text-sm ${artwork.likedBy?.includes(user?.uid) ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
+                        <span className="text-[10px] md:text-xs text-gray-500">{artwork.likes || 0}</span>
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5 md:gap-2">
                       <button
                         onClick={() => handleWishlist(artwork.id)}
-                        className={`flex-1 flex items-center justify-center gap-1 rounded-xl py-2.5 text-xs font-semibold transition-all border ${
+                        className={`flex-1 flex items-center justify-center gap-1 rounded-lg md:rounded-xl py-1.5 md:py-2.5 text-[10px] md:text-xs font-semibold transition-all border ${
                           wishlist.includes(artwork.id) 
                             ? 'bg-red-50 text-red-600 border-red-200' 
                             : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                         }`}
                       >
-                        {wishlist.includes(artwork.id) ? <FaHeart className="text-sm" /> : <FiHeart className="text-sm" />}
+                        {wishlist.includes(artwork.id) ? <FaHeart className="text-xs md:text-sm" /> : <FiHeart className="text-xs md:text-sm" />}
                       </button>
                       <button
                         onClick={() => handleBuyClick(artwork.id)}
-                        className="flex-1 bg-gray-900 text-white rounded-xl py-2.5 text-xs font-semibold hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
+                        className="flex-1 bg-gray-900 text-white rounded-lg md:rounded-xl py-1.5 md:py-2.5 text-[10px] md:text-xs font-semibold hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
                       >
                         {t.buy}
                       </button>

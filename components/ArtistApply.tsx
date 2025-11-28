@@ -155,29 +155,62 @@ export default function ArtistApply() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-white to-gray-50">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Become an Artist</h1>
-          <p className="text-gray-600">
-            Sign in or create an account to start selling your artwork and earning money.
-          </p>
+    <div className="min-h-screen flex flex-col">
+      {/* Hero Section with Image and Quote */}
+      <div className="relative w-full py-12 md:py-16 px-4 bg-gradient-to-br from-orange-50 via-white to-pink-50">
+        <div className="mx-auto max-w-4xl text-center">
+          {/* Image */}
+          <div className="mb-6 flex justify-center">
+            <img
+              src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+              alt="Peter Art"
+              className="w-48 h-auto md:w-64 object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/logoo.png'
+              }}
+            />
+          </div>
+          
+          {/* Title and Subtitle */}
+          <div className="space-y-2">
+            <h1 className="text-xl md:text-4xl font-bold text-slate-900 leading-tight whitespace-nowrap">
+              Fall in love with art — take one home today.
+            </h1>
+            <p className="text-sm md:text-lg text-slate-600 font-medium whitespace-nowrap">
+              Turn Empty Walls into Expressions
+            </p>
+          </div>
         </div>
+      </div>
+
+      {/* Form Section */}
+      <div className="flex-1 flex items-center justify-center p-4 bg-gradient-to-b from-white to-gray-50">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Become an Artist</h2>
+            <p className="text-gray-600 text-sm md:text-base">
+              Sign in or create an account to start selling your artwork and earning money.
+            </p>
+          </div>
 
         <div className="card p-6 space-y-5">
           <div className="flex gap-2">
             <button
               onClick={() => setMode('signin')}
-              className={`flex-1 py-2 rounded-lg font-medium ${
-                mode === 'signin' ? 'btn-primary' : 'btn-secondary'
+              className={`flex-1 py-2 rounded-lg font-bold transition ${
+                mode === 'signin' 
+                  ? 'bg-black text-white shadow-lg shadow-black/30' 
+                  : 'bg-white text-gray-600 border border-gray-300 hover:text-gray-900'
               }`}
             >
               Artist Sign In
             </button>
             <button
               onClick={() => setMode('signup')}
-              className={`flex-1 py-2 rounded-lg font-medium ${
-                mode === 'signup' ? 'btn-primary' : 'btn-secondary'
+              className={`flex-1 py-2 rounded-lg font-bold transition ${
+                mode === 'signup' 
+                  ? 'bg-black text-white shadow-lg shadow-black/30' 
+                  : 'bg-white text-gray-600 border border-gray-300 hover:text-gray-900'
               }`}
             >
               Artist Sign Up
@@ -206,7 +239,7 @@ export default function ArtistApply() {
                   required
                 />
               </div>
-              <button type="submit" disabled={loading} className="btn-primary w-full py-2">
+              <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-black text-white font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Signing in...' : 'Sign In & Continue'}
               </button>
             </form>
@@ -243,7 +276,7 @@ export default function ArtistApply() {
                   required
                 />
               </div>
-              <button type="submit" disabled={loading} className="btn-primary w-full py-2">
+              <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-black text-white font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Creating account...' : 'Sign Up & Continue'}
               </button>
             </form>
@@ -263,6 +296,7 @@ export default function ArtistApply() {
             <FcGoogle className="text-xl" />
             <span>Continue with Google</span>
           </button>
+        </div>
         </div>
       </div>
     </div>
