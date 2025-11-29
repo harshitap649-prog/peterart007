@@ -3,6 +3,8 @@ import { readFile } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 
+export const dynamic = 'force-dynamic'
+
 const ORDERS_FILE = path.join(process.cwd(), 'data', 'orders.json')
 
 async function readOrders() {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/firebase.config'
 
+export const dynamic = 'force-dynamic'
+
 // GET - Get user profile
 export async function GET(request: NextRequest) {
   try {

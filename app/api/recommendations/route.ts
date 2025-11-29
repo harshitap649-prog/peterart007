@@ -9,6 +9,8 @@ import {
   getBecauseYouLiked 
 } from '@/lib/recommendations'
 
+export const dynamic = 'force-dynamic'
+
 const ARTWORKS_FILE = path.join(process.cwd(), 'data', 'artworks.json')
 const WISHLIST_FILE = path.join(process.cwd(), 'data', 'wishlist.json')
 const ORDERS_FILE = path.join(process.cwd(), 'data', 'orders.json')

@@ -6,6 +6,8 @@ import { getCurrentUser, isAdmin } from '@/lib/auth'
 import LogoutButton from '@/components/LogoutButton'
 import AdminDashboard from '@/components/AdminDashboard'
 
+export const dynamic = 'force-dynamic'
+
 export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)

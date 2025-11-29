@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { usePathname } from 'next/navigation'
 import SiteHeader from '@/components/SiteHeader'
 import SiteFooter from '@/components/SiteFooter'
@@ -22,7 +23,9 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
         <main className="app-main pb-20 md:pb-8">
           <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
         </main>
-        <MobileDock />
+        <Suspense fallback={null}>
+          <MobileDock />
+        </Suspense>
       </div>
     )
   }
@@ -58,7 +61,9 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
         <main className="app-main pb-20 md:pb-8">
           <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
         </main>
-        <MobileDock />
+        <Suspense fallback={null}>
+          <MobileDock />
+        </Suspense>
       </div>
     )
   }
@@ -69,7 +74,9 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
       <main className="app-main pb-20 md:pb-8">
         <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
       </main>
-      <MobileDock />
+      <Suspense fallback={null}>
+        <MobileDock />
+      </Suspense>
       <BannerAd />
     </div>
   )

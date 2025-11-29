@@ -7,6 +7,8 @@ import { getArtistByUserId } from '@/lib/artists'
 import toast from 'react-hot-toast'
 import { FiMessageCircle, FiUser, FiSearch, FiArrowLeft } from 'react-icons/fi'
 
+export const dynamic = 'force-dynamic'
+
 export default function MessagesPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
