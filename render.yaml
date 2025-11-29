@@ -1,10 +1,10 @@
 services:
   - type: web
     name: peterart007
-    env: node
+    env: node-18
     region: oregon
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /
     autoDeploy: true
