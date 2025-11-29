@@ -1,16 +1,39 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { FiHome, FiGrid, FiMessageCircle, FiShoppingCart, FiUser } from 'react-icons/fi'
-import { useCart } from '@/contexts/CartContext'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { FiHome, FiMessageCircle, FiShoppingBag, FiUser } from 'react-icons/fi'
+import { FaHome, FaComments, FaShoppingBag, FaUser } from 'react-icons/fa'
 
 const dockLinks = [
-  { href: '/', label: 'Home', icon: FiHome, color: 'blue' },
-  { href: '/user?tab=artworks', label: 'Browse', icon: FiGrid, color: 'purple' },
-  { href: '/messages', label: 'Chat', icon: FiMessageCircle, color: 'green' },
-  { href: '/cart', label: 'Cart', icon: FiShoppingCart, color: 'orange' },
-  { href: '/user', label: 'Profile', icon: FiUser, color: 'pink' }
+  { 
+    href: '/', 
+    label: 'Home', 
+    icon: FiHome, 
+    iconActive: FaHome,
+    color: 'blue' 
+  },
+  { 
+    href: '/messages', 
+    label: 'Chat', 
+    icon: FiMessageCircle, 
+    iconActive: FaComments,
+    color: 'green' 
+  },
+  { 
+    href: '/user?tab=orders', 
+    label: 'My Orders', 
+    icon: FiShoppingBag, 
+    iconActive: FaShoppingBag,
+    color: 'orange' 
+  },
+  { 
+    href: '/user', 
+    label: 'Profile', 
+    icon: FiUser, 
+    iconActive: FaUser,
+    color: 'pink' 
+  }
 ]
 
 const colorMap: Record<string, { active: string; inactive: string; bg: string }> = {
@@ -18,11 +41,6 @@ const colorMap: Record<string, { active: string; inactive: string; bg: string }>
     active: 'from-blue-500 to-blue-600',
     inactive: 'text-blue-600',
     bg: 'bg-blue-50'
-  },
-  purple: {
-    active: 'from-purple-500 to-purple-600',
-    inactive: 'text-purple-600',
-    bg: 'bg-purple-50'
   },
   green: {
     active: 'from-green-500 to-green-600',
@@ -43,20 +61,31 @@ const colorMap: Record<string, { active: string; inactive: string; bg: string }>
 
 export default function MobileDock() {
   const pathname = usePathname()
-  const { cartItemCount } = useCart()
+  const searchParams = useSearchParams()
 
   const isActive = (href: string) => {
+    if (href === '/') {
+      return pathname === '/'
+    }
     if (href.startsWith('/user')) {
-      return pathname === '/user' || pathname.startsWith('/user/')
+      const tab = searchParams?.get('tab')
+      if (href.includes('tab=orders')) {
+        return pathname === '/user' && tab === 'orders'
+      }
+      return pathname === '/user' && (!tab || tab === 'artworks')
+    }
+    if (href === '/messages') {
+      return pathname === '/messages' || pathname.startsWith('/chat/')
     }
     return pathname === href
   }
 
   return (
     <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-3 md:hidden safe-area-bottom">
-      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center gap-0.5 rounded-[28px] border border-gray-200/80 bg-white/98 px-1.5 py-2 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl">
+      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center gap-1 rounded-[28px] border border-gray-200/80 bg-white/98 px-2 py-2.5 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl">
         {dockLinks.map((item) => {
           const Icon = item.icon
+          const IconActive = item.iconActive || item.icon
           const active = isActive(item.href)
           const colors = colorMap[item.color] || colorMap.blue
           
@@ -64,46 +93,51 @@ export default function MobileDock() {
             <Link
               key={item.href}
               href={item.href}
-              className={`group relative flex flex-1 flex-col items-center gap-0.5 rounded-2xl px-1.5 py-1.5 text-[10px] font-semibold transition-all duration-200 active:scale-95 ${
+              className={`group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[10px] font-semibold transition-all duration-300 active:scale-95 touch-manipulation ${
                 active
-                  ? `bg-gradient-to-br ${colors.active} text-white`
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? `bg-gradient-to-br ${colors.active} text-white shadow-lg`
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               {/* Active indicator dot */}
               {active && (
-                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/90 shadow-sm"></div>
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-md"></div>
               )}
               
               <span
-                className={`relative flex h-10 w-10 items-center justify-center rounded-xl text-lg transition-all duration-200 ${
+                className={`relative flex h-11 w-11 items-center justify-center rounded-xl text-lg transition-all duration-300 ${
                   active
-                    ? 'bg-white/20 text-white shadow-sm'
-                    : `${colors.bg} ${colors.inactive} group-hover:scale-110`
+                    ? 'bg-white/25 text-white shadow-inner'
+                    : `${colors.bg} ${colors.inactive} group-hover:scale-110 group-hover:shadow-md`
                 }`}
               >
-                <Icon className="relative z-10" />
+                {active ? (
+                  <IconActive 
+                    className="relative z-10" 
+                    style={{ 
+                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                      strokeWidth: 0
+                    }}
+                  />
+                ) : (
+                  <Icon 
+                    className="relative z-10" 
+                    style={{ 
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                      strokeWidth: 2
+                    }}
+                  />
+                )}
                 
                 {/* Subtle glow effect for active state */}
                 {active && (
-                  <span className="absolute inset-0 rounded-xl bg-white/10 blur-sm"></span>
+                  <span className="absolute inset-0 rounded-xl bg-white/20 blur-sm"></span>
                 )}
               </span>
               
-              <span className={`leading-tight transition-colors ${active ? 'text-white' : 'text-gray-600'}`}>
+              <span className={`leading-tight transition-colors text-[10px] font-bold ${active ? 'text-white' : 'text-gray-600'}`}>
                 {item.label}
               </span>
-              
-              {/* Enhanced cart badge */}
-              {item.label === 'Cart' && cartItemCount > 0 && (
-                <span className={`absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-lg ${
-                  active
-                    ? 'bg-white/30 backdrop-blur-sm border border-white/40'
-                    : 'bg-gradient-to-br from-orange-500 to-red-500 border-2 border-white'
-                }`}>
-                  {cartItemCount > 9 ? '9+' : cartItemCount}
-                </span>
-              )}
               
               {/* Hover effect overlay */}
               {!active && (

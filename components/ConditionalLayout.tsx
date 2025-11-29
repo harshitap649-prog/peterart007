@@ -9,11 +9,50 @@ import BannerAd from '@/components/BannerAd'
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isUserPage = pathname === '/user'
+  const isArtworkPage = pathname?.startsWith('/artwork/')
+  const isCartPage = pathname === '/cart'
+  const isMessagesPage = pathname === '/messages' || pathname?.startsWith('/chat/')
 
   // All pages - no header or footer, but show mobile dock
   if (isUserPage) {
     // User page - full width on mobile
     // BannerAd is rendered inline in UserDashboard component
+    return (
+      <div className="app-shell">
+        <main className="app-main pb-20 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+        </main>
+        <MobileDock />
+      </div>
+    )
+  }
+
+  // Artwork details page - no mobile dock on mobile
+  if (isArtworkPage) {
+    return (
+      <div className="app-shell">
+        <main className="app-main pb-4 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+        </main>
+        <BannerAd />
+      </div>
+    )
+  }
+
+  // Cart page - no mobile dock on mobile
+  if (isCartPage) {
+    return (
+      <div className="app-shell">
+        <main className="app-main pb-4 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+        </main>
+        <BannerAd />
+      </div>
+    )
+  }
+
+  // Messages page - show mobile dock, no banner ad
+  if (isMessagesPage) {
     return (
       <div className="app-shell">
         <main className="app-main pb-20 md:pb-8">

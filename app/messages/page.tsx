@@ -179,8 +179,8 @@ export default function MessagesPage() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-700 font-semibold text-lg">Loading messages...</p>
+          <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-3 md:mb-4"></div>
+          <p className="text-gray-700 font-semibold text-sm md:text-lg">Loading messages...</p>
         </div>
       </div>
     )
@@ -188,104 +188,104 @@ export default function MessagesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
-      {/* Header */}
+      {/* Header - Mobile Optimized */}
       <div className="glass-panel border-b border-white/20 backdrop-blur-xl bg-white/60 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-5">
-          <div className="flex items-center gap-4 mb-5">
+        <div className="max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5">
+          <div className="flex items-center gap-2 md:gap-4 mb-3 md:mb-5">
             <button
               onClick={() => router.back()}
-              className="p-2.5 hover:bg-white/50 rounded-xl transition-all transform hover:scale-110"
+              className="p-2 md:p-2.5 hover:bg-white/50 rounded-lg md:rounded-xl transition-all"
             >
-              <FiArrowLeft className="text-xl text-gray-700" />
+              <FiArrowLeft className="text-base md:text-xl text-gray-700" />
             </button>
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                <FiMessageCircle className="text-white text-xl" />
+            <div className="flex items-center gap-2 md:gap-3 flex-1">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-md md:shadow-lg">
+                <FiMessageCircle className="text-white text-base md:text-xl" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <h1 className="text-base md:text-2xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 Messages
               </h1>
             </div>
           </div>
           
-          {/* Search Bar */}
+          {/* Search Bar - Mobile Optimized */}
           <div className="relative">
-            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+            <FiSearch className="absolute left-3 md:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm md:text-lg" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="w-full pl-12 pr-4 py-3.5 bg-white/80 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-500 shadow-sm transition-all"
+              className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-2.5 md:py-3.5 bg-white/80 border-2 border-gray-200 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs md:text-base text-gray-900 placeholder-gray-500 shadow-sm transition-all"
             />
           </div>
         </div>
       </div>
 
-      {/* Conversations List */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Conversations List - Mobile Optimized */}
+      <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-6">
         {loading ? (
-          <div className="text-center py-16">
-            <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 font-medium">Loading conversations...</p>
+          <div className="text-center py-12 md:py-16">
+            <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-3 md:mb-4"></div>
+            <p className="text-gray-600 font-medium text-xs md:text-base">Loading conversations...</p>
           </div>
         ) : filteredConversations.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <FiMessageCircle className="text-5xl text-orange-600" />
+          <div className="text-center py-12 md:py-20">
+            <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md md:shadow-lg">
+              <FiMessageCircle className="text-3xl md:text-5xl text-orange-600" />
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-base md:text-xl font-bold text-gray-900 mb-2 md:mb-3">
               {searchQuery ? 'No conversations found' : 'No messages yet'}
             </h3>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-sm md:text-lg">
               {searchQuery 
                 ? 'Try a different search term' 
                 : 'Start a conversation by messaging an artist or user!'}
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 md:space-y-3">
             {filteredConversations.map((conv) => (
               <div
                 key={conv.userId}
                 onClick={() => router.push(`/chat/${conv.userId}`)}
-                className="glass-panel p-5 rounded-xl hover:shadow-xl cursor-pointer transition-all transform hover:scale-[1.02] border border-white/20"
+                className="glass-panel p-3 md:p-5 rounded-lg md:rounded-xl hover:shadow-lg md:hover:shadow-xl cursor-pointer transition-all border border-white/20 active:scale-[0.98]"
               >
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
+                <div className="flex items-start gap-3 md:gap-4">
+                  {/* Avatar - Mobile Optimized */}
                   <div className="relative flex-shrink-0">
                     {conv.profileImage ? (
                       <img
                         src={conv.profileImage}
                         alt={conv.userName}
-                        className="w-16 h-16 rounded-xl object-cover border-4 border-white shadow-lg ring-2 ring-orange-100"
+                        className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl object-cover border-2 md:border-4 border-white shadow-md md:shadow-lg ring-1 md:ring-2 ring-orange-100"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center border-4 border-white shadow-lg ring-2 ring-orange-100">
-                        <span className="text-white text-xl font-bold">
+                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg md:rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center border-2 md:border-4 border-white shadow-md md:shadow-lg ring-1 md:ring-2 ring-orange-100">
+                        <span className="text-white text-sm md:text-xl font-bold">
                           {conv.userName[0]?.toUpperCase() || 'U'}
                         </span>
                       </div>
                     )}
                     {conv.unreadCount > 0 && (
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
-                        <span className="text-white text-xs font-bold">{conv.unreadCount}</span>
+                      <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-5 h-5 md:w-6 md:h-6 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center border-2 md:border-4 border-white shadow-md md:shadow-lg">
+                        <span className="text-white text-[10px] md:text-xs font-bold">{conv.unreadCount}</span>
                       </div>
                     )}
                   </div>
                   
-                  {/* Conversation Info */}
+                  {/* Conversation Info - Mobile Optimized */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-bold text-lg text-gray-900 truncate">{conv.userName}</h3>
-                      <span className="text-xs text-gray-500 flex-shrink-0 ml-3 font-medium">
+                    <div className="flex items-start justify-between mb-1 md:mb-2">
+                      <h3 className="font-bold text-sm md:text-lg text-gray-900 truncate">{conv.userName}</h3>
+                      <span className="text-[10px] md:text-xs text-gray-500 flex-shrink-0 ml-2 md:ml-3 font-medium">
                         {formatTime(conv.lastMessage.createdAt)}
                       </span>
                     </div>
                     {conv.userEmail && (
-                      <p className="text-sm text-gray-500 truncate mb-2">{conv.userEmail}</p>
+                      <p className="text-[10px] md:text-sm text-gray-500 truncate mb-1 md:mb-2">{conv.userEmail}</p>
                     )}
-                    <p className={`text-base truncate ${
+                    <p className={`text-xs md:text-base truncate ${
                       conv.unreadCount > 0 ? 'font-semibold text-gray-900' : 'text-gray-600'
                     }`}>
                       {conv.lastMessage.message || 'No message text'}
