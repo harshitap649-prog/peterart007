@@ -236,13 +236,6 @@ export default function RecommendationSection({
             className="card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer"
             onClick={() => router.push(`/artwork/${artwork.id}`)}
           >
-            <div className="p-4 pb-2">
-              {artwork.artistId && (
-                <div className="mb-2">
-                  <ArtistBadge artistId={artwork.artistId} />
-                </div>
-              )}
-            </div>
             <div className="relative h-48 w-full overflow-hidden">
               <img
                 src={artwork.images?.[0] || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage%3C/text%3E%3C/svg%3E'}
@@ -298,13 +291,6 @@ export default function RecommendationSection({
                 style={{ width: 'calc(50vw - 1.5rem)', minWidth: '160px', maxWidth: '280px' }}
                 onClick={() => router.push(`/artwork/${artwork.id}`)}
               >
-                <div className="p-3 pb-2">
-                  {artwork.artistId && (
-                    <div className="mb-2">
-                      <ArtistBadge artistId={artwork.artistId} className="text-xs" />
-                    </div>
-                  )}
-                </div>
                 <div className="relative h-40 w-full overflow-hidden">
                   <img
                     src={artwork.images?.[0] || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage%3C/text%3E%3C/svg%3E'}

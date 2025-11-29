@@ -10,7 +10,8 @@ import { logout } from '@/lib/auth'
 import { loadPopunderAd, resetPopunderAd } from '@/lib/popunderAd'
 import toast from 'react-hot-toast'
 import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle, FiMenu, FiX, FiSettings, FiLogOut, FiUser, FiStar, FiPackage, FiTrendingUp, FiCalendar, FiDollarSign, FiArrowRight, FiCheckCircle } from 'react-icons/fi'
-import { FaHeart } from 'react-icons/fa'
+import { FaHeart, FaSearch, FaShoppingCart, FaUser, FaStar, FaBox, FaQuestionCircle, FaCog, FaDollarSign, FaChartLine, FaComments } from 'react-icons/fa'
+import { HiSearch, HiHeart, HiShoppingCart, HiUser, HiStar, HiCube, HiQuestionMarkCircle, HiCog, HiCurrencyDollar, HiTrendingUp, HiChatAlt2 } from 'react-icons/hi'
 import HelpSupport from './HelpSupport'
 import LoginModal from './LoginModal'
 import Cart from './Cart'
@@ -23,6 +24,7 @@ import ArtistDashboard from './ArtistDashboard'
 import ArtistBadge from './ArtistBadge'
 import ArtistFeed from './ArtistFeed'
 import FollowButton from './FollowButton'
+import BannerAd from './BannerAd'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtistByUserId, getArtistById } from '@/lib/artists'
 import { getUserFollowing } from '@/lib/follows'
@@ -58,6 +60,9 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [showCongratulations, setShowCongratulations] = useState(false)
   const [followingArtists, setFollowingArtists] = useState<any[]>([])
   const [isMobileView, setIsMobileView] = useState(false)
+  const [expandedArtistId, setExpandedArtistId] = useState<string | null>(null)
+  const [artistArtworks, setArtistArtworks] = useState<Record<string, any[]>>({})
+  const [loadingArtworks, setLoadingArtworks] = useState<Record<string, boolean>>({})
 
   // Translations
   const translations = {
@@ -552,6 +557,34 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     }
   }
 
+  const loadArtistArtworks = async (artistId: string) => {
+    if (artistArtworks[artistId]) {
+      // Already loaded, just toggle
+      return
+    }
+
+    setLoadingArtworks(prev => ({ ...prev, [artistId]: true }))
+    try {
+      const allArts = await getAllArtworks()
+      const filtered = allArts.filter((art: any) => art.artistId === artistId)
+      setArtistArtworks(prev => ({ ...prev, [artistId]: filtered }))
+    } catch (error) {
+      console.error('Error loading artist artworks:', error)
+      toast.error('Failed to load artworks')
+    } finally {
+      setLoadingArtworks(prev => ({ ...prev, [artistId]: false }))
+    }
+  }
+
+  const handleArtistClick = (artistId: string) => {
+    if (expandedArtistId === artistId) {
+      setExpandedArtistId(null)
+    } else {
+      setExpandedArtistId(artistId)
+      loadArtistArtworks(artistId)
+    }
+  }
+
   const handleCancelOrder = async (orderId: string, e: React.MouseEvent) => {
     e.stopPropagation() // Prevent card click
     
@@ -756,47 +789,66 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   return (
     <div className="space-y-4 md:space-y-6 pb-24">
-      {/* Mobile Top Bar */}
-      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white/95 px-2 py-2 md:hidden">
-        {/* Hamburger Menu */}
+      {/* Top Bar - Mobile Optimized */}
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white/98 backdrop-blur-sm px-3 py-2.5 md:px-4 md:py-3">
+        {/* Logo/Image Icon - Mobile Optimized */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          className="flex items-center justify-center w-11 h-11 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-orange-50 to-pink-50 border border-orange-100/50 active:scale-95 transition-all duration-200 shadow-sm active:shadow-md touch-manipulation"
+          aria-label="Open menu"
         >
-          <FiMenu className="text-xl" />
+          <img
+            src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+            alt="Peter Art"
+            className="w-8 h-8 md:w-9 md:h-9 object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/logoo.png'
+            }}
+          />
         </button>
 
-        {/* Center - Peter Art */}
-        <h1 className="text-lg font-bold text-gray-900">{t.peterArt}</h1>
+        {/* Center - Brand Name - Mobile Optimized */}
+        <div className="flex-1 text-center px-2">
+          <h1 className="text-base md:text-lg font-bold text-gray-900 truncate">{t.peterArt}</h1>
+        </div>
 
-        {/* Right Side - Cart and User Icon */}
-        <div className="flex items-center gap-2 relative">
-          <Cart />
+        {/* Right Side - Action Icons - Mobile Optimized */}
+        <div className="flex items-center gap-1.5 md:gap-2 relative">
+          <div className="hidden sm:block">
+            <Cart />
+          </div>
           {user ? (
             <>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors relative z-[61]"
+                className="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 active:scale-95 transition-all duration-200 shadow-sm active:shadow-md relative z-[61] touch-manipulation"
                 aria-label="User menu"
               >
-                <FiUser className="text-xl" />
+                <FiUser className="text-lg md:text-xl text-gray-700" />
               </button>
               
-              {/* User Menu Dropdown - Only Email/User Info */}
+              {/* User Menu Dropdown - Mobile Optimized */}
               {userMenuOpen && (
                 <>
                   {/* Backdrop */}
                   <div
-                    className="fixed inset-0 z-[120]"
+                    className="fixed inset-0 z-[120] bg-black/20 backdrop-blur-sm"
                     onClick={() => setUserMenuOpen(false)}
                   ></div>
                   
-                  {/* Dropdown Menu - Only User Info */}
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-xl z-[130]">
-                    {/* User Info */}
-                    <div className="px-4 py-3">
-                      <p className="text-sm font-semibold text-gray-900">{user.displayName || user.email?.split('@')[0]}</p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
+                  {/* Dropdown Menu - Mobile Responsive */}
+                  <div className="absolute right-0 top-full mt-2 w-64 md:w-72 bg-white border border-gray-200 rounded-2xl shadow-2xl z-[130] overflow-hidden">
+                    {/* User Info Header */}
+                    <div className="px-4 py-4 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center text-white font-bold text-base shadow-lg flex-shrink-0">
+                          {(user.displayName || user.email?.split('@')[0] || 'U')[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-gray-900 truncate">{user.displayName || user.email?.split('@')[0]}</p>
+                          <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -805,10 +857,10 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           ) : (
             <button
               onClick={() => setLoginModalOpen(true)}
-              className="p-2 text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 active:scale-95 transition-all duration-200 shadow-sm active:shadow-md touch-manipulation"
               aria-label="Login"
             >
-              <FiUser className="text-xl" />
+              <FiUser className="text-lg md:text-xl text-gray-700" />
             </button>
           )}
         </div>
@@ -824,134 +876,172 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
             style={{ backdropFilter: 'blur(3px)' }}
           ></div>
           
-          {/* Compact Professional Left Sidebar Menu */}
+          {/* Compact Sidebar Menu */}
           <div className="fixed inset-0 z-[201] flex items-start justify-start md:justify-center p-0 md:p-8 pointer-events-none">
-            <div className="w-[260px] bg-white h-full md:h-auto md:rounded-xl md:max-h-[90vh] shadow-xl overflow-hidden pointer-events-auto animate-slideInLeft border-r border-gray-200 md:border-r-0 md:border md:border-gray-200">
+            <div className="w-[75vw] max-w-[260px] md:w-[260px] bg-white h-full md:h-auto md:rounded-xl md:max-h-[90vh] shadow-2xl overflow-hidden pointer-events-auto animate-slideInLeft border-r border-gray-100 md:border-r-0 md:border md:border-gray-200">
               {/* Compact Header */}
-              <div className="p-4 border-b border-gray-200 bg-white">
-                <div className="flex items-center justify-between">
+              <div className="p-3 md:p-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+                <div className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                  {user ? (
+                    {user ? (
                       <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0 shadow-sm">
+                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-md">
                           {(user.displayName || user.email?.split('@')[0] || 'U')[0].toUpperCase()}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h2 className="text-sm font-semibold text-gray-900 truncate">{user.displayName || user.email?.split('@')[0]}</h2>
-                          <p className="text-[10px] text-gray-500 truncate">{user.email}</p>
+                          <h2 className="text-xs md:text-sm font-bold text-gray-900 truncate">{user.displayName || user.email?.split('@')[0]}</h2>
+                          <p className="text-[9px] md:text-[10px] text-gray-500 truncate">{user.email}</p>
                         </div>
-                    </div>
-                  ) : (
-                      <h2 className="text-base font-semibold text-gray-900">Menu</h2>
-                  )}
-                </div>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                    className="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                  aria-label="Close menu"
-                >
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-orange-100 to-pink-100 flex items-center justify-center shadow-sm flex-shrink-0">
+                          <img
+                            src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+                            alt="Peter Art"
+                            className="w-7 h-7 object-contain"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/logoo.png'
+                            }}
+                          />
+                        </div>
+                        <h2 className="text-sm md:text-base font-bold text-gray-900">Menu</h2>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-lg transition-all duration-200 flex-shrink-0 active:scale-95 touch-manipulation"
+                    aria-label="Close menu"
+                  >
                     <FiX className="text-lg" />
-                </button>
-              </div>
+                  </button>
+                </div>
               </div>
               
-              {/* Compact Navigation Menu */}
-              <nav className="py-2 max-h-[calc(100vh-180px)] overflow-y-auto">
+              {/* Compact Navigation Menu - Orange Active State with Realistic Icons */}
+              <nav className="py-2 md:py-3 max-h-[calc(100vh-180px)] overflow-y-auto overscroll-contain">
                 {navTabs.map((tab) => {
-                  const Icon = tab.icon
                   const isActiveTab = activeTab === tab.id
                   
-                  // Colorful icon colors based on tab type
-                  const iconColors: Record<string, string> = {
-                    artworks: isActiveTab ? 'text-white' : 'text-blue-600',
-                    wishlist: isActiveTab ? 'text-white' : 'text-pink-600',
-                    following: isActiveTab ? 'text-white' : 'text-purple-600',
-                    orders: isActiveTab ? 'text-white' : 'text-orange-600',
-                    reviews: isActiveTab ? 'text-white' : 'text-amber-600',
-                    support: isActiveTab ? 'text-white' : 'text-green-600',
-                    profile: isActiveTab ? 'text-white' : 'text-indigo-600',
-                    giftcards: isActiveTab ? 'text-white' : 'text-emerald-600',
-                    artist: isActiveTab ? 'text-white' : 'text-cyan-600',
+                  // Enhanced icon mapping with filled/realistic versions
+                  const iconMap: Record<string, any> = {
+                    artworks: isActiveTab ? FaSearch : HiSearch,
+                    wishlist: isActiveTab ? FaHeart : HiHeart,
+                    following: isActiveTab ? FaUser : HiUser,
+                    orders: isActiveTab ? FaShoppingCart : HiShoppingCart,
+                    reviews: isActiveTab ? FaStar : HiStar,
+                    support: isActiveTab ? FaQuestionCircle : HiQuestionMarkCircle,
+                    profile: isActiveTab ? FaCog : HiCog,
+                    giftcards: isActiveTab ? FaDollarSign : HiCurrencyDollar,
+                    artist: isActiveTab ? FaChartLine : HiTrendingUp,
                   }
                   
-                  // Unique gradient backgrounds for active state matching icon colors
-                  const activeBackgrounds: Record<string, string> = {
-                    artworks: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30',
-                    wishlist: 'bg-gradient-to-r from-pink-500 to-pink-600 text-white shadow-lg shadow-pink-500/30',
-                    following: 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30',
-                    orders: 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30',
-                    reviews: 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/30',
-                    support: 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30',
-                    profile: 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30',
-                    giftcards: 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30',
-                    artist: 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30',
-                  }
+                  const Icon = iconMap[tab.id] || tab.icon
                   
                   return (
-              <button
+                    <button
                       key={tab.id}
                       onClick={() => {
                         handleNavClick(tab.id)
                         setSidebarOpen(false)
                       }}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all duration-200 mx-2 rounded-lg mb-0.5 relative overflow-hidden ${
+                      className={`w-full flex items-center gap-2.5 px-3 py-2.5 md:py-2 text-xs md:text-sm font-semibold transition-all duration-300 mx-2 rounded-lg mb-1.5 relative overflow-hidden active:scale-[0.98] touch-manipulation ${
                         isActiveTab
-                          ? `${activeBackgrounds[tab.id] || 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg'}`
+                          ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/40'
                           : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
                       }`}
                     >
-                      {/* Subtle shine effect for active items */}
+                      {/* Shine effect for active items */}
                       {isActiveTab && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-shimmer"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer"></div>
                       )}
-                      <Icon className={`text-base flex-shrink-0 relative z-10 ${iconColors[tab.id] || (isActiveTab ? 'text-white' : 'text-gray-600')}`} />
+                      {/* Icon with enhanced realistic styling */}
+                      <div className={`flex items-center justify-center w-8 h-8 md:w-7 md:h-7 rounded-lg flex-shrink-0 relative z-10 transition-all ${
+                        isActiveTab 
+                          ? 'bg-white/25 backdrop-blur-sm shadow-inner' 
+                          : 'bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/50'
+                      }`}>
+                        {iconMap[tab.id] ? (
+                          <Icon 
+                            className={`text-base md:text-sm relative z-10 ${
+                              isActiveTab ? 'text-white drop-shadow-lg' : 'text-gray-700'
+                            }`}
+                            style={{
+                              filter: isActiveTab 
+                                ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' 
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                            }}
+                          />
+                        ) : (
+                          <Icon 
+                            className={`text-base md:text-sm relative z-10 ${
+                              isActiveTab ? 'text-white drop-shadow-lg' : 'text-gray-700'
+                            }`}
+                            strokeWidth={isActiveTab ? 2.5 : 2}
+                            style={{
+                              filter: isActiveTab 
+                                ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' 
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                            }}
+                          />
+                        )}
+                      </div>
                       <span className="flex-1 text-left relative z-10">{tab.label}</span>
                       {isActiveTab && (
-                        <div className="w-2 h-2 bg-white/90 rounded-full flex-shrink-0 relative z-10 shadow-sm"></div>
+                        <div className="w-2 h-2 bg-white rounded-full flex-shrink-0 relative z-10 shadow-md ring-1 ring-white/50"></div>
                       )}
-              </button>
+                    </button>
                   )
                 })}
-                {/* Messages Link */}
-              {user && (
+                {/* Messages Link - Compact with Realistic Icon */}
+                {user && (
                   <button
                     onClick={() => {
                       router.push('/messages')
                       setSidebarOpen(false)
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-all mx-2 rounded-lg mb-0.5"
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 md:py-2 text-xs md:text-sm font-semibold text-gray-700 hover:bg-gray-50 active:scale-[0.98] transition-all mx-2 rounded-lg mb-1.5 touch-manipulation"
                   >
-                    <FiMessageCircle className="text-base text-blue-600 flex-shrink-0" />
+                    <div className="flex items-center justify-center w-8 h-8 md:w-7 md:h-7 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/50 flex-shrink-0">
+                      <HiChatAlt2 
+                        className="text-base md:text-sm text-gray-700 flex-shrink-0" 
+                        style={{ 
+                          filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                          strokeWidth: 0
+                        }}
+                      />
+                    </div>
                     <span className="flex-1 text-left">{language === 'hi' ? 'संदेश' : 'Messages'}</span>
                   </button>
                 )}
 
-                {/* Divider */}
-              {user && (
-                  <div className="border-t border-gray-200 my-3 mx-3"></div>
+                {/* Divider - Compact */}
+                {user && (
+                  <div className="border-t border-gray-100 my-3 mx-3"></div>
                 )}
 
-                  {/* Language Selection */}
+                {/* Language Selection - Compact */}
                 {user && (
-                  <div className="px-4 py-3">
-                    <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2.5">{t.changeLanguage}</p>
-                    <div className="flex gap-2">
+                  <div className="px-3 py-2.5 md:py-3 bg-gradient-to-br from-gray-50 to-white mx-2 rounded-lg border border-gray-100">
+                    <p className="text-[9px] md:text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-2">{t.changeLanguage}</p>
+                    <div className="flex gap-1.5">
                       <button
                         onClick={() => changeLanguage('en')}
-                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        className={`flex-1 px-2.5 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 active:scale-95 touch-manipulation ${
                           language === 'en'
                             ? 'bg-gray-900 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-sm'
                         }`}
                       >
                         {t.english}
                       </button>
                       <button
                         onClick={() => changeLanguage('hi')}
-                        className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                        className={`flex-1 px-2.5 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 active:scale-95 touch-manipulation ${
                           language === 'hi'
                             ? 'bg-gray-900 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-sm'
                         }`}
                       >
                         {t.hindi}
@@ -960,21 +1050,24 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                   </div>
                 )}
 
-                  {/* Logout */}
+                {/* Logout - Compact */}
                 {user && (
-                  <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-                  <button
-                    onClick={() => {
-                      setShowLogoutConfirm(true)
-                      setSidebarOpen(false)
-                    }}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-lg transition-all shadow-md hover:shadow-lg"
-                  >
-                    <FiLogOut className="text-base" />
+                  <div className="px-3 py-3 md:py-4 border-t border-gray-100 bg-gradient-to-br from-red-50/50 to-white mt-2">
+                    <button
+                      onClick={() => {
+                        setShowLogoutConfirm(true)
+                        setSidebarOpen(false)
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2.5 md:py-2.5 text-xs md:text-sm font-bold text-white bg-gradient-to-r from-red-600 via-red-600 to-red-700 hover:from-red-700 hover:via-red-700 hover:to-red-800 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg active:scale-[0.98] touch-manipulation"
+                    >
+                      <FiLogOut 
+                        className="text-base md:text-sm" 
+                        strokeWidth={2.5}
+                      />
                       <span>Logout</span>
-                  </button>
+                    </button>
                   </div>
-              )}
+                )}
             </nav>
           </div>
         </div>
@@ -982,7 +1075,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       )}
 
       {/* Compact Professional Menu Button */}
-      <div className="mb-4 flex items-center gap-2.5">
+      <div className="mb-4 flex items-center gap-2.5 px-3 md:px-0">
         {/* Menu Button - Compact */}
         <button
           onClick={() => setSidebarOpen(true)}
@@ -1033,7 +1126,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         {activeTab === 'artworks' && (
           <div className="space-y-4 md:space-y-6">
             {/* Premium Search Section */}
-            <div className="bg-white rounded-none md:rounded-2xl border-0 md:border border-gray-100 p-3 md:p-6 shadow-sm">
+            <div className="bg-white rounded-none md:rounded-2xl border-0 md:border border-gray-100 p-3 md:p-6 shadow-sm mx-0 md:mx-0">
             <SearchFilters
               artworks={artworks}
               onFilterChange={setFilteredArtworks}
@@ -1061,14 +1154,9 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-gray-400 text-sm">{t.loadingArtworks}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4 px-3 md:px-0">
                 {filteredArtworks.map((artwork: any) => (
                   <div key={artwork.id} className="group bg-white rounded-lg md:rounded-2xl border border-gray-100 p-1.5 md:p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
-                    {artwork.artistId && (
-                      <div className="mb-1 md:mb-2">
-                        <ArtistBadge artistId={artwork.artistId} className="text-[10px] md:text-xs" />
-                      </div>
-                    )}
                     {artwork.images && artwork.images[0] ? (
                       <div className="relative mb-2 md:mb-3 h-24 md:h-40 w-full overflow-hidden rounded-lg md:rounded-xl bg-gray-100">
                         <img
@@ -1129,6 +1217,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                          limit={10}
                          language={language}
                        />
+                       {/* Banner Ad between For You and Because You Liked sections */}
+                       <BannerAd inline={true} />
                        <RecommendationSection
                          userId={user.uid}
                          type="becauseYouLiked"
@@ -1605,13 +1695,13 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           </div>
         )}
 
-        {/* Following Tab */}
+        {/* Following Tab - Clean Vertical List */}
         {activeTab === 'following' && user && (
-          <div className="space-y-4 rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{t.followingArtists}</h2>
+          <div className="space-y-3 md:space-y-4">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 px-3 md:px-0">{t.followingArtists}</h2>
             
             {followingArtists.length === 0 ? (
-              <div className="card p-6 md:p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100">
+              <div className="card p-6 md:p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100 mx-3 md:mx-0">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mb-4">
                   <FiUser className="text-4xl text-white" />
                 </div>
@@ -1626,53 +1716,123 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 </button>
               </div>
             ) : (
-              <>
-                {/* Artists List */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-                  {followingArtists.map((artist: any) => (
-                    <div key={artist.id} className="card p-4">
-                      <div className="flex items-center gap-3 mb-3">
+              <div className="space-y-2 md:space-y-3 px-3 md:px-0">
+                {followingArtists.map((artist: any) => {
+                  const isExpanded = expandedArtistId === artist.id
+                  const artworks = artistArtworks[artist.id] || []
+                  const isLoading = loadingArtworks[artist.id] || false
+
+                  return (
+                    <div key={artist.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                      {/* Artist Card - Clickable */}
+                      <button
+                        onClick={() => handleArtistClick(artist.id)}
+                        className="w-full p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors"
+                      >
+                        {/* Avatar */}
                         {artist.profileImage ? (
                           <img
                             src={artist.profileImage}
                             alt={artist.artistName}
-                            className="w-12 h-12 rounded-full object-cover"
+                            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                            <FiUser className="text-gray-500" />
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center flex-shrink-0">
+                            <FiUser className="text-gray-500 text-lg" />
                           </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm truncate">{artist.artistName}</h3>
+                        
+                        {/* Artist Info */}
+                        <div className="flex-1 min-w-0 text-left">
+                          <h3 className="font-semibold text-sm md:text-base text-gray-900 truncate">{artist.artistName}</h3>
                           <p className="text-xs text-gray-500 truncate">{artist.email}</p>
                         </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => router.push(`/artist/${artist.id}`)}
-                          className="btn-secondary flex-1 text-xs py-2"
-                        >
-                          {t.viewProfile}
-                        </button>
-                        <button
-                          onClick={() => router.push(`/chat/${artist.userId}`)}
-                          className="btn-primary flex-1 text-xs py-2 flex items-center justify-center gap-1"
-                        >
-                          <FiMessageCircle className="text-xs" />
-                          {t.message}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
 
-                {/* Artworks from Following */}
-                <div className="card p-4 md:p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">{t.artworksFromFollowing}</h3>
-                  <ArtistFeed userId={user.uid} language={language} />
-                </div>
-              </>
+                        {/* Expand/Collapse Icon */}
+                        <div className={`flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
+                          <FiArrowRight className="text-gray-400 text-lg" />
+                        </div>
+                      </button>
+
+                      {/* Expanded Artworks Section */}
+                      {isExpanded && (
+                        <div className="border-t border-gray-100 bg-gray-50/50">
+                          {isLoading ? (
+                            <div className="p-6 text-center">
+                              <div className="w-8 h-8 border-3 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                              <p className="text-xs text-gray-500">{t.loadingArtworks}</p>
+                            </div>
+                          ) : artworks.length === 0 ? (
+                            <div className="p-6 text-center">
+                              <p className="text-sm text-gray-500">No artworks available</p>
+                            </div>
+                          ) : (
+                            <div className="p-4 space-y-3">
+                              <div className="grid grid-cols-2 gap-2 md:gap-3">
+                                {artworks.map((artwork: any) => (
+                                  <div
+                                    key={artwork.id}
+                                    onClick={() => router.push(`/artwork/${artwork.id}`)}
+                                    className="group bg-white rounded-lg border border-gray-200 p-2 md:p-3 shadow-sm hover:shadow-md hover:border-gray-300 transition-all cursor-pointer"
+                                  >
+                                    {artwork.images && artwork.images[0] ? (
+                                      <div className="relative mb-2 h-32 md:h-40 w-full overflow-hidden rounded-lg bg-gray-100">
+                                        <img
+                                          src={artwork.images[0]}
+                                          alt={artwork.title}
+                                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                          onError={(e) => {
+                                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
+                                          }}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="w-full h-32 md:h-40 mb-2 rounded-lg bg-gray-100 flex items-center justify-center">
+                                        <span className="text-gray-400 text-[10px]">{t.noImage}</span>
+                                      </div>
+                                    )}
+                                    <h4 className="font-semibold text-xs md:text-sm mb-1 line-clamp-1 text-gray-900">{artwork.title}</h4>
+                                    <div className="flex items-center justify-between">
+                                      <p className="text-gray-900 font-bold text-xs md:text-sm">₹{artwork.price}</p>
+                                      <div className="flex items-center gap-1">
+                                        <FiThumbsUp className={`text-xs ${artwork.likedBy?.includes(user?.uid) ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
+                                        <span className="text-[10px] text-gray-500">{artwork.likes || 0}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              
+                              {/* View Profile and Message Buttons */}
+                              <div className="flex gap-2 pt-2 border-t border-gray-200">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    router.push(`/artist/${artist.id}`)
+                                  }}
+                                  className="flex-1 bg-white border border-gray-300 text-gray-700 rounded-lg py-2.5 text-xs md:text-sm font-semibold hover:bg-gray-50 transition-colors"
+                                >
+                                  {t.viewProfile}
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    router.push(`/chat/${artist.userId}`)
+                                  }}
+                                  className="flex-1 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg py-2.5 text-xs md:text-sm font-semibold hover:from-orange-600 hover:to-amber-700 transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-1.5"
+                                >
+                                  <FiMessageCircle className="text-sm" />
+                                  {t.message}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
             )}
           </div>
         )}

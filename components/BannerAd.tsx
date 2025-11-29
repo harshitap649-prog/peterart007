@@ -8,7 +8,11 @@ declare global {
   }
 }
 
-export default function BannerAd() {
+interface BannerAdProps {
+  inline?: boolean // If true, render inline instead of fixed at bottom
+}
+
+export default function BannerAd({ inline = false }: BannerAdProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const slotRef = useRef<HTMLDivElement>(null)
   const scriptRef = useRef<HTMLScriptElement | null>(null)
@@ -116,6 +120,9 @@ export default function BannerAd() {
           }
           checkCount++
           
+
+
+
           const adSlotElement = document.getElementById(placeholderId)
           const iframeElement = slot.querySelector('iframe')
           const hasAdContent = !!(adSlotElement && adSlotElement.innerHTML.trim() && 
@@ -206,8 +213,16 @@ export default function BannerAd() {
   return (
     <div 
       ref={containerRef}
-      className="fixed bottom-0 left-0 right-0 z-[10000] py-2 bg-transparent"
-      style={{
+      className={inline ? "w-full py-4 flex justify-center" : "fixed bottom-0 left-0 right-0 z-[10000] py-2 bg-transparent"}
+      style={inline ? {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        position: 'relative',
+        backgroundColor: 'transparent',
+        pointerEvents: 'none'
+      } : {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',

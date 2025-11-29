@@ -12,6 +12,7 @@ import LoginModal from '@/components/LoginModal'
 import Cart from '@/components/Cart'
 import RecommendationSection from '@/components/RecommendationSection'
 import ArtistBadge from '@/components/ArtistBadge'
+import BannerAd from '@/components/BannerAd'
 import { likeArtwork } from '@/lib/comments'
 import { useCart } from '@/contexts/CartContext'
 
@@ -458,7 +459,7 @@ export default function ArtworkDetailsPage() {
     <div className="min-h-screen bg-white">
       {/* Sticky Top Bar - Mobile Optimized */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-3 py-3 md:px-4 md:py-4">
-        <div className="flex justify-between items-center max-w-6xl mx-auto">
+        <div className="flex justify-between items-center w-full md:max-w-6xl md:mx-auto">
           <button
             onClick={() => router.push('/user')}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm md:text-base font-semibold text-gray-700 hover:bg-gray-100 transition-all"
@@ -470,7 +471,7 @@ export default function ArtworkDetailsPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-0 md:px-4 py-4 md:py-6">
+      <div className="w-full md:max-w-6xl md:mx-auto md:px-4 py-4 md:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
           {/* Artwork Images */}
           <div className="space-y-3 md:space-y-4">
@@ -1164,15 +1165,22 @@ export default function ArtworkDetailsPage() {
         </div>
       )}
 
+      {/* Banner Ad before Similar Artworks */}
+      <div className="w-full md:max-w-6xl md:mx-auto md:px-4 py-4 md:py-6">
+        <BannerAd inline={true} />
+      </div>
+
       {/* Similar Artworks Section */}
       {artwork && (
-        <RecommendationSection
-          type="similar"
-          artworkId={artwork.id}
-          title="Similar Artworks"
-          subtitle="You might also like these"
-          limit={6}
-        />
+        <div className="w-full md:max-w-6xl md:mx-auto md:px-4">
+          <RecommendationSection
+            type="similar"
+            artworkId={artwork.id}
+            title="Similar Artworks"
+            subtitle="You might also like these"
+            limit={6}
+          />
+        </div>
       )}
     </div>
   )
