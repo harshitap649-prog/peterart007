@@ -7,11 +7,13 @@ import { getAllUsers, disableUser, deleteUser } from '@/lib/users'
 import { getAllSupportMessages, updateSupportMessage, deleteSupportMessage } from '@/lib/support'
 import { getAllArtists, updateArtistProfile, getArtistArtworks, deleteArtist } from '@/lib/artists'
 import toast from 'react-hot-toast'
-import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiUser, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch, FiImage, FiEye, FiMail } from 'react-icons/fi'
+import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiUser, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch, FiImage, FiEye, FiMail, FiMenu, FiLogOut } from 'react-icons/fi'
+import LogoutButton from '@/components/LogoutButton'
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('home')
   const [ordersSubTab, setOrdersSubTab] = useState<'pending' | 'delivered'>('pending')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [artworks, setArtworks] = useState<any[]>([])
   const [filteredArtworks, setFilteredArtworks] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -404,102 +406,131 @@ export default function AdminDashboard() {
   const approvedArtists = artists.filter((artist: any) => artist.status === 'approved')
   const rejectedArtists = artists.filter((artist: any) => artist.status === 'rejected')
 
+  const navTabs = [
+    { id: 'home', label: 'Home', icon: FiHome },
+    { id: 'artworks', label: 'All Artworks', icon: FiShoppingBag },
+    { id: 'orders', label: 'All Orders', icon: FiPackage },
+    { id: 'users', label: 'Users', icon: FiUsers },
+    { id: 'artists', label: 'Artists', icon: FiUser },
+    { id: 'deletedOrders', label: 'Deleted Orders', icon: FiTrash2, badge: deletedOrders.length },
+    { id: 'support', label: 'Support Messages', icon: FiMessageSquare, badge: supportMessages.filter((m: any) => m.status === 'pending').length },
+  ]
+
   return (
-    <div>
-      {/* Tabs */}
-      <div className="flex gap-1.5 md:gap-2 mb-4 md:mb-6 overflow-x-auto pb-2">
+    <div className="pb-20 md:pb-0">
+      {/* Top Bar with Menu Icon */}
+      <div className="flex items-center justify-between mb-4 md:mb-6 px-0">
         <button
-          onClick={() => setActiveTab('home')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'home' ? 'btn-primary' : 'btn-secondary'
-          }`}
+          onClick={() => setSidebarOpen(true)}
+          className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all active:scale-95"
+          aria-label="Open menu"
         >
-          <FiHome className="inline mr-1 md:mr-2 text-xs md:text-sm" />
-          Home
+          <FiMenu className="text-lg md:text-xl text-gray-700" />
         </button>
-        <button
-          onClick={() => setActiveTab('artworks')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'artworks' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          <FiShoppingBag className="inline mr-1 md:mr-2 text-xs md:text-sm" />
-          All Artworks
-        </button>
-        <button
-          onClick={() => setActiveTab('orders')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          <FiPackage className="inline mr-1 md:mr-2 text-xs md:text-sm" />
-          All Orders
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'users' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          <FiUsers className="inline mr-1 md:mr-2 text-xs md:text-sm" />
-          Users
-        </button>
-        <button
-          onClick={() => setActiveTab('artists')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'artists' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          <FiUser className="inline mr-1 md:mr-2 text-xs md:text-sm" />
-          Artists
-        </button>
-        <button
-          onClick={() => setActiveTab('deletedOrders')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'deletedOrders' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          <FiTrash2 className="inline mr-1 md:mr-2 text-xs md:text-sm" />
-          Deleted Orders
-          {deletedOrders.length > 0 && (
-            <span className="ml-1.5 md:ml-2 px-1.5 md:px-2 py-0.5 bg-red-500 text-gray-900 text-xs rounded-full">
-              {deletedOrders.length}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('support')}
-          className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-sm md:text-base font-medium transition-all whitespace-nowrap ${
-            activeTab === 'support' ? 'btn-primary' : 'btn-secondary'
-          }`}
-        >
-          <FiMessageSquare className="inline mr-1 md:mr-2 text-xs md:text-sm" />
-          Support Messages
-          {supportMessages.filter((m: any) => m.status === 'pending').length > 0 && (
-            <span className="ml-1.5 md:ml-2 px-1.5 md:px-2 py-0.5 bg-red-500 text-gray-900 text-xs rounded-full">
-              {supportMessages.filter((m: any) => m.status === 'pending').length}
-            </span>
-          )}
-        </button>
+        <div className="flex-1 text-center">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">Admin Panel</h1>
+        </div>
+        <div className="w-10 h-10 md:w-12 md:h-12"></div> {/* Spacer for centering */}
       </div>
+
+      {/* Logo and Heading at Top */}
+      <div className="text-center mb-6 md:mb-8">
+        <div className="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
+          <img
+            src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+            alt="Logo"
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none'
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Sidebar Menu */}
+      {sidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-60 z-[200] transition-opacity duration-300"
+            onClick={() => setSidebarOpen(false)}
+            style={{ backdropFilter: 'blur(3px)' }}
+          ></div>
+          
+          <div className="fixed inset-0 z-[201] flex items-start justify-start md:justify-center p-0 md:p-8 pointer-events-none">
+            <div className="w-[75vw] max-w-[280px] md:w-[280px] bg-white h-full md:h-auto md:rounded-xl md:max-h-[90vh] shadow-2xl overflow-hidden pointer-events-auto animate-slideInLeft border-r border-gray-100 md:border-r-0 md:border md:border-gray-200">
+              {/* Sidebar Header */}
+              <div className="p-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-base font-bold text-gray-900">Admin Menu</h2>
+        <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-lg transition-all duration-200 flex-shrink-0 active:scale-95"
+                    aria-label="Close menu"
+                  >
+                    <FiX className="text-lg" />
+        </button>
+                </div>
+              </div>
+              
+              {/* Navigation Menu */}
+              <nav className="py-3 max-h-[calc(100vh-200px)] overflow-y-auto overscroll-contain">
+                {navTabs.map((tab) => {
+                  const isActiveTab = activeTab === tab.id
+                  const Icon = tab.icon
+                  
+                  return (
+        <button
+                      key={tab.id}
+                      onClick={() => {
+                        setActiveTab(tab.id)
+                        setSidebarOpen(false)
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all duration-300 mx-2 rounded-lg mb-1.5 relative overflow-hidden active:scale-[0.98] ${
+                        isActiveTab
+                          ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/40'
+                          : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                      }`}
+                    >
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 relative z-10 transition-all ${
+                        isActiveTab 
+                          ? 'bg-white/25 backdrop-blur-sm shadow-inner' 
+                          : 'bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/50'
+                      }`}>
+                        <Icon 
+                          className={`text-base relative z-10 ${
+                            isActiveTab ? 'text-white drop-shadow-lg' : 'text-gray-700'
+                          }`}
+                        />
+                      </div>
+                      <span className="flex-1 text-left relative z-10">{tab.label}</span>
+                      {tab.badge && tab.badge > 0 && (
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                          isActiveTab ? 'bg-white/30 text-white' : 'bg-red-500 text-white'
+                        }`}>
+                          {tab.badge}
+            </span>
+          )}
+        </button>
+                  )
+                })}
+
+                {/* Divider */}
+                <div className="border-t border-gray-100 my-3 mx-3"></div>
+
+                {/* Logout Button */}
+                <div className="px-4 py-3">
+                  <LogoutButton className="w-full justify-center" />
+      </div>
+              </nav>
+            </div>
+          </div>
+        </>
+      )}
+
 
       {/* Home Tab */}
       {activeTab === 'home' && (
         <div>
-          {/* Logo at top */}
-          <div className="text-center mb-6 md:mb-8">
-            <div className="relative w-32 h-32 md:w-44 md:h-44 mx-auto mb-3 md:mb-4 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
-              <img
-                src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-                alt="Logo"
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none'
-                }}
-              />
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Admin Panel</h1>
-          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6">
             <div className="card p-3 md:p-4">
               <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Total Artworks</h3>
@@ -1902,6 +1933,45 @@ export default function AdminDashboard() {
         </div>
         )
       })()}
+
+      {/* Bottom Navigation Bar - Mobile Only */}
+      <nav className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 md:hidden safe-area-bottom pointer-events-none">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-2 rounded-2xl border border-gray-200/60 bg-white/95 px-2 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+          <button
+            onClick={() => setActiveTab('home')}
+            className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 transition-all duration-200 active:scale-95 ${
+              activeTab === 'home'
+                ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <FiHome className="text-lg" />
+            <span className="text-xs font-medium">Home</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('orders')}
+            className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 transition-all duration-200 active:scale-95 ${
+              activeTab === 'orders'
+                ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <FiPackage className="text-lg" />
+            <span className="text-xs font-medium">Orders</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('artists')}
+            className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 transition-all duration-200 active:scale-95 ${
+              activeTab === 'artists'
+                ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <FiUser className="text-lg" />
+            <span className="text-xs font-medium">Artists</span>
+          </button>
+        </div>
+      </nav>
     </div>
   )
 }

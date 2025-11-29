@@ -791,14 +791,14 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     <div className="space-y-4 md:space-y-6 pb-24">
       {/* Centered Logo Image */}
       <div className="flex flex-col justify-center items-center py-4 md:py-6">
-        <img
-          src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-          alt="Peter Art"
+          <img
+            src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+            alt="Peter Art"
           className="w-16 h-16 md:w-20 md:h-20 object-contain"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/logoo.png'
-          }}
-        />
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = '/logoo.png'
+            }}
+          />
         <h1 className="text-xs md:text-sm font-bold text-gray-700 mt-2">{t.peterArt}</h1>
       </div>
 
@@ -1013,49 +1013,49 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       {/* Compact Professional Menu Button */}
       <div className="mb-4 flex items-center justify-between gap-2.5 px-2 md:px-0">
         <div className="flex items-center gap-2.5 flex-1">
-          {/* Menu Button - Compact */}
-          <button
-            onClick={() => setSidebarOpen(true)}
+        {/* Menu Button - Compact */}
+        <button
+          onClick={() => setSidebarOpen(true)}
             className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-gray-900 border border-gray-200 shadow-md hover:bg-gray-50 hover:shadow-lg transition-all font-medium active:scale-95 z-10"
-          >
-            <FiMenu className="text-base" />
-            <span className="hidden sm:inline text-xs">Menu</span>
-          </button>
+        >
+          <FiMenu className="text-base" />
+          <span className="hidden sm:inline text-xs">Menu</span>
+        </button>
 
-          {/* Current Tab Display - Compact Badge */}
-          {navTabs.find(tab => tab.id === activeTab) && (
-            <div className="flex items-center gap-2.5 flex-1 bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:shadow transition-all">
-              {(() => {
-                const currentTab = navTabs.find(tab => tab.id === activeTab)
-                const Icon = currentTab?.icon
-                
-                // Colorful icon colors for current tab badge
-                const badgeIconColors: Record<string, string> = {
-                  artworks: 'text-blue-600',
-                  wishlist: 'text-pink-600',
-                  following: 'text-purple-600',
-                  orders: 'text-orange-600',
-                  reviews: 'text-amber-600',
-                  support: 'text-green-600',
-                  profile: 'text-indigo-600',
-                  giftcards: 'text-emerald-600',
-                  artist: 'text-cyan-600',
-                }
-                
-                return Icon ? (
-                  <div className={`flex items-center justify-center w-7 h-7 rounded-md bg-gray-100`}>
-                    <Icon className={`text-sm ${badgeIconColors[currentTab?.id || ''] || 'text-gray-700'}`} />
-                  </div>
-                ) : null
-              })()}
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] text-gray-500 font-medium">Current</p>
-                <p className="text-xs font-semibold text-gray-900 truncate">
-                  {navTabs.find(tab => tab.id === activeTab)?.label}
-                </p>
-              </div>
+        {/* Current Tab Display - Compact Badge */}
+        {navTabs.find(tab => tab.id === activeTab) && (
+          <div className="flex items-center gap-2.5 flex-1 bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:shadow transition-all">
+            {(() => {
+              const currentTab = navTabs.find(tab => tab.id === activeTab)
+              const Icon = currentTab?.icon
+              
+              // Colorful icon colors for current tab badge
+              const badgeIconColors: Record<string, string> = {
+                artworks: 'text-blue-600',
+                wishlist: 'text-pink-600',
+                following: 'text-purple-600',
+                orders: 'text-orange-600',
+                reviews: 'text-amber-600',
+                support: 'text-green-600',
+                profile: 'text-indigo-600',
+                giftcards: 'text-emerald-600',
+                artist: 'text-cyan-600',
+              }
+              
+              return Icon ? (
+                <div className={`flex items-center justify-center w-7 h-7 rounded-md bg-gray-100`}>
+                  <Icon className={`text-sm ${badgeIconColors[currentTab?.id || ''] || 'text-gray-700'}`} />
+                </div>
+              ) : null
+            })()}
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] text-gray-500 font-medium">Current</p>
+              <p className="text-xs font-semibold text-gray-900 truncate">
+                {navTabs.find(tab => tab.id === activeTab)?.label}
+              </p>
             </div>
-          )}
+          </div>
+        )}
         </div>
         
         {/* Shopping Cart Icon - Right Corner */}

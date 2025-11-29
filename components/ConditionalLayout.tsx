@@ -14,6 +14,7 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   const isArtworkPage = pathname?.startsWith('/artwork/')
   const isCartPage = pathname === '/cart'
   const isMessagesPage = pathname === '/messages' || pathname?.startsWith('/chat/')
+  const isAdminPage = pathname === '/admin'
 
   // All pages - no header or footer, but show mobile dock
   if (isUserPage) {
@@ -68,6 +69,17 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
 
   // Home page (login page) - no mobile dock, banner ad is in LoginPage component
   if (isHomePage) {
+    return (
+      <div className="app-shell">
+        <main className="app-main pb-0 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+        </main>
+      </div>
+    )
+  }
+
+  // Admin page - no mobile dock, has its own bottom navigation
+  if (isAdminPage) {
     return (
       <div className="app-shell">
         <main className="app-main pb-0 md:pb-8">
