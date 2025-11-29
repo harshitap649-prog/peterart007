@@ -7,6 +7,7 @@ import { getArtistByUserId } from '@/lib/artists'
 import ArtistRegistration from '@/components/ArtistRegistration'
 import toast from 'react-hot-toast'
 import { FcGoogle } from 'react-icons/fc'
+import { FiEye, FiEyeOff } from 'react-icons/fi'
 
 export default function ArtistApply() {
   const router = useRouter()
@@ -15,6 +16,7 @@ export default function ArtistApply() {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [checking, setChecking] = useState(true)
   const [checkingArtist, setCheckingArtist] = useState(false)
@@ -231,13 +233,23 @@ export default function ArtistApply() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-field pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
+                  </button>
+                </div>
               </div>
               <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-black text-white font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Signing in...' : 'Sign In & Continue'}
@@ -267,14 +279,24 @@ export default function ArtistApply() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field"
-                  minLength={6}
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-field pr-10"
+                    minLength={6}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
+                  </button>
+                </div>
               </div>
               <button type="submit" disabled={loading} className="w-full py-3 rounded-lg bg-black text-white font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Creating account...' : 'Sign Up & Continue'}

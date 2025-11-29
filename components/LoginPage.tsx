@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { loginWithEmail, signUpWithEmail, loginWithGoogle, isAdmin } from '@/lib/auth'
 import toast from 'react-hot-toast'
 import { FcGoogle } from 'react-icons/fc'
+import { FiEye, FiEyeOff } from 'react-icons/fi'
+import BannerAd from '@/components/BannerAd'
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin')
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -139,10 +142,10 @@ export default function LoginPage() {
 
         <div className="grid gap-4 md:gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 shadow-lift sm:p-6 md:p-8 text-[var(--text-primary)]">
-          <div className="mb-4 md:mb-6 flex rounded-full border border-black/10 bg-white p-0.5 md:p-1 text-xs md:text-sm font-semibold text-[var(--text-secondary)] shadow">
+          <div className="mb-4 md:mb-6 flex rounded-lg border border-black/10 bg-white p-0.5 md:p-1 text-xs md:text-sm font-semibold text-[var(--text-secondary)] shadow">
             <button
               onClick={() => setActiveTab('signin')}
-              className={`flex-1 rounded-full px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
+              className={`flex-1 rounded px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
                 activeTab === 'signin' 
                   ? 'bg-black text-white shadow-lg shadow-black/30' 
                   : 'text-gray-600 hover:text-gray-900'
@@ -152,7 +155,7 @@ export default function LoginPage() {
             </button>
             <button
               onClick={() => setActiveTab('signup')}
-              className={`flex-1 rounded-full px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
+              className={`flex-1 rounded px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
                 activeTab === 'signup' 
                   ? 'bg-black text-white shadow-lg shadow-black/30' 
                   : 'text-gray-600 hover:text-gray-900'
@@ -165,7 +168,7 @@ export default function LoginPage() {
           {activeTab === 'signin' ? (
             <form onSubmit={handleSignIn} className="space-y-3 md:space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
                 </label>
                 <input
@@ -178,17 +181,27 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field rounded-2xl text-sm"
-                  placeholder="Enter your password"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-field rounded-2xl text-sm pr-10"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
+                  </button>
+                </div>
               </div>
               <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-base md:text-lg font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-3 disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Signing in...' : 'Sign In'}
@@ -197,7 +210,7 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleSignUp} className="space-y-3 md:space-y-4">
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Full Name
                 </label>
                 <input
@@ -210,7 +223,7 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
                 </label>
                 <input
@@ -223,18 +236,28 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.3em] text-[var(--text-secondary)]">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-field rounded-2xl text-sm"
-                  placeholder="Create a password (min 6 characters)"
-                  required
-                  minLength={6}
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input-field rounded-2xl text-sm pr-10"
+                    placeholder="Create a password (min 6 characters)"
+                    required
+                    minLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
+                  </button>
+                </div>
               </div>
               <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-base md:text-lg font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-3 disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Creating account...' : 'Sign Up'}
@@ -329,6 +352,11 @@ export default function LoginPage() {
           </div>
         </div>
         </div>
+      </div>
+
+      {/* Banner Ad after sign in box */}
+      <div className="w-full py-6 md:py-8">
+        <BannerAd />
       </div>
     </div>
   )

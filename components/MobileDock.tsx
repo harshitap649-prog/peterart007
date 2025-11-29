@@ -7,7 +7,7 @@ import { FaHome, FaComments, FaShoppingBag, FaUser } from 'react-icons/fa'
 
 const dockLinks = [
   { 
-    href: '/', 
+    href: '/user?tab=artworks', 
     label: 'Home', 
     icon: FiHome, 
     iconActive: FaHome,
@@ -22,13 +22,13 @@ const dockLinks = [
   },
   { 
     href: '/user?tab=orders', 
-    label: 'My Orders', 
+    label: 'Orders', 
     icon: FiShoppingBag, 
     iconActive: FaShoppingBag,
     color: 'orange' 
   },
   { 
-    href: '/user', 
+    href: '/user?tab=profile', 
     label: 'Profile', 
     icon: FiUser, 
     iconActive: FaUser,
@@ -72,6 +72,12 @@ export default function MobileDock() {
       if (href.includes('tab=orders')) {
         return pathname === '/user' && tab === 'orders'
       }
+      if (href.includes('tab=profile')) {
+        return pathname === '/user' && tab === 'profile'
+      }
+      if (href.includes('tab=artworks')) {
+        return pathname === '/user' && (!tab || tab === 'artworks')
+      }
       return pathname === '/user' && (!tab || tab === 'artworks')
     }
     if (href === '/messages') {
@@ -81,8 +87,8 @@ export default function MobileDock() {
   }
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-3 md:hidden safe-area-bottom">
-      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center gap-1 rounded-[28px] border border-gray-200/80 bg-white/98 px-2 py-2.5 shadow-[0_-8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl">
+    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-4 pb-4 md:hidden safe-area-bottom">
+      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-0.5 rounded-2xl border border-gray-200/60 bg-white/95 px-1.5 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-xl">
         {dockLinks.map((item) => {
           const Icon = item.icon
           const IconActive = item.iconActive || item.icon
@@ -93,29 +99,29 @@ export default function MobileDock() {
             <Link
               key={item.href}
               href={item.href}
-              className={`group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[10px] font-semibold transition-all duration-300 active:scale-95 touch-manipulation ${
+              className={`group relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1.5 py-1.5 transition-all duration-200 active:scale-95 touch-manipulation ${
                 active
-                  ? `bg-gradient-to-br ${colors.active} text-white shadow-lg`
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? `bg-gradient-to-br ${colors.active} text-white shadow-sm`
+                  : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               {/* Active indicator dot */}
               {active && (
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-md"></div>
+                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-sm"></div>
               )}
               
               <span
-                className={`relative flex h-11 w-11 items-center justify-center rounded-xl text-lg transition-all duration-300 ${
+                className={`relative flex h-7 w-7 items-center justify-center rounded-lg text-sm transition-all duration-200 ${
                   active
-                    ? 'bg-white/25 text-white shadow-inner'
-                    : `${colors.bg} ${colors.inactive} group-hover:scale-110 group-hover:shadow-md`
+                    ? 'text-white'
+                    : `${colors.inactive} group-hover:scale-105`
                 }`}
               >
                 {active ? (
                   <IconActive 
                     className="relative z-10" 
                     style={{ 
-                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.15))',
                       strokeWidth: 0
                     }}
                   />
@@ -123,25 +129,20 @@ export default function MobileDock() {
                   <Icon 
                     className="relative z-10" 
                     style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                      filter: 'drop-shadow(0 0.5px 1px rgba(0,0,0,0.08))',
                       strokeWidth: 2
                     }}
                   />
                 )}
-                
-                {/* Subtle glow effect for active state */}
-                {active && (
-                  <span className="absolute inset-0 rounded-xl bg-white/20 blur-sm"></span>
-                )}
               </span>
               
-              <span className={`leading-tight transition-colors text-[10px] font-bold ${active ? 'text-white' : 'text-gray-600'}`}>
+              <span className={`leading-tight transition-colors text-[9px] font-medium ${active ? 'text-white' : 'text-gray-500'}`}>
                 {item.label}
               </span>
               
               {/* Hover effect overlay */}
               {!active && (
-                <span className="absolute inset-0 rounded-2xl bg-gray-100/0 group-hover:bg-gray-100/50 transition-all duration-200"></span>
+                <span className="absolute inset-0 rounded-xl bg-gray-100/0 group-hover:bg-gray-100/30 transition-all duration-200"></span>
               )}
             </Link>
           )

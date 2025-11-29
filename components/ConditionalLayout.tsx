@@ -9,6 +9,7 @@ import BannerAd from '@/components/BannerAd'
 
 export default function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const isHomePage = pathname === '/'
   const isUserPage = pathname === '/user'
   const isArtworkPage = pathname?.startsWith('/artwork/')
   const isCartPage = pathname === '/cart'
@@ -54,16 +55,24 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
     )
   }
 
-  // Messages page - show mobile dock, no banner ad
+  // Messages page - no mobile dock on mobile, no banner ad, full screen
   if (isMessagesPage) {
     return (
       <div className="app-shell">
-        <main className="app-main pb-20 md:pb-8">
+        <main className="app-main pb-0 md:pb-8">
           <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
         </main>
-        <Suspense fallback={null}>
-          <MobileDock />
-        </Suspense>
+      </div>
+    )
+  }
+
+  // Home page (login page) - no mobile dock, banner ad is in LoginPage component
+  if (isHomePage) {
+    return (
+      <div className="app-shell">
+        <main className="app-main pb-0 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+        </main>
       </div>
     )
   }

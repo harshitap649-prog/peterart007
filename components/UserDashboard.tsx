@@ -789,81 +789,17 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   return (
     <div className="space-y-4 md:space-y-6 pb-24">
-      {/* Top Bar - Mobile Optimized */}
-      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-white/98 backdrop-blur-sm px-3 py-2.5 md:px-4 md:py-3">
-        {/* Logo/Image Icon - Mobile Optimized */}
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="flex items-center justify-center w-11 h-11 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-orange-50 to-pink-50 border border-orange-100/50 active:scale-95 transition-all duration-200 shadow-sm active:shadow-md touch-manipulation"
-          aria-label="Open menu"
-        >
-          <img
-            src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-            alt="Peter Art"
-            className="w-8 h-8 md:w-9 md:h-9 object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/logoo.png'
-            }}
-          />
-        </button>
-
-        {/* Center - Brand Name - Mobile Optimized */}
-        <div className="flex-1 text-center px-2">
-          <h1 className="text-base md:text-lg font-bold text-gray-900 truncate">{t.peterArt}</h1>
-        </div>
-
-        {/* Right Side - Action Icons - Mobile Optimized */}
-        <div className="flex items-center gap-1.5 md:gap-2 relative">
-          <div className="hidden sm:block">
-            <Cart />
-          </div>
-          {user ? (
-            <>
-              <button
-                onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 active:scale-95 transition-all duration-200 shadow-sm active:shadow-md relative z-[61] touch-manipulation"
-                aria-label="User menu"
-              >
-                <FiUser className="text-lg md:text-xl text-gray-700" />
-              </button>
-              
-              {/* User Menu Dropdown - Mobile Optimized */}
-              {userMenuOpen && (
-                <>
-                  {/* Backdrop */}
-                  <div
-                    className="fixed inset-0 z-[120] bg-black/20 backdrop-blur-sm"
-                    onClick={() => setUserMenuOpen(false)}
-                  ></div>
-                  
-                  {/* Dropdown Menu - Mobile Responsive */}
-                  <div className="absolute right-0 top-full mt-2 w-64 md:w-72 bg-white border border-gray-200 rounded-2xl shadow-2xl z-[130] overflow-hidden">
-                    {/* User Info Header */}
-                    <div className="px-4 py-4 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center text-white font-bold text-base shadow-lg flex-shrink-0">
-                          {(user.displayName || user.email?.split('@')[0] || 'U')[0].toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-gray-900 truncate">{user.displayName || user.email?.split('@')[0]}</p>
-                          <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </>
-          ) : (
-            <button
-              onClick={() => setLoginModalOpen(true)}
-              className="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 active:scale-95 transition-all duration-200 shadow-sm active:shadow-md touch-manipulation"
-              aria-label="Login"
-            >
-              <FiUser className="text-lg md:text-xl text-gray-700" />
-            </button>
-          )}
-        </div>
+      {/* Centered Logo Image */}
+      <div className="flex flex-col justify-center items-center py-4 md:py-6">
+        <img
+          src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+          alt="Peter Art"
+          className="w-16 h-16 md:w-20 md:h-20 object-contain"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/logoo.png'
+          }}
+        />
+        <h1 className="text-xs md:text-sm font-bold text-gray-700 mt-2">{t.peterArt}</h1>
       </div>
 
       {/* Sidebar */}
@@ -1075,50 +1011,57 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       )}
 
       {/* Compact Professional Menu Button */}
-      <div className="mb-4 flex items-center gap-2.5 px-3 md:px-0">
-        {/* Menu Button - Compact */}
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-900 text-white shadow-md hover:bg-gray-800 hover:shadow-lg transition-all font-medium active:scale-95 z-10"
-        >
-          <FiMenu className="text-base" />
-          <span className="hidden sm:inline text-xs">Menu</span>
-        </button>
+      <div className="mb-4 flex items-center justify-between gap-2.5 px-2 md:px-0">
+        <div className="flex items-center gap-2.5 flex-1">
+          {/* Menu Button - Compact */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white text-gray-900 border border-gray-200 shadow-md hover:bg-gray-50 hover:shadow-lg transition-all font-medium active:scale-95 z-10"
+          >
+            <FiMenu className="text-base" />
+            <span className="hidden sm:inline text-xs">Menu</span>
+          </button>
 
-        {/* Current Tab Display - Compact Badge */}
-        {navTabs.find(tab => tab.id === activeTab) && (
-          <div className="flex items-center gap-2.5 flex-1 bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:shadow transition-all">
-            {(() => {
-              const currentTab = navTabs.find(tab => tab.id === activeTab)
-              const Icon = currentTab?.icon
-              
-              // Colorful icon colors for current tab badge
-              const badgeIconColors: Record<string, string> = {
-                artworks: 'text-blue-600',
-                wishlist: 'text-pink-600',
-                following: 'text-purple-600',
-                orders: 'text-orange-600',
-                reviews: 'text-amber-600',
-                support: 'text-green-600',
-                profile: 'text-indigo-600',
-                giftcards: 'text-emerald-600',
-                artist: 'text-cyan-600',
-              }
-              
-              return Icon ? (
-                <div className={`flex items-center justify-center w-7 h-7 rounded-md bg-gray-100`}>
-                  <Icon className={`text-sm ${badgeIconColors[currentTab?.id || ''] || 'text-gray-700'}`} />
-                </div>
-              ) : null
-            })()}
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-gray-500 font-medium">Current</p>
-              <p className="text-xs font-semibold text-gray-900 truncate">
-                {navTabs.find(tab => tab.id === activeTab)?.label}
-              </p>
+          {/* Current Tab Display - Compact Badge */}
+          {navTabs.find(tab => tab.id === activeTab) && (
+            <div className="flex items-center gap-2.5 flex-1 bg-white rounded-lg border border-gray-200 px-3 py-2 shadow-sm hover:shadow transition-all">
+              {(() => {
+                const currentTab = navTabs.find(tab => tab.id === activeTab)
+                const Icon = currentTab?.icon
+                
+                // Colorful icon colors for current tab badge
+                const badgeIconColors: Record<string, string> = {
+                  artworks: 'text-blue-600',
+                  wishlist: 'text-pink-600',
+                  following: 'text-purple-600',
+                  orders: 'text-orange-600',
+                  reviews: 'text-amber-600',
+                  support: 'text-green-600',
+                  profile: 'text-indigo-600',
+                  giftcards: 'text-emerald-600',
+                  artist: 'text-cyan-600',
+                }
+                
+                return Icon ? (
+                  <div className={`flex items-center justify-center w-7 h-7 rounded-md bg-gray-100`}>
+                    <Icon className={`text-sm ${badgeIconColors[currentTab?.id || ''] || 'text-gray-700'}`} />
+                  </div>
+                ) : null
+              })()}
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-gray-500 font-medium">Current</p>
+                <p className="text-xs font-semibold text-gray-900 truncate">
+                  {navTabs.find(tab => tab.id === activeTab)?.label}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        
+        {/* Shopping Cart Icon - Right Corner */}
+        <div className="flex-shrink-0">
+          <Cart />
+        </div>
       </div>
 
       {/* Main Content - Mobile Optimized */}
@@ -1154,7 +1097,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-gray-400 text-sm">{t.loadingArtworks}</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4 px-3 md:px-0">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4 px-0 md:px-0">
                 {filteredArtworks.map((artwork: any) => (
                   <div key={artwork.id} className="group bg-white rounded-lg md:rounded-2xl border border-gray-100 p-1.5 md:p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
                     {artwork.images && artwork.images[0] ? (
@@ -1698,10 +1641,10 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         {/* Following Tab - Clean Vertical List */}
         {activeTab === 'following' && user && (
           <div className="space-y-3 md:space-y-4">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900 px-3 md:px-0">{t.followingArtists}</h2>
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 px-0 md:px-0">{t.followingArtists}</h2>
             
             {followingArtists.length === 0 ? (
-              <div className="card p-6 md:p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100 mx-3 md:mx-0">
+              <div className="card p-6 md:p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100 mx-0 md:mx-0">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mb-4">
                   <FiUser className="text-4xl text-white" />
                 </div>
@@ -1716,7 +1659,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 </button>
               </div>
             ) : (
-              <div className="space-y-2 md:space-y-3 px-3 md:px-0">
+              <div className="space-y-2 md:space-y-3 px-0 md:px-0">
                 {followingArtists.map((artist: any) => {
                   const isExpanded = expandedArtistId === artist.id
                   const artworks = artistArtworks[artist.id] || []
@@ -1845,49 +1788,49 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         onSuccess={handleLoginSuccess}
       />
 
-      {/* Logout Confirmation Modal */}
+      {/* Logout Confirmation Modal - Compact for Mobile */}
       {showLogoutConfirm && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 md:p-4">
           <div
             className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"
             onClick={() => setShowLogoutConfirm(false)}
           />
-          <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl border border-white/40 bg-white/95 shadow-[0_35px_120px_-45px_rgba(15,23,42,0.8)]">
-            <div className="absolute -top-16 right-10 h-32 w-32 rounded-full bg-orange-100 blur-3xl" />
-            <div className="absolute -bottom-16 left-10 h-32 w-32 rounded-full bg-pink-100 blur-3xl" />
-            <div className="relative grid gap-6 p-6 sm:p-8">
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg shadow-gray-900/40">
-                  <FiLogOut className="text-2xl" />
+          <div className="relative z-10 w-full max-w-xs md:max-w-lg overflow-hidden rounded-xl md:rounded-3xl border border-white/40 bg-white/95 shadow-[0_35px_120px_-45px_rgba(15,23,42,0.8)]">
+            <div className="absolute -top-8 right-5 h-16 w-16 md:-top-16 md:right-10 md:h-32 md:w-32 rounded-full bg-orange-100 blur-2xl md:blur-3xl" />
+            <div className="absolute -bottom-8 left-5 h-16 w-16 md:-bottom-16 md:left-10 md:h-32 md:w-32 rounded-full bg-pink-100 blur-2xl md:blur-3xl" />
+            <div className="relative grid gap-3 md:gap-6 p-4 md:p-6 sm:p-8">
+              <div className="flex items-center gap-2.5 md:gap-4">
+                <div className="flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg shadow-gray-900/40">
+                  <FiLogOut className="text-lg md:text-2xl" />
                 </div>
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">
+                  <p className="text-[9px] md:text-xs font-semibold uppercase tracking-wider md:tracking-[0.3em] text-gray-400">
                     {t.logout}
                   </p>
-                  <h3 className="text-2xl font-bold text-gray-900">{t.confirmLogout}</h3>
+                  <h3 className="text-base md:text-2xl font-bold text-gray-900">{t.confirmLogout}</h3>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-gray-600">
+              <p className="text-xs md:text-sm leading-relaxed text-gray-600">
                 {t.areYouSureLogout}
               </p>
-              <div className="rounded-2xl border border-gray-100 bg-gray-50/60 p-4 text-sm text-gray-500">
-                <p className="font-semibold text-gray-900">{user?.email}</p>
-                <p className="mt-1">
+              <div className="rounded-lg md:rounded-2xl border border-gray-100 bg-gray-50/60 p-2.5 md:p-4 text-xs md:text-sm text-gray-500">
+                <p className="font-semibold text-gray-900 text-xs md:text-sm">{user?.email}</p>
+                <p className="mt-0.5 md:mt-1 text-[10px] md:text-sm">
                   {language === 'hi'
                     ? 'आप पुनः लॉग इन करके कभी भी वापस आ सकते हैं।'
                     : 'You can sign back in at any time to continue exploring Peter Art.'}
                 </p>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="flex flex-col gap-2 md:gap-3 sm:flex-row">
               <button
                 onClick={confirmLogout}
-                  className="flex-1 rounded-2xl bg-gray-900 py-3 text-sm font-semibold text-white shadow-lg shadow-gray-900/40 transition hover:-translate-y-0.5 hover:bg-black"
+                  className="flex-1 rounded-lg md:rounded-2xl bg-gray-900 py-2 md:py-3 text-xs md:text-sm font-semibold text-white shadow-lg shadow-gray-900/40 transition hover:-translate-y-0.5 hover:bg-black"
               >
                 {t.yesLogout}
               </button>
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                  className="flex-1 rounded-2xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                  className="flex-1 rounded-lg md:rounded-2xl border border-gray-200 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
               >
                 {t.cancel}
               </button>

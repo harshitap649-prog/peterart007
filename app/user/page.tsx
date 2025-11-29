@@ -51,7 +51,7 @@ export default function UserPage() {
   }
 
   return (
-    <div className="min-h-screen py-4 text-[var(--text-primary)] md:px-4">
+    <div className="min-h-screen py-0 md:py-4 text-[var(--text-primary)] md:px-4">
       <div className="w-full md:container md:mx-auto">
         <Suspense
           fallback={

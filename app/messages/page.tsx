@@ -251,7 +251,7 @@ export default function MessagesPage() {
               <div
                 key={conv.userId}
                 onClick={() => router.push(`/chat/${conv.userId}`)}
-                className="glass-panel p-3 md:p-5 rounded-lg md:rounded-xl hover:shadow-lg md:hover:shadow-xl cursor-pointer transition-all border border-white/20 active:scale-[0.98]"
+                className="glass-panel p-3 md:p-5 rounded-none md:rounded-xl hover:shadow-lg md:hover:shadow-xl cursor-pointer transition-all border border-white/20 active:scale-[0.98]"
               >
                 <div className="flex items-start gap-3 md:gap-4">
                   {/* Avatar - Mobile Optimized */}
