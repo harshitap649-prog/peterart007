@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtistByUserId } from '@/lib/artists'
 import toast from 'react-hot-toast'
-import { FiMessageCircle, FiUser, FiSearch, FiArrowLeft, FiClock } from 'react-icons/fi'
+import { FiMessageCircle, FiUser, FiSearch, FiArrowLeft } from 'react-icons/fi'
 
 export default function MessagesPage() {
   const router = useRouter()
