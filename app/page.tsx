@@ -14,13 +14,15 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
-  // Override body background for home page with orange-to-white gradient
+  // Override body background for home page with gradient waves image
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Set orange-to-white gradient background matching the Shutterstock image
-      document.body.style.background = 'linear-gradient(to bottom, #ff8c42 0%, #ff9d5c 15%, #ffb380 30%, #ffc9a3 45%, #ffe0c9 60%, #fff0e6 75%, #ffffff 100%)'
+      // Set background image optimized for mobile
+      document.body.style.backgroundImage = 'url("https://t4.ftcdn.net/jpg/02/42/23/93/360_F_242239379_ChJ2nNXxlxuhq6EzolfjcFcvuMFL8zdA.jpg")'
       document.body.style.backgroundAttachment = 'fixed'
-      document.body.style.backgroundSize = '100% 100%'
+      document.body.style.backgroundSize = 'cover'
+      document.body.style.backgroundPosition = 'center center'
+      document.body.style.backgroundRepeat = 'no-repeat'
       document.body.style.minHeight = '100vh'
       // Remove pseudo-element backgrounds
       const style = document.createElement('style')
@@ -40,9 +42,11 @@ export default function Home() {
       document.head.appendChild(style)
       
       return () => {
-        document.body.style.background = ''
+        document.body.style.backgroundImage = ''
         document.body.style.backgroundAttachment = ''
         document.body.style.backgroundSize = ''
+        document.body.style.backgroundPosition = ''
+        document.body.style.backgroundRepeat = ''
         document.body.style.minHeight = ''
         if (document.head.contains(style)) {
           document.head.removeChild(style)

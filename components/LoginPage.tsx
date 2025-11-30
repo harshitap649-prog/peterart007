@@ -108,9 +108,11 @@ export default function LoginPage() {
     <div 
       className="min-h-screen flex flex-col relative overflow-hidden" 
       style={{
-        background: 'linear-gradient(to bottom, #ff8c42 0%, #ff9d5c 15%, #ffb380 30%, #ffc9a3 45%, #ffe0c9 60%, #fff0e6 75%, #ffffff 100%)',
+        backgroundImage: 'url("https://t4.ftcdn.net/jpg/02/42/23/93/360_F_242239379_ChJ2nNXxlxuhq6EzolfjcFcvuMFL8zdA.jpg")',
         backgroundAttachment: 'fixed',
-        backgroundSize: '100% 100%',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
         minHeight: '100vh',
         width: '100%'
       }}
