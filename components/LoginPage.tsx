@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { loginWithEmail, signUpWithEmail, loginWithGoogle, isAdmin } from '@/lib/auth'
 import toast from 'react-hot-toast'
@@ -105,16 +105,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col relative overflow-hidden" 
+      style={{
+        background: 'linear-gradient(to bottom, #ff8c42 0%, #ff9d5c 15%, #ffb380 30%, #ffc9a3 45%, #ffe0c9 60%, #fff0e6 75%, #ffffff 100%)',
+        backgroundAttachment: 'fixed',
+        backgroundSize: '100% 100%',
+        minHeight: '100vh',
+        width: '100%'
+      }}
+    >
       {/* Hero Section with Image and Quote */}
-      <div className="relative w-full py-12 md:py-16 px-4 bg-gradient-to-br from-orange-50 via-white to-pink-50">
+      <div className="relative w-full py-12 md:py-16 px-4 z-10">
         <div className="mx-auto max-w-4xl text-center">
           {/* Image */}
           <div className="mb-6 flex justify-center">
             <img
               src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
               alt="Peter Art"
-              className="w-64 h-auto md:w-80 lg:w-96 object-contain"
+              className="w-96 h-auto md:w-[500px] lg:w-[600px] object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/logoo.png'
               }}
@@ -134,11 +143,7 @@ export default function LoginPage() {
       </div>
 
       {/* Login Form Section */}
-      <div className="flex-1 relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4">
-        <div className="absolute inset-0 -z-10 opacity-60 blur-3xl">
-          <div className="absolute left-0 top-0 h-72 w-72 rounded-full bg-orange-200/60" />
-          <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-200/50" />
-        </div>
+      <div className="flex-1 relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4 z-10">
 
         <div className="grid gap-4 md:gap-6">
         <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 shadow-lift sm:p-6 md:p-8 text-[var(--text-primary)] max-w-md mx-auto">

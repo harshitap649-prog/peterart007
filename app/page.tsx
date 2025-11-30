@@ -14,6 +14,43 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
+  // Override body background for home page with orange-to-white gradient
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Set orange-to-white gradient background matching the Shutterstock image
+      document.body.style.background = 'linear-gradient(to bottom, #ff8c42 0%, #ff9d5c 15%, #ffb380 30%, #ffc9a3 45%, #ffe0c9 60%, #fff0e6 75%, #ffffff 100%)'
+      document.body.style.backgroundAttachment = 'fixed'
+      document.body.style.backgroundSize = '100% 100%'
+      document.body.style.minHeight = '100vh'
+      // Remove pseudo-element backgrounds
+      const style = document.createElement('style')
+      style.textContent = `
+        body::before,
+        body::after {
+          display: none !important;
+        }
+        html {
+          height: 100%;
+        }
+        body {
+          margin: 0;
+          padding: 0;
+        }
+      `
+      document.head.appendChild(style)
+      
+      return () => {
+        document.body.style.background = ''
+        document.body.style.backgroundAttachment = ''
+        document.body.style.backgroundSize = ''
+        document.body.style.minHeight = ''
+        if (document.head.contains(style)) {
+          document.head.removeChild(style)
+        }
+      }
+    }
+  }, [])
+
   useEffect(() => {
     // Set a maximum timeout to prevent infinite loading
     const maxTimeout = setTimeout(() => {
@@ -109,7 +146,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-700 font-semibold text-lg">Loading...</p>
@@ -125,7 +162,7 @@ export default function Home() {
 
   // If user is authenticated, show loading while redirecting
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center">
         <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-gray-700 font-semibold text-lg">Redirecting...</p>

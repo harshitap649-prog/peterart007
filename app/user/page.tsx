@@ -41,7 +41,7 @@ export default function UserPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--page-bg)] px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center text-[var(--text-primary)]">
           <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-black/10 border-t-transparent"></div>
           <p className="text-lg font-semibold text-[var(--text-secondary)]">Loading dashboard...</p>

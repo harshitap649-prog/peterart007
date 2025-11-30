@@ -794,12 +794,12 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         <img
           src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
           alt="Peter Art"
-          className="w-16 h-16 md:w-20 md:h-20 object-contain"
+          className="w-48 h-48 md:w-32 md:h-32 object-contain"
           onError={(e) => {
             (e.target as HTMLImageElement).src = '/logoo.png'
           }}
         />
-        <h1 className="text-xs md:text-sm font-bold text-gray-700 mt-2">{t.peterArt}</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-700 mt-3">{t.peterArt}</h1>
       </div>
 
       {/* Sidebar */}
