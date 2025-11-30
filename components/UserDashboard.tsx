@@ -789,16 +789,16 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   return (
     <div className="space-y-4 md:space-y-6 pb-24">
-      {/* Centered Logo Image */}
-      <div className="flex flex-col justify-center items-center py-4 md:py-6">
-          <img
-            src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
-            alt="Peter Art"
+      {/* Centered Logo Image - Hidden on mobile for profile and orders tabs */}
+      <div className={`flex flex-col justify-center items-center py-4 md:py-6 ${(activeTab === 'profile' || activeTab === 'orders') ? 'hidden md:flex' : ''}`}>
+        <img
+          src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
+          alt="Peter Art"
           className="w-16 h-16 md:w-20 md:h-20 object-contain"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/logoo.png'
-            }}
-          />
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/logoo.png'
+          }}
+        />
         <h1 className="text-xs md:text-sm font-bold text-gray-700 mt-2">{t.peterArt}</h1>
       </div>
 
@@ -1272,59 +1272,59 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
         {/* Orders Tab */}
         {activeTab === 'orders' && (
-          <div className="space-y-4 rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
+          <div className="space-y-2 md:space-y-4 rounded-3xl bg-white/95 p-2 md:p-6 shadow-lg">
             {/* Header with Statistics */}
-            <div className="card p-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50 border-2 border-blue-100">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg">
-                  <FiShoppingCart className="text-2xl text-white" />
+            <div className="card p-2 md:p-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50 border-2 border-blue-100">
+              <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                <div className="p-1.5 md:p-2 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg">
+                  <FiShoppingCart className="text-lg md:text-2xl text-white" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-lg md:text-xl font-bold text-gray-900">{t.myOrders}</h2>
-                  <p className="text-xs md:text-sm text-gray-600">
+                  <h2 className="text-sm md:text-xl font-bold text-gray-900">{t.myOrders}</h2>
+                  <p className="text-[10px] md:text-sm text-gray-600">
                     {orders.length} {orders.length === 1 ? t.myOrders.slice(0, -1) : t.myOrders} placed
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl md:text-3xl font-bold text-blue-600">{orders.length}</div>
-                  <div className="text-xs text-gray-500">{t.totalOrders}</div>
+                  <div className="text-lg md:text-3xl font-bold text-blue-600">{orders.length}</div>
+                  <div className="text-[10px] md:text-xs text-gray-500">{t.totalOrders}</div>
                 </div>
               </div>
               {orders.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-blue-100">
-                  <div className="text-center p-2 bg-white rounded-lg">
-                    <div className="text-lg font-bold text-green-600">
+                <div className="grid grid-cols-2 gap-1.5 md:gap-2 pt-2 md:pt-3 border-t border-blue-100">
+                  <div className="text-center p-1.5 md:p-2 bg-white rounded-lg">
+                    <div className="text-sm md:text-lg font-bold text-green-600">
                       {orders.filter((o: any) => o.status === 'delivered').length}
                     </div>
-                    <div className="text-xs text-gray-600">{t.delivered}</div>
+                    <div className="text-[10px] md:text-xs text-gray-600">{t.delivered}</div>
                   </div>
-                  <div className="text-center p-2 bg-white rounded-lg">
-                    <div className="text-lg font-bold text-yellow-600">
+                  <div className="text-center p-1.5 md:p-2 bg-white rounded-lg">
+                    <div className="text-sm md:text-lg font-bold text-yellow-600">
                       {orders.filter((o: any) => o.status === 'pending' || o.status === 'confirmed').length}
                     </div>
-                    <div className="text-xs text-gray-600">{t.pending}</div>
+                    <div className="text-[10px] md:text-xs text-gray-600">{t.pending}</div>
                   </div>
                 </div>
               )}
             </div>
 
             {orders.length === 0 ? (
-              <div className="card p-6 md:p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full mb-4">
-                  <FiShoppingCart className="text-4xl text-white" />
+              <div className="card p-4 md:p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full mb-2 md:mb-4">
+                  <FiShoppingCart className="text-3xl md:text-4xl text-white" />
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{t.noOrdersYet}</h3>
-                <p className="text-sm text-gray-600 mb-4">{t.noOrders}</p>
+                <h3 className="text-sm md:text-xl font-bold text-gray-900 mb-1 md:mb-2">{t.noOrdersYet}</h3>
+                <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">{t.noOrders}</p>
                 <button
                   onClick={() => handleNavClick('artworks')}
-                  className="btn-primary flex items-center gap-2 mx-auto text-sm py-2.5 px-6"
+                  className="btn-primary flex items-center gap-1 md:gap-2 mx-auto text-xs md:text-sm py-1.5 md:py-2.5 px-4 md:px-6"
                 >
-                  <FiArrowRight className="text-sm" />
+                  <FiArrowRight className="text-xs md:text-sm" />
                   {t.startShopping}
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 {orders.map((order: any) => {
                   const canCancel = canCancelOrder(order)
                   const canReturn = canReturnOrder(order)
@@ -1332,12 +1332,12 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                   return (
                   <div 
                     key={order.id} 
-                      className="card p-3 md:p-4 hover:shadow-lg transition-shadow border-l-4 border-l-blue-500"
+                      className="card p-2 md:p-4 hover:shadow-lg transition-shadow border-l-4 border-l-blue-500"
                   >
-                      <div className="flex gap-3 md:gap-4">
+                      <div className="flex gap-2 md:gap-4">
                     {order.artworkImage ? (
                           <div 
-                            className="relative w-20 h-20 md:w-24 md:h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer"
+                            className="relative w-16 h-16 md:w-24 md:h-24 rounded-lg overflow-hidden flex-shrink-0 cursor-pointer"
                             onClick={() => order.artworkId && router.push(`/artwork/${order.artworkId}`)}
                           >
                         <img
@@ -1350,29 +1350,29 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                         />
                       </div>
                     ) : (
-                          <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center flex-shrink-0">
-                            <FiPackage className="text-2xl text-gray-400" />
+                          <div className="w-16 h-16 md:w-24 md:h-24 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center flex-shrink-0">
+                            <FiPackage className="text-xl md:text-2xl text-gray-400" />
                       </div>
                     )}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex items-start justify-between gap-1 md:gap-2 mb-1 md:mb-2">
                             <div className="flex-1 min-w-0">
                               <h3 
-                                className="font-bold text-sm md:text-base mb-1 line-clamp-1 cursor-pointer hover:text-blue-600"
+                                className="font-bold text-xs md:text-base mb-0.5 md:mb-1 line-clamp-1 cursor-pointer hover:text-blue-600"
                                 onClick={() => order.artworkId && router.push(`/artwork/${order.artworkId}`)}
                               >
                                 {order.artworkTitle}
                               </h3>
-                              <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-1">
-                                <span className="flex items-center gap-1">
-                                  <FiCalendar className="text-xs" />
+                              <div className="flex flex-wrap items-center gap-1 md:gap-2 text-[10px] md:text-xs text-gray-500 mb-0.5 md:mb-1">
+                                <span className="flex items-center gap-0.5 md:gap-1">
+                                  <FiCalendar className="text-[10px] md:text-xs" />
                                   {orderDate.toLocaleDateString()}
                                 </span>
                                 <span className="hidden md:inline">•</span>
                                 <span className="hidden md:inline">#{order.id.slice(0, 8)}</span>
                               </div>
                             </div>
-                            <span className={`text-xs px-2 py-1 rounded-full font-semibold whitespace-nowrap ${
+                            <span className={`text-[10px] md:text-xs px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-semibold whitespace-nowrap ${
                               order.status === 'confirmed' 
                                 ? 'bg-blue-100 text-blue-800' 
                                 : order.status === 'pending' 
@@ -1388,20 +1388,20 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                               {getStatusLabel(order.status)}
                             </span>
                   </div>
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="text-xs text-gray-600">
+                          <div className="flex items-center justify-between mb-1.5 md:mb-2">
+                            <div className="text-[10px] md:text-xs text-gray-600">
                               {t.quantity}: <span className="font-semibold">{order.quantity || 1}</span> × ₹{order.unitPrice || order.total}
               </div>
-                            <div className="flex items-center gap-1 text-base md:text-lg font-bold text-gray-900">
-                              <FiDollarSign className="text-sm" />
+                            <div className="flex items-center gap-0.5 md:gap-1 text-sm md:text-lg font-bold text-gray-900">
+                              <FiDollarSign className="text-xs md:text-sm" />
                               ₹{order.total}
                             </div>
                           </div>
-                          <div className="flex gap-2 flex-wrap">
+                          <div className="flex gap-1.5 md:gap-2 flex-wrap">
                             {canCancel && (
                               <button
                                 onClick={(e) => handleCancelOrder(order.id, e)}
-                                className="flex-1 text-xs md:text-sm py-2 px-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold"
+                                className="flex-1 text-[10px] md:text-sm py-1.5 md:py-2 px-2 md:px-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold"
                               >
                                 {t.cancelOrder}
                               </button>
@@ -1409,24 +1409,24 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                             {canReturn && (
                               <button
                                 onClick={(e) => handleReturnOrder(order.id, e)}
-                                className="flex-1 text-xs md:text-sm py-2 px-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold"
+                                className="flex-1 text-[10px] md:text-sm py-1.5 md:py-2 px-2 md:px-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold"
                               >
                                 {t.returnOrder}
                               </button>
                             )}
                             <button
                               onClick={() => setSelectedOrderForTracking(order)}
-                              className="text-xs md:text-sm py-2 px-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold flex items-center justify-center gap-1"
+                              className="text-[10px] md:text-sm py-1.5 md:py-2 px-2 md:px-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold flex items-center justify-center gap-0.5 md:gap-1"
                             >
-                              <FiPackage className="text-xs" />
+                              <FiPackage className="text-[10px] md:text-xs" />
                               Track Order
                             </button>
                             <button
                               onClick={() => order.artworkId && router.push(`/artwork/${order.artworkId}`)}
-                              className={`text-xs md:text-sm py-2 px-3 btn-secondary font-semibold flex items-center justify-center gap-1 ${canCancel || canReturn ? 'flex-1' : 'w-full'}`}
+                              className={`text-[10px] md:text-sm py-1.5 md:py-2 px-2 md:px-3 btn-secondary font-semibold flex items-center justify-center gap-0.5 md:gap-1 ${canCancel || canReturn ? 'flex-1' : 'w-full'}`}
                             >
                               {t.viewDetails}
-                              <FiArrowRight className="text-xs" />
+                              <FiArrowRight className="text-[10px] md:text-xs" />
                             </button>
                           </div>
                         </div>

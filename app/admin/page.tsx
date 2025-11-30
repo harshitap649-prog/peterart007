@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser, isAdmin } from '@/lib/auth'
-import LogoutButton from '@/components/LogoutButton'
 import AdminDashboard from '@/components/AdminDashboard'
 
 export const dynamic = 'force-dynamic'
@@ -62,8 +61,8 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 md:py-10">
-        <div className="rounded-3xl border border-white/70 bg-white/95 p-4 shadow-[0_45px_120px_-60px_rgba(15,23,42,0.55)] backdrop-blur md:p-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-0 py-0 md:px-4 md:py-6 md:py-10">
+        <div className="rounded-none md:rounded-3xl border-0 md:border border-white/70 bg-white/95 p-0 md:p-4 shadow-none md:shadow-[0_45px_120px_-60px_rgba(15,23,42,0.55)] backdrop-blur md:p-6">
           <AdminDashboard />
         </div>
       </div>

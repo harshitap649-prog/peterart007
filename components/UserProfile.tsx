@@ -312,64 +312,64 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
   }
 
   return (
-    <div className="space-y-4 md:space-y-6">
+    <div className="space-y-2 md:space-y-6">
       {/* Header */}
-      <div className="card p-4 md:p-6 bg-gradient-to-br from-orange-50 via-white to-purple-50 border-2 border-orange-100">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 bg-gradient-to-br from-orange-500 to-purple-500 rounded-lg">
-            <FiUser className="text-2xl text-white" />
+      <div className="card p-2 md:p-6 bg-gradient-to-br from-orange-50 via-white to-purple-50 border-2 border-orange-100">
+        <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+          <div className="p-1.5 md:p-2 bg-gradient-to-br from-orange-500 to-purple-500 rounded-lg">
+            <FiUser className="text-lg md:text-2xl text-white" />
           </div>
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">{t.myProfile}</h2>
-            <p className="text-xs md:text-sm text-gray-600">Manage your profile and account settings</p>
+            <h2 className="text-base md:text-2xl font-bold text-gray-900">{t.myProfile}</h2>
+            <p className="text-[10px] md:text-sm text-gray-600">Manage your profile and account settings</p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200 overflow-x-auto">
+      <div className="flex gap-1 md:gap-2 border-b border-gray-200 overflow-x-auto">
         <button
           onClick={() => setActiveTab('profile')}
-          className={`px-4 py-2 text-sm md:text-base font-medium transition-colors whitespace-nowrap ${
+          className={`px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-base font-medium transition-colors whitespace-nowrap ${
             activeTab === 'profile'
               ? 'border-b-2 border-orange-600 text-gray-900'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          <FiUser className="inline mr-2" />
+          <FiUser className="inline mr-1 md:mr-2 text-xs md:text-base" />
           Profile
         </button>
         <button
           onClick={() => setActiveTab('addresses')}
-          className={`px-4 py-2 text-sm md:text-base font-medium transition-colors whitespace-nowrap ${
+          className={`px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-base font-medium transition-colors whitespace-nowrap ${
             activeTab === 'addresses'
               ? 'border-b-2 border-orange-600 text-gray-900'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          <FiMapPin className="inline mr-2" />
+          <FiMapPin className="inline mr-1 md:mr-2 text-xs md:text-base" />
           Addresses
         </button>
         <button
           onClick={() => setActiveTab('settings')}
-          className={`px-4 py-2 text-sm md:text-base font-medium transition-colors whitespace-nowrap ${
+          className={`px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-base font-medium transition-colors whitespace-nowrap ${
             activeTab === 'settings'
               ? 'border-b-2 border-orange-600 text-gray-900'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          <FiSettings className="inline mr-2" />
+          <FiSettings className="inline mr-1 md:mr-2 text-xs md:text-base" />
           Settings
         </button>
       </div>
 
       {/* Profile Tab */}
       {activeTab === 'profile' && (
-        <div className="card p-4 md:p-6 space-y-4 md:space-y-6">
+        <div className="card p-2 md:p-6 space-y-3 md:space-y-6">
           {/* Profile Picture */}
           <div className="flex flex-col items-center">
             <div className="relative">
-              <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-orange-200 bg-gray-100">
+              <div className="w-16 h-16 md:w-32 md:h-32 rounded-full overflow-hidden border-2 md:border-4 border-orange-200 bg-gray-100">
                 {profile?.photoURL || user.photoURL ? (
                   <img
                     src={profile?.photoURL || user.photoURL}
@@ -378,19 +378,19 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-400 to-purple-400">
-                    <FiUser className="text-4xl md:text-5xl text-white" />
+                    <FiUser className="text-2xl md:text-5xl text-white" />
                   </div>
                 )}
               </div>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingPhoto}
-                className="absolute bottom-0 right-0 p-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors shadow-lg"
+                className="absolute bottom-0 right-0 p-1 md:p-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors shadow-lg"
               >
                 {uploadingPhoto ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <FiCamera className="text-sm md:text-base" />
+                  <FiCamera className="text-xs md:text-base" />
                 )}
               </button>
               <input
@@ -401,85 +401,85 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                 className="hidden"
               />
             </div>
-            <p className="text-xs md:text-sm text-gray-600 mt-2">{t.profilePicture}</p>
+            <p className="text-[10px] md:text-sm text-gray-600 mt-1 md:mt-2">{t.profilePicture}</p>
           </div>
 
           {/* Personal Information */}
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2">
-                <FiUser className="text-gray-900" />
+            <div className="flex items-center justify-between mb-2 md:mb-4">
+              <h3 className="text-sm md:text-xl font-bold text-gray-900 flex items-center gap-1 md:gap-2">
+                <FiUser className="text-sm md:text-base text-gray-900" />
                 {t.personalInformation}
               </h3>
               {!editing && (
                 <button
                   onClick={() => setEditing(true)}
-                  className="btn-secondary text-sm py-1.5 px-3 flex items-center gap-1"
+                  className="btn-secondary text-[10px] md:text-sm py-1 md:py-1.5 px-2 md:px-3 flex items-center gap-0.5 md:gap-1"
                 >
-                  <FiEdit2 className="text-sm" />
+                  <FiEdit2 className="text-xs md:text-sm" />
                   {t.editProfile}
                 </button>
               )}
             </div>
 
             {editing ? (
-              <div className="space-y-4">
+              <div className="space-y-2 md:space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
+                  <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-2 text-gray-700">
                     {t.fullName} *
                   </label>
                   <input
                     type="text"
                     value={profileData.name}
                     onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                    className="input-field text-sm md:text-base py-2.5"
+                    className="input-field text-xs md:text-base py-1.5 md:py-2.5"
                     placeholder="Enter your full name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 flex items-center gap-1">
-                    <FiMail className="text-xs" />
+                  <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-2 text-gray-700 flex items-center gap-1">
+                    <FiMail className="text-[10px] md:text-xs" />
                     {t.email}
                   </label>
                   <input
                     type="email"
                     value={profileData.email}
                     disabled
-                    className="input-field text-sm md:text-base py-2.5 bg-gray-50"
+                    className="input-field text-xs md:text-base py-1.5 md:py-2.5 bg-gray-50"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                  <p className="text-[10px] md:text-xs text-gray-500 mt-0.5 md:mt-1">Email cannot be changed</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 flex items-center gap-1">
-                    <FiPhone className="text-xs" />
+                  <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-2 text-gray-700 flex items-center gap-1">
+                    <FiPhone className="text-[10px] md:text-xs" />
                     {t.phone}
                   </label>
                   <input
                     type="tel"
                     value={profileData.phone}
                     onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                    className="input-field text-sm md:text-base py-2.5"
+                    className="input-field text-xs md:text-base py-1.5 md:py-2.5"
                     placeholder="+91 1234567890"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700">
+                  <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-2 text-gray-700">
                     {t.bio}
                   </label>
                   <textarea
                     value={profileData.bio}
                     onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                    className="input-field text-sm md:text-base py-2.5 resize-none"
+                    className="input-field text-xs md:text-base py-1.5 md:py-2.5 resize-none"
                     rows={3}
                     placeholder="Tell us about yourself..."
                   />
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-2 md:gap-3">
                   <button
                     onClick={handleSaveProfile}
-                    className="btn-primary flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-2.5"
+                    className="btn-primary flex-1 flex items-center justify-center gap-1 md:gap-2 text-xs md:text-base py-1.5 md:py-2.5"
                   >
-                    <FiSave className="text-sm" />
+                    <FiSave className="text-xs md:text-sm" />
                     {t.saveChanges}
                   </button>
                   <button
@@ -487,32 +487,32 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                       setEditing(false)
                       loadProfile()
                     }}
-                    className="btn-secondary flex-1 text-sm md:text-base py-2.5"
+                    className="btn-secondary flex-1 text-xs md:text-base py-1.5 md:py-2.5"
                   >
                     {t.cancel}
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-600 mb-1">{t.fullName}</p>
-                  <p className="font-semibold text-gray-900">{profileData.name || 'Not set'}</p>
+              <div className="space-y-2 md:space-y-3">
+                <div className="p-2 md:p-3 bg-gray-50 rounded-lg">
+                  <p className="text-[10px] md:text-xs text-gray-600 mb-0.5 md:mb-1">{t.fullName}</p>
+                  <p className="text-xs md:text-sm font-semibold text-gray-900">{profileData.name || 'Not set'}</p>
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-600 mb-1">{t.email}</p>
-                  <p className="font-semibold text-gray-900">{profileData.email || 'Not set'}</p>
+                <div className="p-2 md:p-3 bg-gray-50 rounded-lg">
+                  <p className="text-[10px] md:text-xs text-gray-600 mb-0.5 md:mb-1">{t.email}</p>
+                  <p className="text-xs md:text-sm font-semibold text-gray-900">{profileData.email || 'Not set'}</p>
                 </div>
                 {profileData.phone && (
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-600 mb-1">{t.phone}</p>
-                    <p className="font-semibold text-gray-900">{profileData.phone}</p>
+                  <div className="p-2 md:p-3 bg-gray-50 rounded-lg">
+                    <p className="text-[10px] md:text-xs text-gray-600 mb-0.5 md:mb-1">{t.phone}</p>
+                    <p className="text-xs md:text-sm font-semibold text-gray-900">{profileData.phone}</p>
                   </div>
                 )}
                 {profileData.bio && (
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-600 mb-1">{t.bio}</p>
-                    <p className="text-sm text-gray-900">{profileData.bio}</p>
+                  <div className="p-2 md:p-3 bg-gray-50 rounded-lg">
+                    <p className="text-[10px] md:text-xs text-gray-600 mb-0.5 md:mb-1">{t.bio}</p>
+                    <p className="text-xs md:text-sm text-gray-900">{profileData.bio}</p>
                   </div>
                 )}
               </div>
@@ -523,10 +523,10 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
 
       {/* Addresses Tab */}
       {activeTab === 'addresses' && (
-        <div className="space-y-4">
+        <div className="space-y-2 md:space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2">
-              <FiMapPin className="text-gray-900" />
+            <h3 className="text-sm md:text-xl font-bold text-gray-900 flex items-center gap-1 md:gap-2">
+              <FiMapPin className="text-sm md:text-base text-gray-900" />
               {t.savedAddresses}
             </h3>
             <button
@@ -546,17 +546,17 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                 })
                 setShowAddressForm(true)
               }}
-              className="btn-primary text-sm py-2 px-4 flex items-center gap-2"
+              className="btn-primary text-[10px] md:text-sm py-1 md:py-2 px-2 md:px-4 flex items-center gap-1 md:gap-2"
             >
-              <FiPlus className="text-sm" />
+              <FiPlus className="text-xs md:text-sm" />
               {t.addAddress}
             </button>
           </div>
 
           {addresses.length === 0 && !showAddressForm ? (
-            <div className="card p-8 md:p-12 text-center">
-              <FiMapPin className="text-6xl text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">{t.noAddresses}</p>
+            <div className="card p-4 md:p-12 text-center">
+              <FiMapPin className="text-4xl md:text-6xl text-gray-300 mx-auto mb-2 md:mb-4" />
+              <p className="text-xs md:text-base text-gray-500 mb-2 md:mb-4">{t.noAddresses}</p>
               <button
                 onClick={() => {
                   setAddressForm({
@@ -573,43 +573,43 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                   })
                   setShowAddressForm(true)
                 }}
-                className="btn-primary text-sm py-2.5 px-6"
+                className="btn-primary text-xs md:text-sm py-1.5 md:py-2.5 px-4 md:px-6"
               >
                 {t.addNewAddress}
               </button>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 md:space-y-3">
               {addresses.map((address) => (
                 <div
                   key={address.id}
-                  className={`card p-4 md:p-5 ${
+                  className={`card p-2 md:p-5 ${
                     address.isDefault
                       ? 'border-2 border-orange-500 bg-orange-50'
                       : 'border border-gray-200'
                   }`}
                 >
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-start justify-between mb-2 md:mb-3">
                     <div className="flex-1">
                       {address.isDefault && (
-                        <span className="inline-block px-2 py-1 bg-orange-600 text-white text-xs font-semibold rounded-full mb-2">
+                        <span className="inline-block px-1.5 md:px-2 py-0.5 md:py-1 bg-orange-600 text-white text-[10px] md:text-xs font-semibold rounded-full mb-1 md:mb-2">
                           {t.defaultAddress}
                         </span>
                       )}
-                      <p className="font-bold text-gray-900 text-sm md:text-base mb-1">
+                      <p className="font-bold text-gray-900 text-xs md:text-base mb-0.5 md:mb-1">
                         {address.fullName}
                       </p>
-                      <p className="text-xs md:text-sm text-gray-600">
+                      <p className="text-[10px] md:text-sm text-gray-600">
                         {address.address1}
                         {address.address2 && `, ${address.address2}`}
                       </p>
-                      <p className="text-xs md:text-sm text-gray-600">
+                      <p className="text-[10px] md:text-sm text-gray-600">
                         {address.city}, {address.state} - {address.pincode}
                       </p>
-                      <p className="text-xs md:text-sm text-gray-600">{address.country}</p>
+                      <p className="text-[10px] md:text-sm text-gray-600">{address.country}</p>
                       {address.phone && (
-                        <p className="text-xs md:text-sm text-gray-600 mt-1">
-                          <FiPhone className="inline mr-1" />
+                        <p className="text-[10px] md:text-sm text-gray-600 mt-0.5 md:mt-1">
+                          <FiPhone className="inline mr-0.5 md:mr-1 text-[10px] md:text-xs" />
                           {address.phone}
                         </p>
                       )}
@@ -645,139 +645,139 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
               ))}
 
               {showAddressForm && (
-                <div className="card p-4 md:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-100">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                <div className="card p-2 md:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-100">
+                  <h3 className="text-sm md:text-lg font-bold text-gray-900 mb-2 md:mb-4">
                     {editingAddress ? 'Edit Address' : t.addNewAddress}
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-2 md:space-y-3">
                     <div>
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                         {t.fullName} *
                       </label>
                       <input
                         type="text"
                         value={addressForm.fullName}
                         onChange={(e) => setAddressForm({ ...addressForm, fullName: e.target.value })}
-                        className="input-field text-sm py-2"
+                        className="input-field text-xs md:text-sm py-1.5 md:py-2"
                         required
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                           {t.phone} *
                         </label>
                         <input
                           type="tel"
                           value={addressForm.phone}
                           onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
-                          className="input-field text-sm py-2"
+                          className="input-field text-xs md:text-sm py-1.5 md:py-2"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                           {t.email}
                         </label>
                         <input
                           type="email"
                           value={addressForm.email}
                           onChange={(e) => setAddressForm({ ...addressForm, email: e.target.value })}
-                          className="input-field text-sm py-2"
+                          className="input-field text-xs md:text-sm py-1.5 md:py-2"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                         Address Line 1 *
                       </label>
                       <input
                         type="text"
                         value={addressForm.address1}
                         onChange={(e) => setAddressForm({ ...addressForm, address1: e.target.value })}
-                        className="input-field text-sm py-2"
+                        className="input-field text-xs md:text-sm py-1.5 md:py-2"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                      <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                         Address Line 2
                       </label>
                       <input
                         type="text"
                         value={addressForm.address2}
                         onChange={(e) => setAddressForm({ ...addressForm, address2: e.target.value })}
-                        className="input-field text-sm py-2"
+                        className="input-field text-xs md:text-sm py-1.5 md:py-2"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                           Pincode *
                         </label>
                         <input
                           type="text"
                           value={addressForm.pincode}
                           onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value })}
-                          className="input-field text-sm py-2"
+                          className="input-field text-xs md:text-sm py-1.5 md:py-2"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                           City *
                         </label>
                         <input
                           type="text"
                           value={addressForm.city}
                           onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
-                          className="input-field text-sm py-2"
+                          className="input-field text-xs md:text-sm py-1.5 md:py-2"
                           required
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                           State
                         </label>
                         <input
                           type="text"
                           value={addressForm.state}
                           onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
-                          className="input-field text-sm py-2"
+                          className="input-field text-xs md:text-sm py-1.5 md:py-2"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1.5 text-gray-700">
+                        <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-1.5 text-gray-700">
                           Country
                         </label>
                         <input
                           type="text"
                           value={addressForm.country}
                           onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
-                          className="input-field text-sm py-2"
+                          className="input-field text-xs md:text-sm py-1.5 md:py-2"
                         />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 md:gap-2">
                       <input
                         type="checkbox"
                         id="isDefault"
                         checked={addressForm.isDefault}
                         onChange={(e) => setAddressForm({ ...addressForm, isDefault: e.target.checked })}
-                        className="w-4 h-4"
+                        className="w-3.5 h-3.5 md:w-4 md:h-4"
                       />
-                      <label htmlFor="isDefault" className="text-sm text-gray-700 cursor-pointer">
+                      <label htmlFor="isDefault" className="text-[10px] md:text-sm text-gray-700 cursor-pointer">
                         {t.setAsDefault}
                       </label>
                     </div>
-                    <div className="flex gap-3 pt-2">
+                    <div className="flex gap-2 md:gap-3 pt-1.5 md:pt-2">
                       <button
                         onClick={handleSaveAddress}
-                        className="btn-primary flex-1 text-sm py-2.5 flex items-center justify-center gap-2"
+                        className="btn-primary flex-1 text-xs md:text-sm py-1.5 md:py-2.5 flex items-center justify-center gap-1 md:gap-2"
                       >
-                        <FiCheck className="text-sm" />
+                        <FiCheck className="text-xs md:text-sm" />
                         {editingAddress ? 'Update Address' : t.addAddress}
                       </button>
                       <button
@@ -797,7 +797,7 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                             isDefault: false
                           })
                         }}
-                        className="btn-secondary text-sm py-2.5 px-4"
+                        className="btn-secondary text-xs md:text-sm py-1.5 md:py-2.5 px-3 md:px-4"
                       >
                         {t.cancel}
                       </button>
@@ -812,68 +812,68 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
 
       {/* Settings Tab */}
       {activeTab === 'settings' && (
-        <div className="space-y-4">
+        <div className="space-y-2 md:space-y-4">
           {/* Order History Export */}
-          <div className="card p-4 md:p-6">
-            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiDownload className="text-gray-900" />
+          <div className="card p-2 md:p-6">
+            <h3 className="text-sm md:text-xl font-bold text-gray-900 mb-2 md:mb-4 flex items-center gap-1 md:gap-2">
+              <FiDownload className="text-sm md:text-base text-gray-900" />
               {t.orderHistory}
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-[10px] md:text-sm text-gray-600 mb-2 md:mb-4">
               Export your complete order history as a PDF document.
             </p>
             <button
               onClick={handleExportPDF}
-              className="btn-primary text-sm md:text-base py-2.5 px-6 flex items-center gap-2"
+              className="btn-primary text-xs md:text-base py-1.5 md:py-2.5 px-4 md:px-6 flex items-center gap-1 md:gap-2"
             >
-              <FiDownload className="text-sm" />
+              <FiDownload className="text-xs md:text-sm" />
               {t.exportPDF}
             </button>
           </div>
 
           {/* Notifications */}
-          <div className="card p-4 md:p-6">
-            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiBell className="text-gray-900" />
+          <div className="card p-2 md:p-6">
+            <h3 className="text-sm md:text-xl font-bold text-gray-900 mb-2 md:mb-4 flex items-center gap-1 md:gap-2">
+              <FiBell className="text-sm md:text-base text-gray-900" />
               {t.notifications}
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <FiMail className="text-gray-900" />
-                  <span className="text-sm font-medium text-gray-700">{t.emailNotifications}</span>
+            <div className="space-y-2 md:space-y-3">
+              <div className="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <FiMail className="text-xs md:text-sm text-gray-900" />
+                  <span className="text-[10px] md:text-sm font-medium text-gray-700">{t.emailNotifications}</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                  <div className="w-9 h-5 md:w-11 md:h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 md:after:h-5 md:after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
                 </label>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <FiPhone className="text-gray-900" />
-                  <span className="text-sm font-medium text-gray-700">{t.smsNotifications}</span>
+              <div className="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <FiPhone className="text-xs md:text-sm text-gray-900" />
+                  <span className="text-[10px] md:text-sm font-medium text-gray-700">{t.smsNotifications}</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                  <div className="w-9 h-5 md:w-11 md:h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 md:after:h-5 md:after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
                 </label>
               </div>
             </div>
           </div>
 
           {/* Privacy & Security */}
-          <div className="card p-4 md:p-6">
-            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FiShield className="text-gray-900" />
+          <div className="card p-2 md:p-6">
+            <h3 className="text-sm md:text-xl font-bold text-gray-900 mb-2 md:mb-4 flex items-center gap-1 md:gap-2">
+              <FiShield className="text-sm md:text-base text-gray-900" />
               {t.privacy}
             </h3>
-            <div className="space-y-3">
-              <button className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FiLock className="text-gray-900" />
-                  <span className="text-sm font-medium text-gray-700">{t.changePassword}</span>
+            <div className="space-y-2 md:space-y-3">
+              <button className="w-full text-left p-2 md:p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors flex items-center justify-between">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <FiLock className="text-xs md:text-sm text-gray-900" />
+                  <span className="text-[10px] md:text-sm font-medium text-gray-700">{t.changePassword}</span>
                 </div>
-                <FiX className="text-gray-400 text-xs">Coming Soon</FiX>
+                <FiX className="text-gray-400 text-[10px] md:text-xs">Coming Soon</FiX>
               </button>
             </div>
           </div>

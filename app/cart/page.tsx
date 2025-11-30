@@ -15,7 +15,6 @@ import { getSavedAddresses } from '@/lib/profile'
 import CouponInput from '@/components/CouponInput'
 import GiftCardInput from '@/components/GiftCardInput'
 import { calculateBulkDiscount } from '@/lib/coupons'
-import BannerAd from '@/components/BannerAd'
 
 export default function CartPage() {
   const { cart, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart()
@@ -253,20 +252,20 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
-      <div className="container mx-auto px-3 md:px-4 py-4 md:py-6">
+      <div className="container mx-auto px-2 md:px-4 py-2 md:py-6">
         {/* Header - Mobile Optimized */}
-        <div className="flex items-center justify-between mb-4 md:mb-6 gap-2">
+        <div className="flex items-center justify-between mb-3 md:mb-6 gap-1.5 md:gap-2">
           <button
             onClick={() => router.push('/user')}
-            className="btn-secondary flex items-center gap-1.5 text-xs md:text-sm px-3 md:px-5 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold shadow-sm md:shadow-md hover:shadow-md md:hover:shadow-lg transition-all"
+            className="btn-secondary flex items-center gap-1 md:gap-1.5 text-[10px] md:text-sm px-2 md:px-5 py-1.5 md:py-2.5 rounded-lg md:rounded-xl font-semibold shadow-sm md:shadow-md hover:shadow-md md:hover:shadow-lg transition-all"
           >
-            <FiArrowLeft className="text-sm" />
+            <FiArrowLeft className="text-xs md:text-sm" />
             <span className="hidden sm:inline">Continue Shopping</span>
             <span className="sm:hidden">Back</span>
           </button>
-          <h1 className="text-base md:text-2xl font-bold text-gray-900 flex items-center gap-2 md:gap-3">
-            <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-md md:shadow-lg">
-              <FiShoppingCart className="text-white text-sm md:text-xl" />
+          <h1 className="text-sm md:text-2xl font-bold text-gray-900 flex items-center gap-1.5 md:gap-3">
+            <div className="w-6 h-6 md:w-12 md:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-md md:shadow-lg">
+              <FiShoppingCart className="text-white text-xs md:text-xl" />
             </div>
             <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent hidden sm:inline">Shopping Cart</span>
             <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent sm:hidden">Cart</span>
@@ -275,37 +274,32 @@ export default function CartPage() {
 
         {cart.length === 0 ? (
           <>
-            <div className="glass-panel p-6 md:p-12 text-center rounded-xl md:rounded-2xl">
-              <div className="w-20 h-20 md:w-32 md:h-32 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-md md:shadow-lg">
-                <FiShoppingCart className="text-4xl md:text-6xl text-orange-600" />
+            <div className="glass-panel p-4 md:p-12 text-center rounded-xl md:rounded-2xl">
+              <div className="w-16 h-16 md:w-32 md:h-32 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl md:rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-6 shadow-md md:shadow-lg">
+                <FiShoppingCart className="text-3xl md:text-6xl text-orange-600" />
               </div>
-              <h2 className="text-lg md:text-2xl font-bold text-gray-900 mb-2 md:mb-3">Your cart is empty</h2>
-              <p className="text-gray-600 text-sm md:text-lg mb-6 md:mb-8">Add some items to get started!</p>
+              <h2 className="text-sm md:text-2xl font-bold text-gray-900 mb-1.5 md:mb-3">Your cart is empty</h2>
+              <p className="text-gray-600 text-xs md:text-lg mb-4 md:mb-8">Add some items to get started!</p>
               <button
                 onClick={() => router.push('/user')}
-                className="btn-primary text-sm md:text-base py-2.5 md:py-3 px-6 md:px-8 rounded-lg md:rounded-xl font-semibold shadow-md md:shadow-lg hover:shadow-lg md:hover:shadow-xl transition-all"
+                className="btn-primary text-xs md:text-base py-2 md:py-3 px-4 md:px-8 rounded-lg md:rounded-xl font-semibold shadow-md md:shadow-lg hover:shadow-lg md:hover:shadow-xl transition-all"
               >
                 Browse Artworks
               </button>
             </div>
-            
-            {/* Banner Ad after empty cart */}
-            <div className="mt-4 md:mt-6">
-              <BannerAd inline={true} />
-            </div>
           </>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6">
             {/* Cart Items - Mobile Optimized */}
-            <div className="lg:col-span-2 space-y-3 md:space-y-4">
+            <div className="lg:col-span-2 space-y-2 md:space-y-4">
               {cart.map((item) => (
                 <div
                   key={item.artworkId}
-                  className="glass-panel p-3 md:p-5 flex flex-col md:flex-row gap-3 md:gap-5 rounded-lg md:rounded-xl hover:shadow-lg md:hover:shadow-xl transition-all"
+                  className="glass-panel p-2 md:p-5 flex flex-col md:flex-row gap-2 md:gap-5 rounded-lg md:rounded-xl hover:shadow-lg md:hover:shadow-xl transition-all"
                 >
                   {/* Image */}
                   <div className="flex-shrink-0">
-                    <div className="w-full md:w-36 h-28 md:h-36 rounded-lg md:rounded-xl overflow-hidden shadow-md md:shadow-lg bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="w-full md:w-36 h-24 md:h-36 rounded-lg md:rounded-xl overflow-hidden shadow-md md:shadow-lg bg-gradient-to-br from-gray-100 to-gray-200">
                     <img
                       src={item.artworkImage}
                       alt={item.artworkTitle}
@@ -320,17 +314,17 @@ export default function CartPage() {
                   {/* Details */}
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm md:text-xl font-bold text-gray-900 mb-1 md:mb-2 line-clamp-2">
+                      <h3 className="text-xs md:text-xl font-bold text-gray-900 mb-1 md:mb-2 line-clamp-2">
                         {item.artworkTitle}
                       </h3>
-                      <p className="text-orange-600 font-bold text-base md:text-xl mb-3 md:mb-4">
+                      <p className="text-orange-600 font-bold text-sm md:text-xl mb-2 md:mb-4">
                         ₹{(item.unitPrice || item.price || 0).toFixed(2)}
                       </p>
                     </div>
 
                     {/* Quantity Controls - Mobile Optimized */}
-                    <div className="flex items-center justify-between gap-2 md:gap-4">
-                      <div className="flex items-center gap-2 md:gap-3">
+                    <div className="flex items-center justify-between gap-1.5 md:gap-4">
+                      <div className="flex items-center gap-1.5 md:gap-3">
                         <button
                           onClick={() => {
                             if (item.quantity > 1) {
@@ -340,26 +334,26 @@ export default function CartPage() {
                               toast.success('Item removed from cart')
                             }
                           }}
-                          className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl hover:bg-gray-100 transition-all border-2 border-gray-200 hover:border-orange-300 flex items-center justify-center shadow-sm hover:shadow-md"
+                          className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl hover:bg-gray-100 transition-all border-2 border-gray-200 hover:border-orange-300 flex items-center justify-center shadow-sm hover:shadow-md"
                           aria-label="Decrease quantity"
                         >
-                          <FiMinus className="text-sm md:text-lg text-gray-700" />
+                          <FiMinus className="text-xs md:text-lg text-gray-700" />
                         </button>
-                        <span className="text-base md:text-xl font-bold text-gray-900 min-w-[2rem] md:min-w-[3rem] text-center">
+                        <span className="text-sm md:text-xl font-bold text-gray-900 min-w-[1.5rem] md:min-w-[3rem] text-center">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateQuantity(item.artworkId, item.quantity + 1)}
-                          className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl hover:bg-gray-100 transition-all border-2 border-gray-200 hover:border-orange-300 flex items-center justify-center shadow-sm hover:shadow-md"
+                          className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl hover:bg-gray-100 transition-all border-2 border-gray-200 hover:border-orange-300 flex items-center justify-center shadow-sm hover:shadow-md"
                           aria-label="Increase quantity"
                         >
-                          <FiPlus className="text-sm md:text-lg text-gray-700" />
+                          <FiPlus className="text-xs md:text-lg text-gray-700" />
                         </button>
                       </div>
 
                       <div className="text-right">
-                        <p className="text-gray-600 text-xs md:text-sm mb-0.5 md:mb-1 font-medium">Subtotal</p>
-                        <p className="text-base md:text-xl font-bold text-orange-600">
+                        <p className="text-gray-600 text-[10px] md:text-sm mb-0.5 md:mb-1 font-medium">Subtotal</p>
+                        <p className="text-sm md:text-xl font-bold text-orange-600">
                           ₹{((item.unitPrice || item.price || 0) * item.quantity).toFixed(2)}
                         </p>
                       </div>
@@ -369,10 +363,10 @@ export default function CartPage() {
                           removeFromCart(item.artworkId)
                           toast.success('Item removed from cart')
                         }}
-                        className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl text-red-500 hover:bg-red-50 transition-all border-2 border-red-200 hover:border-red-300 flex items-center justify-center shadow-sm hover:shadow-md"
+                        className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl text-red-500 hover:bg-red-50 transition-all border-2 border-red-200 hover:border-red-300 flex items-center justify-center shadow-sm hover:shadow-md"
                         aria-label="Remove item"
                       >
-                        <FiTrash2 className="text-sm md:text-lg" />
+                        <FiTrash2 className="text-xs md:text-lg" />
                       </button>
                     </div>
                   </div>
@@ -382,15 +376,15 @@ export default function CartPage() {
 
             {/* Order Summary - Mobile Optimized */}
             <div className="lg:col-span-1">
-              <div className="glass-panel p-4 md:p-6 sticky top-4 rounded-xl md:rounded-2xl">
-                <h2 className="text-base md:text-xl font-bold text-gray-900 mb-4 md:mb-6 flex items-center gap-2">
-                  <span className="w-1 h-5 md:h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
+              <div className="glass-panel p-2 md:p-6 sticky top-4 rounded-xl md:rounded-2xl">
+                <h2 className="text-sm md:text-xl font-bold text-gray-900 mb-3 md:mb-6 flex items-center gap-1.5 md:gap-2">
+                  <span className="w-0.5 md:w-1 h-4 md:h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
                   Order Summary
                 </h2>
                 
                 {/* Coupon Input */}
                 {user && (
-                  <div className="space-y-4 mb-4">
+                  <div className="space-y-2 md:space-y-4 mb-3 md:mb-4">
                     <CouponInput
                       onCouponApplied={(coupon, discount) => {
                         setAppliedCoupon(coupon)
@@ -418,35 +412,35 @@ export default function CartPage() {
                   </div>
                 )}
                 
-                <div className="space-y-2 md:space-y-3 mb-4 md:mb-6">
-                  <div className="flex justify-between text-xs md:text-sm">
+                <div className="space-y-1.5 md:space-y-3 mb-3 md:mb-6">
+                  <div className="flex justify-between text-[10px] md:text-sm">
                     <span className="text-gray-600">Items ({cart.length}):</span>
                     <span className="font-medium text-orange-600">₹{cartTotal.toFixed(2)}</span>
                   </div>
                   {bulkDiscount > 0 && (
-                    <div className="flex justify-between text-xs md:text-sm text-green-600">
+                    <div className="flex justify-between text-[10px] md:text-sm text-green-600">
                       <span>Bulk Discount:</span>
                       <span className="font-medium">-₹{bulkDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   {couponDiscount > 0 && (
-                    <div className="flex justify-between text-xs md:text-sm text-green-600">
+                    <div className="flex justify-between text-[10px] md:text-sm text-green-600">
                       <span>Coupon ({appliedCoupon?.code}):</span>
                       <span className="font-medium">-₹{couponDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   {giftCardDiscount > 0 && (
-                    <div className="flex justify-between text-xs md:text-sm text-green-600">
+                    <div className="flex justify-between text-[10px] md:text-sm text-green-600">
                       <span>Gift Card ({appliedGiftCard?.code}):</span>
                       <span className="font-medium">-₹{giftCardDiscount.toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-xs md:text-sm">
+                  <div className="flex justify-between text-[10px] md:text-sm">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">Free</span>
                   </div>
-                  <div className="border-t border-gray-200 pt-2 md:pt-3">
-                    <div className="flex justify-between text-sm md:text-base">
+                  <div className="border-t border-gray-200 pt-1.5 md:pt-3">
+                    <div className="flex justify-between text-xs md:text-base">
                       <span className="font-bold text-gray-900">Total:</span>
                       <span className="font-bold text-orange-600">
                         ₹{Math.max(0, cartTotal - bulkDiscount - couponDiscount - giftCardDiscount).toFixed(2)}
@@ -458,28 +452,28 @@ export default function CartPage() {
                 {!showCheckout ? (
                   <button
                     onClick={handleCheckout}
-                    className="btn-primary w-full text-sm md:text-base py-3 md:py-4 mb-3 rounded-lg md:rounded-xl font-semibold shadow-md md:shadow-lg hover:shadow-lg md:hover:shadow-xl transition-all"
+                    className="btn-primary w-full text-xs md:text-base py-2 md:py-4 mb-2 md:mb-3 rounded-lg md:rounded-xl font-semibold shadow-md md:shadow-lg hover:shadow-lg md:hover:shadow-xl transition-all"
                   >
                     Proceed to Checkout
                   </button>
                 ) : (
-                  <form onSubmit={handleOrderSubmit} className="space-y-3 md:space-y-4">
-                    <h3 className="text-base md:text-xl font-bold mb-4 md:mb-6 text-gray-900 flex items-center gap-2">
-                      <span className="w-1 h-5 md:h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
+                  <form onSubmit={handleOrderSubmit} className="space-y-2 md:space-y-4">
+                    <h3 className="text-sm md:text-xl font-bold mb-3 md:mb-6 text-gray-900 flex items-center gap-1.5 md:gap-2">
+                      <span className="w-0.5 md:w-1 h-4 md:h-6 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></span>
                       Checkout
                     </h3>
 
                     {/* Saved Addresses - Mobile Optimized */}
                     {savedAddresses.length > 0 && (
                       <div>
-                        <label className="block text-xs md:text-sm font-medium mb-2 text-gray-600">
+                        <label className="block text-[10px] md:text-sm font-medium mb-1.5 md:mb-2 text-gray-600">
                           Use Saved Address
                         </label>
-                        <div className="space-y-2 mb-3 md:mb-4">
+                        <div className="space-y-1.5 md:space-y-2 mb-2 md:mb-4">
                           {savedAddresses.map((address) => (
                             <label
                               key={address.id}
-                              className={`flex items-start gap-2 cursor-pointer p-2.5 md:p-3 border-2 rounded-lg transition-colors ${
+                              className={`flex items-start gap-1.5 md:gap-2 cursor-pointer p-2 md:p-3 border-2 rounded-lg transition-colors ${
                                 selectedAddressId === address.id
                                   ? 'border-orange-500 bg-orange-50'
                                   : 'border-gray-200 hover:border-gray-300'
@@ -504,23 +498,23 @@ export default function CartPage() {
                                     country: address.country || 'India'
                                   })
                                 }}
-                                className="mt-0.5 md:mt-1 w-3.5 h-3.5 md:w-4 md:h-4"
+                                className="mt-0.5 md:mt-1 w-3 h-3 md:w-4 md:h-4"
                               />
-                              <div className="flex-1">
+                              <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-0.5 md:mb-1">
-                                  <span className="font-semibold text-xs md:text-sm text-gray-900">
+                                  <span className="font-semibold text-[10px] md:text-sm text-gray-900 truncate">
                                     {address.fullName}
                                   </span>
                                   {address.isDefault && (
-                                    <span className="text-[10px] md:text-xs bg-orange-100 text-gray-900 px-1.5 md:px-2 py-0.5 rounded-full">
+                                    <span className="text-[9px] md:text-xs bg-orange-100 text-gray-900 px-1 md:px-2 py-0.5 rounded-full flex-shrink-0 ml-1">
                                       Default
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-[10px] md:text-xs text-gray-600">
+                                <p className="text-[9px] md:text-xs text-gray-600 truncate">
                                   {address.address1}, {address.city}, {address.pincode}
                                 </p>
-                                <p className="text-[10px] md:text-xs text-gray-500">{address.phone}</p>
+                                <p className="text-[9px] md:text-xs text-gray-500">{address.phone}</p>
                               </div>
                             </label>
                           ))}
@@ -529,7 +523,7 @@ export default function CartPage() {
                               setUseSavedAddress(false)
                               setSelectedAddressId(null)
                             }}
-                            className="w-full text-xs md:text-sm text-gray-900 hover:text-orange-700 font-medium py-1.5 md:py-2"
+                            className="w-full text-[10px] md:text-sm text-gray-900 hover:text-orange-700 font-medium py-1 md:py-2"
                           >
                             + Use New Address
                           </button>
@@ -538,39 +532,39 @@ export default function CartPage() {
                     )}
 
                     {/* Gifting Options - Mobile Optimized */}
-                    <div className="border-t border-gray-200 pt-3 md:pt-4">
-                      <div className="flex items-center gap-2 mb-3 md:mb-4">
+                    <div className="border-t border-gray-200 pt-2 md:pt-4">
+                      <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-4">
                         <input
                           type="checkbox"
                           id="isGift"
                           checked={isGift}
                           onChange={(e) => setIsGift(e.target.checked)}
-                          className="w-3.5 h-3.5 md:w-4 md:h-4"
+                          className="w-3 h-3 md:w-4 md:h-4"
                         />
-                        <label htmlFor="isGift" className="text-xs md:text-sm font-medium text-gray-900 cursor-pointer">
+                        <label htmlFor="isGift" className="text-[10px] md:text-sm font-medium text-gray-900 cursor-pointer">
                           This is a gift
                         </label>
                       </div>
                       
                       {isGift && (
-                        <div className="space-y-2 md:space-y-3 pl-4 md:pl-6 border-l-2 border-orange-200">
+                        <div className="space-y-2 md:space-y-3 pl-3 md:pl-6 border-l-2 border-orange-200">
                           <div>
-                            <label className="block text-xs md:text-sm font-medium mb-1.5 md:mb-2 text-gray-600">
+                            <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-2 text-gray-600">
                               Gift Message (Optional)
                             </label>
                             <textarea
                               value={giftMessage}
                               onChange={(e) => setGiftMessage(e.target.value)}
                               rows={3}
-                              className="input-field text-xs md:text-sm py-2 md:py-2.5"
+                              className="input-field text-[10px] md:text-sm py-1.5 md:py-2.5"
                               placeholder="Write a personal message for the recipient..."
                               maxLength={500}
                             />
-                            <p className="text-[10px] md:text-xs text-gray-500 mt-1">{giftMessage.length}/500</p>
+                            <p className="text-[9px] md:text-xs text-gray-500 mt-0.5 md:mt-1">{giftMessage.length}/500</p>
                           </div>
                           
                           <div>
-                            <label className="block text-xs md:text-sm font-medium mb-1.5 md:mb-2 text-gray-600">
+                            <label className="block text-[10px] md:text-sm font-medium mb-1 md:mb-2 text-gray-600">
                               Schedule Delivery Date (Optional)
                             </label>
                             <input
@@ -578,9 +572,9 @@ export default function CartPage() {
                               value={scheduledDeliveryDate}
                               onChange={(e) => setScheduledDeliveryDate(e.target.value)}
                               min={new Date().toISOString().split('T')[0]}
-                              className="input-field text-xs md:text-sm py-2 md:py-2.5"
+                              className="input-field text-[10px] md:text-sm py-1.5 md:py-2.5"
                             />
-                            <p className="text-[10px] md:text-xs text-gray-500 mt-1">
+                            <p className="text-[9px] md:text-xs text-gray-500 mt-0.5 md:mt-1">
                               Leave empty for immediate delivery
                             </p>
                           </div>
@@ -590,29 +584,29 @@ export default function CartPage() {
 
                     {/* Payment Method - Mobile Optimized */}
                     <div>
-                      <label className="block text-xs md:text-sm font-medium mb-2 text-gray-600">
+                      <label className="block text-[10px] md:text-sm font-medium mb-1.5 md:mb-2 text-gray-600">
                         Payment Method *
                       </label>
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 cursor-pointer p-2.5 md:p-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                      <div className="space-y-1.5 md:space-y-2">
+                        <label className="flex items-center gap-1.5 md:gap-2 cursor-pointer p-2 md:p-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
                           <input
                             type="radio"
                             value="cod"
                             checked={paymentMethod === 'cod'}
                             onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="w-3.5 h-3.5 md:w-4 md:h-4"
+                            className="w-3 h-3 md:w-4 md:h-4"
                           />
-                          <span className="text-xs md:text-sm">Cash on Delivery</span>
+                          <span className="text-[10px] md:text-sm">Cash on Delivery</span>
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer p-2.5 md:p-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
+                        <label className="flex items-center gap-1.5 md:gap-2 cursor-pointer p-2 md:p-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors">
                           <input
                             type="radio"
                             value="online"
                             checked={paymentMethod === 'online'}
                             onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="w-3.5 h-3.5 md:w-4 md:h-4"
+                            className="w-3 h-3 md:w-4 md:h-4"
                           />
-                          <span className="text-xs md:text-sm">Online Payment</span>
+                          <span className="text-[10px] md:text-sm">Online Payment</span>
                         </label>
                       </div>
                     </div>

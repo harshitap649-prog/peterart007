@@ -15,6 +15,7 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   const isCartPage = pathname === '/cart'
   const isMessagesPage = pathname === '/messages' || pathname?.startsWith('/chat/')
   const isAdminPage = pathname === '/admin'
+  const isArtistPage = pathname?.startsWith('/artist/')
 
   // All pages - no header or footer, but show mobile dock
   if (isUserPage) {
@@ -44,14 +45,13 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
     )
   }
 
-  // Cart page - no mobile dock on mobile
+  // Cart page - no mobile dock on mobile, no banner ad
   if (isCartPage) {
     return (
       <div className="app-shell">
         <main className="app-main pb-4 md:pb-8">
           <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
         </main>
-        <BannerAd />
       </div>
     )
   }
@@ -85,6 +85,20 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
         <main className="app-main pb-0 md:pb-8">
           <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
         </main>
+      </div>
+    )
+  }
+
+  // Artist page - banner ad is rendered inline in the page component
+  if (isArtistPage) {
+    return (
+      <div className="app-shell">
+        <main className="app-main pb-20 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+        </main>
+        <Suspense fallback={null}>
+          <MobileDock />
+        </Suspense>
       </div>
     )
   }

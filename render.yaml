@@ -1,7 +1,7 @@
 services:
   - type: web
     name: peterart007
-    env: node-18
+    env: node
     region: oregon
     plan: free
     buildCommand: npm install --legacy-peer-deps && npm run build

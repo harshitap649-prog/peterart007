@@ -114,7 +114,7 @@ export default function LoginPage() {
             <img
               src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
               alt="Peter Art"
-              className="w-48 h-auto md:w-64 object-contain"
+              className="w-64 h-auto md:w-80 lg:w-96 object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/logoo.png'
               }}
@@ -123,10 +123,10 @@ export default function LoginPage() {
           
           {/* Title and Subtitle */}
           <div className="space-y-2">
-            <h1 className="text-xl md:text-4xl font-bold text-slate-900 leading-tight whitespace-nowrap">
+            <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight whitespace-nowrap">
               Fall in love with art — take one home today.
             </h1>
-            <p className="text-sm md:text-lg text-slate-600 font-medium whitespace-nowrap">
+            <p className="text-base md:text-xl lg:text-2xl text-slate-600 font-medium whitespace-nowrap">
               Turn Empty Walls into Expressions
             </p>
           </div>
@@ -140,8 +140,8 @@ export default function LoginPage() {
           <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-blue-200/50" />
         </div>
 
-        <div className="grid gap-4 md:gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 shadow-lift sm:p-6 md:p-8 text-[var(--text-primary)]">
+        <div className="grid gap-4 md:gap-6">
+        <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 shadow-lift sm:p-6 md:p-8 text-[var(--text-primary)] max-w-md mx-auto">
           <div className="mb-4 md:mb-6 flex rounded-lg border border-black/10 bg-white p-0.5 md:p-1 text-xs md:text-sm font-semibold text-[var(--text-secondary)] shadow">
             <button
               onClick={() => setActiveTab('signin')}
@@ -300,56 +300,6 @@ export default function LoginPage() {
               Go to artist portal
             </button>
           </p>
-        </div>
-
-        <div className="glass-panel rounded-[40px] border border-black/5 p-6 sm:p-10 text-[var(--text-primary)]">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-[var(--text-secondary)]">Trusted Art Marketplace</p>
-          <h1 className="mt-4 text-3xl font-semibold leading-tight text-[var(--text-primary)] sm:text-4xl">
-            Fall in love with art —
-            <span className="gradient-text"> take one home today.</span>
-          </h1>
-          <p className="mt-4 max-w-xl text-base text-[var(--text-secondary)]">
-            Join thousands of collectors and artists using Peter Art to buy, sell, and commission bespoke artworks with seamless payments, multi-language support, and pro-grade order tracking.
-          </p>
-
-          <div className="hero-grid mt-8">
-            {[
-              { label: 'Artists onboarded', value: '1,200+' },
-              { label: 'Commissions delivered', value: '8,500+' },
-              { label: 'Average rating', value: '4.9/5' },
-            ].map((metric) => (
-              <div key={metric.label} className="metrics-tile">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">{metric.label}</p>
-                <p className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">{metric.value}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3 text-sm text-[var(--text-secondary)]">
-            {['Instant checkout', 'Secure payouts', 'Dedicated artist success', 'Live chat support'].map((point) => (
-              <span key={point} className="chip">
-                {point}
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-10 grid gap-4 rounded-3xl border border-black/5 bg-white p-5 sm:grid-cols-2">
-            {[
-              {
-                title: 'Buy on mobile, manage on desktop',
-                copy: 'Optimized for quick drops, deep dives, and bilingual support.',
-              },
-              {
-                title: 'Commission in three taps',
-                copy: 'Brief artists, track progress, and release payouts confidently.',
-              },
-            ].map((card) => (
-              <div key={card.title} className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{card.title}</p>
-                <p className="mt-2 text-xs text-[var(--text-secondary)]">{card.copy}</p>
-              </div>
-            ))}
-          </div>
         </div>
         </div>
       </div>

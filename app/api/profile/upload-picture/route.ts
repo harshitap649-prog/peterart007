@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { doc, updateDoc } from 'firebase/firestore'
-import { storage, db } from '@/firebase.config'
+import { db } from '@/firebase.config'
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,22 +22,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 })
     }
     
-    // Upload to Firebase Storage
-    const storageRef = ref(storage, `profile-pictures/${userId}/${Date.now()}_${file.name}`)
+    // Convert file to base64
     const bytes = await file.arrayBuffer()
-    await uploadBytes(storageRef, bytes)
+    const buffer = Buffer.from(bytes)
+    const base64Image = buffer.toString('base64')
+    const mimeType = file.type || 'image/jpeg'
+    const dataURL = `data:${mimeType};base64,${base64Image}`
     
-    // Get download URL
-    const downloadURL = await getDownloadURL(storageRef)
-    
-    // Update user profile in Firestore
+    // Update user profile in Firestore with base64 image
     const userRef = doc(db, 'users', userId)
     await updateDoc(userRef, {
-      photoURL: downloadURL,
+      photoURL: dataURL,
       updatedAt: new Date().toISOString()
     })
     
-    return NextResponse.json({ photoURL: downloadURL })
+    return NextResponse.json({ photoURL: dataURL })
   } catch (error) {
     console.error('Error uploading profile picture:', error)
     return NextResponse.json({ error: 'Failed to upload profile picture' }, { status: 500 })

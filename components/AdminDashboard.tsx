@@ -1,19 +1,22 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { getAllArtworks, addArtwork, updateArtwork, deleteArtwork } from '@/lib/artworks'
 import { getAllOrders, updateOrderStatus, getOrdersByStatus, deleteOrder } from '@/lib/orders'
 import { getAllUsers, disableUser, deleteUser } from '@/lib/users'
 import { getAllSupportMessages, updateSupportMessage, deleteSupportMessage } from '@/lib/support'
 import { getAllArtists, updateArtistProfile, getArtistArtworks, deleteArtist } from '@/lib/artists'
+import { logout } from '@/lib/auth'
 import toast from 'react-hot-toast'
 import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiUser, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch, FiImage, FiEye, FiMail, FiMenu, FiLogOut } from 'react-icons/fi'
-import LogoutButton from '@/components/LogoutButton'
 
 export default function AdminDashboard() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('home')
   const [ordersSubTab, setOrdersSubTab] = useState<'pending' | 'delivered'>('pending')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [artworks, setArtworks] = useState<any[]>([])
   const [filteredArtworks, setFilteredArtworks] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -395,6 +398,16 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await logout()
+      toast.success('Logged out successfully')
+      router.push('/')
+    } catch (error: any) {
+      toast.error(error.message || 'Logout failed')
+    }
+  }
+
   const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'confirmed')
   const deliveredOrders = orders.filter(o => o.status === 'delivered')
   const leftOrders = orders.filter(o => o.status === 'left')
@@ -417,9 +430,9 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="pb-20 md:pb-0">
+    <div className="pb-24 md:pb-0">
       {/* Top Bar with Menu Icon */}
-      <div className="flex items-center justify-between mb-4 md:mb-6 px-0">
+      <div className="flex items-center justify-between mb-2 md:mb-6 px-3 md:px-0">
         <button
           onClick={() => setSidebarOpen(true)}
           className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all active:scale-95"
@@ -434,7 +447,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Logo and Heading at Top */}
-      <div className="text-center mb-6 md:mb-8">
+      <div className="text-center mb-3 md:mb-8">
         <div className="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-3 md:mb-4 overflow-hidden" style={{ borderRadius: '0 0 50% 50%' }}>
           <img
             src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
@@ -473,7 +486,7 @@ export default function AdminDashboard() {
               </div>
               
               {/* Navigation Menu */}
-              <nav className="py-3 max-h-[calc(100vh-200px)] overflow-y-auto overscroll-contain">
+              <nav className="py-3 max-h-[calc(100vh-250px)] overflow-y-auto overscroll-contain">
                 {navTabs.map((tab) => {
                   const isActiveTab = activeTab === tab.id
                   const Icon = tab.icon
@@ -512,16 +525,26 @@ export default function AdminDashboard() {
           )}
         </button>
                   )
-                })}
-
-                {/* Divider */}
-                <div className="border-t border-gray-100 my-3 mx-3"></div>
-
-                {/* Logout Button */}
-                <div className="px-4 py-3">
-                  <LogoutButton className="w-full justify-center" />
-      </div>
+                }                )}
               </nav>
+
+              {/* Logout Button */}
+              <div className="border-t border-gray-200 mt-2 pt-2 px-2">
+                <button
+                  onClick={() => {
+                    setShowLogoutConfirm(true)
+                    setSidebarOpen(false)
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all duration-300 rounded-lg mb-1.5 relative overflow-hidden active:scale-[0.98] text-red-600 hover:bg-red-50 active:bg-red-100"
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 relative z-10 transition-all bg-red-100 border border-red-200/50">
+                    <FiLogOut 
+                      className="text-base relative z-10 text-red-600"
+                    />
+                  </div>
+                  <span className="flex-1 text-left relative z-10">Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         </>
@@ -530,9 +553,9 @@ export default function AdminDashboard() {
 
       {/* Home Tab */}
       {activeTab === 'home' && (
-        <div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-4 md:mb-6">
-            <div className="card p-3 md:p-4">
+        <div className="px-2 md:px-0">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4 mb-2 md:mb-6">
+            <div className="card p-2 md:p-4">
               <h3 className="text-gray-400 mb-1.5 text-xs md:text-sm">Total Artworks</h3>
               <p className="text-2xl md:text-3xl font-bold text-gray-900">{artworks.length}</p>
             </div>
@@ -565,8 +588,8 @@ export default function AdminDashboard() {
 
       {/* Artworks Tab */}
       {activeTab === 'artworks' && (
-        <div>
-          <div className="flex justify-between items-center mb-3 md:mb-4">
+        <div className="px-2 md:px-0">
+          <div className="flex justify-between items-center mb-2 md:mb-4">
             <h2 className="text-xl md:text-2xl font-bold">All Artworks</h2>
             <button
               onClick={() => {
@@ -614,9 +637,9 @@ export default function AdminDashboard() {
               <p className="text-gray-400">No artworks available</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2 md:gap-3 lg:gap-4">
+            <div className="grid grid-cols-2 gap-1.5 md:gap-3 lg:gap-4">
               {filteredArtworks.map((artwork: any) => (
-                <div key={artwork.id} className="card p-2 md:p-3 lg:p-4">
+                <div key={artwork.id} className="card p-1.5 md:p-3 lg:p-4">
                   {artwork.images && artwork.images[0] ? (
                     <img
                       src={artwork.images[0]}
@@ -659,8 +682,8 @@ export default function AdminDashboard() {
 
       {/* Orders Tab */}
       {activeTab === 'orders' && (
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">All Orders</h2>
+        <div className="px-2 md:px-0">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">All Orders</h2>
           
           {/* Sub-tabs for Pending and Delivered */}
           <div className="flex gap-2 mb-4 md:mb-6 border-b border-gray-300">
@@ -697,11 +720,11 @@ export default function AdminDashboard() {
               {ordersSubTab === 'pending' && (
                 <div>
                   {pendingOrders.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2 md:space-y-3">
                       {pendingOrders.map((order: any) => {
                         const isExpanded = expandedOrders.has(order.id)
                         return (
-                        <div key={order.id} className="card p-2.5 md:p-3">
+                        <div key={order.id} className="card p-2 md:p-3">
                           <div className="flex items-start justify-between gap-2 md:gap-3 mb-2">
                             <div className="flex-1 min-w-0">
                               <p className="font-bold text-sm md:text-base truncate">Order #{order.id.slice(0, 8)}</p>
@@ -787,11 +810,11 @@ export default function AdminDashboard() {
               {ordersSubTab === 'delivered' && (
                 <div>
                   {deliveredOrders.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2 md:space-y-3">
                       {deliveredOrders.map((order: any) => {
                         const isExpanded = expandedOrders.has(order.id)
                         return (
-                        <div key={order.id} className="card p-2.5 md:p-3">
+                        <div key={order.id} className="card p-2 md:p-3">
                           <div className="flex items-start justify-between gap-2 md:gap-3 mb-2">
                             <div className="flex-1 min-w-0">
                               <p className="font-bold text-sm md:text-base truncate">Order #{order.id.slice(0, 8)}</p>
@@ -995,8 +1018,8 @@ export default function AdminDashboard() {
 
       {/* Deleted Orders Tab */}
       {activeTab === 'deletedOrders' && (
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Deleted Orders</h2>
+        <div className="px-2 md:px-0">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Deleted Orders</h2>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -1005,7 +1028,7 @@ export default function AdminDashboard() {
           ) : (
             <div>
               {deletedOrders.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {deletedOrders.map((order: any) => {
                     const isExpanded = expandedOrders.has(order.id)
                     return (
@@ -1101,17 +1124,17 @@ export default function AdminDashboard() {
 
       {/* Users Tab */}
       {activeTab === 'users' && (
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">All Users</h2>
+        <div className="px-2 md:px-0">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">All Users</h2>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-gray-400">Loading users...</p>
             </div>
           ) : (
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-2 md:space-y-4">
               {users.map((user: any) => (
-                <div key={user.id} className="card p-3 md:p-4">
+                <div key={user.id} className="card p-2 md:p-4">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
@@ -1161,23 +1184,23 @@ export default function AdminDashboard() {
 
       {/* Artists Tab */}
       {activeTab === 'artists' && (
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Artists</h2>
+        <div className="px-2 md:px-0">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Artists</h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
-            <div className="card p-3 md:p-4 bg-gradient-to-br from-purple-50 via-white to-orange-50 border border-purple-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-2 md:mb-4">
+            <div className="card p-2 md:p-4 bg-gradient-to-br from-purple-50 via-white to-orange-50 border border-purple-100">
               <p className="text-xs text-gray-500 mb-1">Total Artists</p>
               <p className="text-2xl md:text-3xl font-bold text-purple-600">{artists.length}</p>
             </div>
-            <div className="card p-3 md:p-4 border border-yellow-100 bg-yellow-50/50">
+            <div className="card p-2 md:p-4 border border-yellow-100 bg-yellow-50/50">
               <p className="text-xs text-gray-500 mb-1">Pending</p>
               <p className="text-2xl md:text-3xl font-bold text-yellow-600">{pendingArtists.length}</p>
             </div>
-            <div className="card p-3 md:p-4 border border-green-100 bg-green-50/50">
+            <div className="card p-2 md:p-4 border border-green-100 bg-green-50/50">
               <p className="text-xs text-gray-500 mb-1">Approved</p>
               <p className="text-2xl md:text-3xl font-bold text-green-600">{approvedArtists.length}</p>
             </div>
-            <div className="card p-3 md:p-4 border border-red-100 bg-red-50/50">
+            <div className="card p-2 md:p-4 border border-red-100 bg-red-50/50">
               <p className="text-xs text-gray-500 mb-1">Rejected</p>
               <p className="text-2xl md:text-3xl font-bold text-red-600">{rejectedArtists.length}</p>
             </div>
@@ -1205,9 +1228,9 @@ export default function AdminDashboard() {
               <p className="text-gray-400">Loading artists...</p>
             </div>
           ) : filteredArtists.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-4">
               {filteredArtists.map((artist: any) => (
-                <div key={artist.id} className="card p-4 md:p-5 border-l-4 border-l-purple-500">
+                <div key={artist.id} className="card p-2 md:p-5 border-l-4 border-l-purple-500">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <p className="font-bold text-base md:text-lg text-gray-900">{artist.artistName}</p>
@@ -1337,8 +1360,8 @@ export default function AdminDashboard() {
 
       {/* Support Messages Tab */}
       {activeTab === 'support' && (
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Support Messages</h2>
+        <div className="px-2 md:px-0">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Support Messages</h2>
           {loading ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -1350,9 +1373,9 @@ export default function AdminDashboard() {
               <p className="text-gray-400">No support messages yet</p>
             </div>
           ) : (
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-2 md:space-y-4">
               {supportMessages.map((message: any) => (
-                <div key={message.id} className="card p-3 md:p-4">
+                <div key={message.id} className="card p-2 md:p-4">
                   <div className="flex flex-col md:flex-row md:items-start gap-3 md:gap-4">
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-2">
@@ -1934,9 +1957,76 @@ export default function AdminDashboard() {
         )
       })()}
 
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 md:p-4">
+          <div
+            className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"
+            onClick={() => setShowLogoutConfirm(false)}
+          />
+          <div className="relative z-10 w-full max-w-xs md:max-w-lg overflow-hidden rounded-xl md:rounded-3xl border border-white/40 bg-white/95 shadow-[0_35px_120px_-45px_rgba(15,23,42,0.8)]">
+            <div className="absolute -top-8 right-5 h-16 w-16 md:-top-16 md:right-10 md:h-32 md:w-32 rounded-full bg-orange-100 blur-2xl md:blur-3xl" />
+            <div className="absolute -bottom-8 left-5 h-16 w-16 md:-bottom-16 md:left-10 md:h-32 md:w-32 rounded-full bg-pink-100 blur-2xl md:blur-3xl" />
+            <div className="relative grid gap-3 md:gap-6 p-4 md:p-6 sm:p-8">
+              <div className="flex items-center gap-2.5 md:gap-4">
+                <div className="flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-xl md:rounded-2xl bg-gradient-to-br from-gray-900 to-gray-700 text-white shadow-lg shadow-gray-900/40">
+                  <FiLogOut className="text-lg md:text-2xl" />
+                </div>
+                <div>
+                  <p className="text-[9px] md:text-xs font-semibold uppercase tracking-wider md:tracking-[0.3em] text-gray-400">
+                    SESSION
+                  </p>
+                  <h3 className="text-base md:text-2xl font-bold text-gray-900">Confirm Logout</h3>
+                </div>
+              </div>
+              <p className="text-xs md:text-sm leading-relaxed text-gray-600">
+                Are you sure you want to log out? You can sign back in anytime to keep managing Peter Art.
+              </p>
+              <div className="rounded-lg md:rounded-2xl border border-gray-100 bg-gray-50/60 p-2.5 md:p-4 text-xs md:text-sm text-gray-500">
+                <p className="font-semibold text-gray-900 text-xs md:text-sm">Admin Panel</p>
+                <p className="mt-0.5 md:mt-1 text-[10px] md:text-sm">
+                  You can sign back in at any time to continue managing Peter Art.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 md:gap-3 sm:flex-row">
+                <button
+                  onClick={handleLogout}
+                  className="flex-1 rounded-lg md:rounded-2xl bg-gray-900 py-2 md:py-3 text-xs md:text-sm font-semibold text-white shadow-lg shadow-gray-900/40 transition hover:-translate-y-0.5 hover:bg-black"
+                >
+                  Yes, Logout
+                </button>
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 rounded-lg md:rounded-2xl border border-gray-200 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Navigation Bar - Mobile Only */}
-      <nav className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 md:hidden safe-area-bottom pointer-events-none">
-        <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-2 rounded-2xl border border-gray-200/60 bg-white/95 px-2 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+      <nav 
+        className="fixed inset-x-0 bottom-0 z-[100] px-4 pb-4 md:hidden safe-area-bottom pointer-events-none" 
+        style={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          left: 0, 
+          right: 0,
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)'
+        }}
+      >
+        <div 
+          className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-2 rounded-2xl border border-gray-200/60 bg-white/95 px-2 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-xl"
+          style={{ 
+            willChange: 'transform',
+            transform: 'translateZ(0)',
+            WebkitTransform: 'translateZ(0)'
+          }}
+        >
           <button
             onClick={() => setActiveTab('home')}
             className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 transition-all duration-200 active:scale-95 ${

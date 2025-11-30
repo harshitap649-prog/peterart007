@@ -51,9 +51,16 @@ export default function ArtworkDetailsPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
+  const [pinchStart, setPinchStart] = useState(0)
+  const [initialScale, setInitialScale] = useState(1)
   const [showDeleteReviewConfirm, setShowDeleteReviewConfirm] = useState(false)
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null)
   const [authChecked, setAuthChecked] = useState(false)
+  const [imageZoomed, setImageZoomed] = useState(false)
+  const [imageScale, setImageScale] = useState(1)
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     checkAuth()
@@ -103,11 +110,17 @@ export default function ArtworkDetailsPage() {
   const handlePreviousImage = () => {
     if (!artwork || !artwork.images) return
     setCurrentImageIndex((prev) => (prev === 0 ? artwork.images.length - 1 : prev - 1))
+    setImageZoomed(false)
+    setImageScale(1)
+    setImagePosition({ x: 0, y: 0 })
   }
 
   const handleNextImage = () => {
     if (!artwork || !artwork.images) return
     setCurrentImageIndex((prev) => (prev === artwork.images.length - 1 ? 0 : prev + 1))
+    setImageZoomed(false)
+    setImageScale(1)
+    setImagePosition({ x: 0, y: 0 })
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -124,11 +137,81 @@ export default function ArtworkDetailsPage() {
     const isLeftSwipe = distance > 50
     const isRightSwipe = distance < -50
 
-    if (isLeftSwipe) {
+    if (isLeftSwipe && !imageZoomed) {
       handleNextImage()
     }
-    if (isRightSwipe) {
+    if (isRightSwipe && !imageZoomed) {
       handlePreviousImage()
+    }
+  }
+
+  const handleImageDoubleClick = () => {
+    if (imageZoomed) {
+      setImageZoomed(false)
+      setImageScale(1)
+      setImagePosition({ x: 0, y: 0 })
+    } else {
+      setImageZoomed(true)
+      setImageScale(2)
+    }
+  }
+
+  const handleImageWheel = (e: React.WheelEvent) => {
+    if (!imageZoomed) return
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? -0.1 : 0.1
+    const newScale = Math.min(Math.max(imageScale + delta, 1), 4)
+    setImageScale(newScale)
+    if (newScale === 1) {
+      setImageZoomed(false)
+      setImagePosition({ x: 0, y: 0 })
+    }
+  }
+
+  const handleImageMouseDown = (e: React.MouseEvent) => {
+    if (!imageZoomed) return
+    setIsDragging(true)
+    setDragStart({ x: e.clientX - imagePosition.x, y: e.clientY - imagePosition.y })
+  }
+
+  const handleImageMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !imageZoomed) return
+    setImagePosition({
+      x: e.clientX - dragStart.x,
+      y: e.clientY - dragStart.y
+    })
+  }
+
+  const handleImageMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const handleTouchPinch = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const touch1 = e.touches[0]
+      const touch2 = e.touches[1]
+      const distance = Math.hypot(
+        touch2.clientX - touch1.clientX,
+        touch2.clientY - touch1.clientY
+      )
+      
+      if (pinchStart === 0) {
+        setPinchStart(distance)
+        setInitialScale(imageScale)
+        return
+      }
+      
+      const scale = distance / pinchStart
+      const newScale = Math.min(Math.max(initialScale * scale, 1), 4)
+      setImageScale(newScale)
+      setImageZoomed(newScale > 1)
+      
+      if (newScale === 1) {
+        setImagePosition({ x: 0, y: 0 })
+      }
+    } else {
+      setPinchStart(0)
+      setInitialScale(1)
     }
   }
 
@@ -478,20 +561,69 @@ export default function ArtworkDetailsPage() {
             {artwork.images && artwork.images.length > 0 ? (
               <div className="bg-white rounded-none md:rounded-2xl overflow-hidden">
                 <div 
-                  className="relative w-full h-64 sm:h-80 md:h-96 rounded-none md:rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center"
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
+                  className={`relative w-full h-[70vh] sm:h-[75vh] md:h-96 rounded-none md:rounded-xl bg-gray-50 flex items-center justify-center ${imageZoomed ? 'overflow-auto cursor-move' : 'overflow-hidden'}`}
+                  onTouchStart={(e) => {
+                    if (e.touches.length === 2) {
+                      handleTouchPinch(e)
+                    } else if (e.touches.length === 1 && !imageZoomed) {
+                      handleTouchStart(e)
+                    }
+                  }}
+                  onTouchMove={(e) => {
+                    if (e.touches.length === 2) {
+                      handleTouchPinch(e)
+                    } else {
+                      handleTouchMove(e)
+                    }
+                  }}
+                  onTouchEnd={(e) => {
+                    if (e.touches.length === 0) {
+                      setPinchStart(0)
+                      handleTouchEnd()
+                    }
+                  }}
+                  onWheel={handleImageWheel}
+                  onMouseDown={handleImageMouseDown}
+                  onMouseMove={handleImageMouseMove}
+                  onMouseUp={handleImageMouseUp}
+                  onMouseLeave={handleImageMouseUp}
                 >
                   <img
                     src={artwork.images[currentImageIndex]}
                     alt={`${artwork.title} ${currentImageIndex + 1}`}
-                    className="w-full h-full object-contain select-none"
+                    className={`select-none transition-transform duration-200 ${imageZoomed ? 'cursor-move' : 'cursor-zoom-in'}`}
+                    style={{
+                      transform: `scale(${imageScale}) translate(${imagePosition.x / imageScale}px, ${imagePosition.y / imageScale}px)`,
+                      maxWidth: imageZoomed ? 'none' : '100%',
+                      maxHeight: imageZoomed ? 'none' : '100%',
+                      width: imageZoomed ? 'auto' : '100%',
+                      height: imageZoomed ? 'auto' : '100%',
+                      objectFit: 'contain'
+                    }}
                     draggable={false}
+                    onDoubleClick={handleImageDoubleClick}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23e5e7eb" width="400" height="400"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage not found%3C/text%3E%3C/svg%3E'
                     }}
                   />
+                  {!imageZoomed && (
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1.5 rounded-full text-xs backdrop-blur-sm">
+                      Double tap or pinch to zoom
+                    </div>
+                  )}
+                  {imageZoomed && (
+                    <button
+                      onClick={() => {
+                        setImageZoomed(false)
+                        setImageScale(1)
+                        setImagePosition({ x: 0, y: 0 })
+                      }}
+                      className="absolute top-4 left-4 bg-black/70 hover:bg-black/90 text-white rounded-full p-2.5 transition-all z-20 backdrop-blur-sm"
+                      aria-label="Close zoom"
+                    >
+                      <FiX className="text-lg" />
+                    </button>
+                  )}
                   
                   {/* Navigation Arrows - Hidden on mobile, visible on desktop */}
                   {artwork.images.length > 1 && (
@@ -516,7 +648,12 @@ export default function ArtworkDetailsPage() {
                         {artwork.images.map((_img: string, idx: number) => (
                           <button
                             key={idx}
-                            onClick={() => setCurrentImageIndex(idx)}
+                            onClick={() => {
+                              setCurrentImageIndex(idx)
+                              setImageZoomed(false)
+                              setImageScale(1)
+                              setImagePosition({ x: 0, y: 0 })
+                            }}
                             className={`h-2 rounded-full transition-all ${
                               idx === currentImageIndex
                                 ? 'w-6 bg-white'
@@ -551,16 +688,16 @@ export default function ArtworkDetailsPage() {
 
           {/* Artwork Details */}
           <div className="space-y-4 md:space-y-6 px-3 md:px-0">
-            <div className="bg-white rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8">
-              <div className="flex items-start justify-between mb-3 md:mb-4">
+            <div className="bg-white rounded-none md:rounded-2xl p-3 md:p-6 lg:p-8">
+              <div className="flex items-start justify-between mb-2 md:mb-4">
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2 md:mb-3 text-gray-900 leading-tight">{artwork.title}</h1>
                   {artwork.artistId && (
-                    <div className="mb-3 md:mb-4">
+                    <div className="mb-2 md:mb-3">
                       <ArtistBadge artistId={artwork.artistId} />
                     </div>
                   )}
-                  <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4 whitespace-pre-wrap leading-relaxed">{artwork.description}</p>
+                  <h1 className="text-base md:text-2xl lg:text-3xl font-bold mb-1.5 md:mb-3 text-gray-900 leading-tight">{artwork.title}</h1>
+                  <p className="text-xs md:text-base text-gray-600 mb-2 md:mb-4 whitespace-pre-wrap leading-relaxed">{artwork.description}</p>
                 </div>
                 <button
                   onClick={handleLike}
@@ -576,20 +713,20 @@ export default function ArtworkDetailsPage() {
                 </button>
               </div>
               {artwork.category && (
-                <span className="inline-block px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs md:text-sm font-semibold mb-3 md:mb-4">
+                <span className="inline-block px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-[10px] md:text-sm font-semibold mb-2 md:mb-4">
                   {artwork.category}
                 </span>
               )}
-              <div className="border-t border-gray-200 pt-4 md:pt-6 mt-4 md:mt-6">
-                <div className="flex items-center justify-between mb-4 md:mb-6">
-                  <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">₹{artwork.price}</p>
+              <div className="border-t border-gray-200 pt-3 md:pt-6 mt-3 md:mt-6">
+                <div className="flex items-center justify-between mb-3 md:mb-6">
+                  <p className="text-xl md:text-3xl lg:text-4xl font-bold text-gray-900">₹{artwork.price}</p>
                 </div>
 
                 {!showCheckout ? (
                   <>
                     {/* Quantity Selector */}
-                    <div className="mb-4 md:mb-6">
-                      <label className="block text-xs md:text-sm font-semibold mb-2 md:mb-3 text-gray-700">
+                    <div className="mb-3 md:mb-6">
+                      <label className="block text-[10px] md:text-sm font-semibold mb-1.5 md:mb-3 text-gray-700">
                         Quantity (Max 5)
                       </label>
                       <div className="flex items-center gap-3 md:gap-4">
@@ -611,12 +748,12 @@ export default function ArtworkDetailsPage() {
                       </div>
                     </div>
 
-                    <div className="mb-4 md:mb-6 p-3 md:p-5 bg-gray-50 rounded-lg md:rounded-xl border border-gray-200">
+                    <div className="mb-3 md:mb-6 p-2 md:p-5 bg-gray-50 rounded-lg md:rounded-xl border border-gray-200">
                       <div className="flex justify-between items-center mb-1 md:mb-2">
-                        <span className="text-gray-700 text-sm md:text-base font-medium">Total Price:</span>
-                        <span className="text-xl md:text-2xl font-bold text-gray-900">₹{totalPrice}</span>
+                        <span className="text-gray-700 text-[10px] md:text-base font-medium">Total Price:</span>
+                        <span className="text-lg md:text-2xl font-bold text-gray-900">₹{totalPrice}</span>
                       </div>
-                      <p className="text-xs md:text-sm text-gray-600">
+                      <p className="text-[10px] md:text-sm text-gray-600">
                         <span className="font-medium">{quantity} × ₹{artwork.price} = ₹{totalPrice}</span>
                       </p>
                     </div>
@@ -638,17 +775,17 @@ export default function ArtworkDetailsPage() {
                           })
                           toast.success('Added to cart!')
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-3 md:py-4 rounded-lg md:rounded-xl font-semibold bg-white border-2 border-gray-300 text-gray-900 hover:bg-gray-50 transition-all"
+                        className="flex-1 flex items-center justify-center gap-1.5 text-xs md:text-base py-2.5 md:py-4 rounded-lg md:rounded-xl font-semibold bg-white border-2 border-gray-300 text-gray-900 hover:bg-gray-50 transition-all"
                       >
-                        <FiShoppingCart className="text-base md:text-lg" />
+                        <FiShoppingCart className="text-sm md:text-lg" />
                         <span className="hidden sm:inline">Add to Cart</span>
                         <span className="sm:hidden">Cart</span>
                       </button>
                       <button
                         onClick={handleBuyNow}
-                        className="flex-1 flex items-center justify-center gap-2 text-sm md:text-base py-3 md:py-4 rounded-lg md:rounded-xl font-bold bg-black text-white hover:bg-gray-900 transition-all shadow-lg"
+                        className="flex-1 flex items-center justify-center gap-1.5 text-xs md:text-base py-2.5 md:py-4 rounded-lg md:rounded-xl font-bold bg-black text-white hover:bg-gray-900 transition-all shadow-lg"
                       >
-                        <FiShoppingCart className="text-base md:text-lg" />
+                        <FiShoppingCart className="text-sm md:text-lg" />
                         Buy Now
                       </button>
                     </div>
