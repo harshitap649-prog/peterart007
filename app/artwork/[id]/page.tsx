@@ -539,9 +539,9 @@ export default function ArtworkDetailsPage() {
   const totalPrice = (artwork.price * quantity).toFixed(2)
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-transparent">
       {/* Sticky Top Bar - Mobile Optimized */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 px-3 py-3 md:px-4 md:py-4">
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-3 py-3 md:px-4 md:py-4">
         <div className="flex justify-between items-center w-full md:max-w-6xl md:mx-auto">
           <button
             onClick={() => router.push('/user')}
@@ -559,7 +559,7 @@ export default function ArtworkDetailsPage() {
           {/* Artwork Images */}
           <div className="space-y-3 md:space-y-4">
             {artwork.images && artwork.images.length > 0 ? (
-              <div className="bg-white rounded-none md:rounded-2xl overflow-hidden">
+              <div className="bg-transparent rounded-none md:rounded-2xl overflow-hidden">
                 <div 
                   className={`relative w-full h-[70vh] sm:h-[75vh] md:h-96 rounded-none md:rounded-xl bg-gray-50 flex items-center justify-center ${imageZoomed ? 'overflow-auto cursor-move' : 'overflow-hidden'}`}
                   onTouchStart={(e) => {
@@ -688,7 +688,7 @@ export default function ArtworkDetailsPage() {
 
           {/* Artwork Details */}
           <div className="space-y-4 md:space-y-6 px-3 md:px-0">
-            <div className="bg-white rounded-none md:rounded-2xl p-3 md:p-6 lg:p-8">
+            <div className="bg-transparent rounded-none md:rounded-2xl p-3 md:p-6 lg:p-8">
               <div className="flex items-start justify-between mb-2 md:mb-4">
                 <div className="flex-1 min-w-0">
                   {artwork.artistId && (
@@ -986,7 +986,7 @@ export default function ArtworkDetailsPage() {
             </div>
 
             {/* Reviews Section */}
-            <div className="bg-white rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8 mt-4 md:mt-6">
+            <div className="bg-transparent rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8 mt-4 md:mt-6">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-900">
                 Reviews
               </h2>

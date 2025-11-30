@@ -14,15 +14,27 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
-  // Override body background for home page with gradient waves image
+  // Override body background for home page - optimized for desktop and mobile
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Set background image optimized for mobile
+      const isMobile = window.innerWidth <= 768
+      
+      // Set background image
       document.body.style.backgroundImage = 'url("https://t4.ftcdn.net/jpg/02/42/23/93/360_F_242239379_ChJ2nNXxlxuhq6EzolfjcFcvuMFL8zdA.jpg")'
-      document.body.style.backgroundAttachment = 'fixed'
       document.body.style.backgroundSize = 'cover'
       document.body.style.backgroundPosition = 'center center'
       document.body.style.backgroundRepeat = 'no-repeat'
+      
+      // Use fixed attachment for desktop, scroll for mobile (better performance)
+      document.body.style.backgroundAttachment = isMobile ? 'scroll' : 'fixed'
+      
+      // Handle window resize
+      const handleResize = () => {
+        const mobile = window.innerWidth <= 768
+        document.body.style.backgroundAttachment = mobile ? 'scroll' : 'fixed'
+      }
+      
+      window.addEventListener('resize', handleResize)
       document.body.style.minHeight = '100vh'
       // Remove pseudo-element backgrounds
       const style = document.createElement('style')
@@ -48,6 +60,7 @@ export default function Home() {
         document.body.style.backgroundPosition = ''
         document.body.style.backgroundRepeat = ''
         document.body.style.minHeight = ''
+        window.removeEventListener('resize', handleResize)
         if (document.head.contains(style)) {
           document.head.removeChild(style)
         }

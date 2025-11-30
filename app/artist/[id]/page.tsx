@@ -7,7 +7,7 @@ import { getArtistById } from '@/lib/artists'
 import { getArtistArtworks } from '@/lib/artists'
 import { getArtistFollowers } from '@/lib/follows'
 import toast from 'react-hot-toast'
-import { FiArrowLeft, FiUser, FiLink, FiImage, FiInstagram, FiFacebook, FiTwitter, FiGlobe, FiCheckCircle, FiShoppingCart, FiMessageCircle, FiUsers } from 'react-icons/fi'
+import { FiArrowLeft, FiUser, FiLink, FiImage, FiInstagram, FiFacebook, FiTwitter, FiGlobe, FiCheckCircle, FiShoppingCart, FiMessageCircle, FiUsers, FiX } from 'react-icons/fi'
 import FollowButton from '@/components/FollowButton'
 import BannerAd from '@/components/BannerAd'
 
@@ -19,6 +19,7 @@ export default function ArtistProfilePage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [followersCount, setFollowersCount] = useState(0)
+  const [showImageModal, setShowImageModal] = useState(false)
 
   useEffect(() => {
     loadArtistData()
@@ -91,10 +92,10 @@ export default function ArtistProfilePage() {
         <div className="max-w-6xl mx-auto px-2 md:px-4 py-2 md:py-4">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-1.5 md:gap-2 text-gray-700 hover:text-gray-900 transition-all hover:bg-gray-100 px-2 md:px-3 py-1.5 md:py-2 rounded-lg font-medium group"
+            className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 text-gray-700 hover:text-gray-900 transition-all hover:bg-gray-100 rounded-full md:rounded-lg group"
+            aria-label="Go back"
           >
-            <FiArrowLeft className="text-lg md:text-xl group-hover:-translate-x-1 transition-transform" />
-            <span className="text-xs md:text-sm">Back</span>
+            <FiArrowLeft className="text-xl md:text-2xl group-hover:-translate-x-1 transition-transform" />
           </button>
         </div>
       </div>
@@ -104,10 +105,13 @@ export default function ArtistProfilePage() {
         {/* Premium Profile Card */}
         <div className="bg-white rounded-xl md:rounded-2xl shadow-lg border border-gray-200/50 p-3 md:p-8 mb-3 md:mb-6">
           <div className="flex flex-col md:flex-row items-start gap-3 md:gap-8">
-            {/* Profile Image - Enhanced */}
-            <div className="relative flex-shrink-0 mx-auto md:mx-0">
+            {/* Profile Image - Enhanced - Centered on mobile - Clickable */}
+            <div className="relative flex-shrink-0 mx-auto md:mx-0 w-full md:w-auto">
               {artist.profileImage ? (
-                <div className="relative">
+                <div 
+                  className="relative mx-auto w-fit cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => setShowImageModal(true)}
+                >
                   <img
                     src={artist.profileImage}
                     alt={artist.artistName}
@@ -123,7 +127,7 @@ export default function ArtistProfilePage() {
                   )}
                 </div>
               ) : (
-                <div className="relative">
+                <div className="relative mx-auto w-fit">
                   <div className="w-20 h-20 md:w-36 md:h-36 rounded-xl md:rounded-2xl border-2 md:border-4 border-white bg-gradient-to-br from-orange-500 via-orange-400 to-orange-600 flex items-center justify-center shadow-xl ring-2 md:ring-4 ring-gray-100">
                     <FiUser className="text-3xl md:text-6xl text-white" />
                   </div>
@@ -136,14 +140,23 @@ export default function ArtistProfilePage() {
               )}
             </div>
 
-            {/* Artist Info - Professional Layout */}
-            <div className="flex-1 min-w-0 text-center md:text-left">
-              {/* Name */}
-              <div className="mb-2 md:mb-4">
+            {/* Artist Info - Professional Layout - Reorganized for mobile */}
+            <div className="flex-1 min-w-0 w-full md:w-auto">
+              {/* Name - Centered on mobile, left on desktop */}
+              <div className="mb-2 md:mb-4 text-center md:text-left">
                 <h1 className="text-lg md:text-3xl font-bold text-gray-900">{artist.artistName}</h1>
               </div>
               
-              {/* Premium Stats Cards */}
+              {/* Bio - Enhanced - Before stats on mobile */}
+              {artist.bio && (
+                <div className="mb-3 md:mb-5">
+                  <p className="text-xs md:text-base text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-2 md:p-4 border border-gray-200/50">
+                    {artist.bio}
+                  </p>
+                </div>
+              )}
+
+              {/* Premium Stats Cards - After bio on mobile */}
               <div className="flex items-center justify-center md:justify-start gap-2 md:gap-4 mb-3 md:mb-5">
                 <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg md:rounded-xl px-2 md:px-4 py-2 md:py-3 border border-orange-200/50 shadow-sm">
                   <p className="text-lg md:text-2xl font-bold text-orange-700">{artworks.length}</p>
@@ -161,26 +174,20 @@ export default function ArtistProfilePage() {
                 </div>
               </div>
 
-              {/* Bio - Enhanced */}
-              {artist.bio && (
-                <div className="mb-3 md:mb-5">
-                  <p className="text-xs md:text-base text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-2 md:p-4 border border-gray-200/50">
-                    {artist.bio}
-                  </p>
-                </div>
-              )}
-
-              {/* Premium Action Buttons */}
+              {/* Premium Action Buttons - Same line, same size on mobile */}
               {user && user.uid !== artist.userId && (
-                <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-3 md:mb-4">
-                  <FollowButton
-                    userId={user.uid}
-                    artistId={artist.id}
-                    language="en"
-                  />
+                <div className="flex gap-2 md:gap-3 mb-3 md:mb-4">
+                  <div className="flex-1">
+                    <FollowButton
+                      userId={user.uid}
+                      artistId={artist.id}
+                      language="en"
+                      className="!bg-gradient-to-r !from-orange-400 !to-orange-500 hover:!from-orange-500 hover:!to-orange-600 !text-white !border-0 w-full px-2 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] justify-center"
+                    />
+                  </div>
                   <button
                     onClick={() => router.push(`/chat/${artist.userId}`)}
-                    className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-1.5 md:gap-2"
+                    className="flex-1 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white px-2 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-1.5 md:gap-2"
                   >
                     <FiMessageCircle className="text-sm md:text-lg" />
                     <span>Message</span>
@@ -338,6 +345,38 @@ export default function ArtistProfilePage() {
           </>
         )}
       </div>
+
+      {/* Profile Image Modal */}
+      {showImageModal && artist.profileImage && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div 
+            className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+              aria-label="Close"
+            >
+              <FiX className="text-xl md:text-2xl" />
+            </button>
+            
+            {/* Large Image */}
+            <img
+              src={artist.profileImage}
+              alt={artist.artistName}
+              className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage%3C/text%3E%3C/svg%3E'
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

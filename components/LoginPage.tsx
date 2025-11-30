@@ -104,12 +104,24 @@ export default function LoginPage() {
     }
   }
 
+  // Detect mobile for background optimization
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
   return (
     <div 
       className="min-h-screen flex flex-col relative overflow-hidden" 
       style={{
         backgroundImage: 'url("https://t4.ftcdn.net/jpg/02/42/23/93/360_F_242239379_ChJ2nNXxlxuhq6EzolfjcFcvuMFL8zdA.jpg")',
-        backgroundAttachment: 'fixed',
+        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
@@ -125,7 +137,7 @@ export default function LoginPage() {
             <img
               src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
               alt="Peter Art"
-              className="w-96 h-auto md:w-[500px] lg:w-[600px] object-contain"
+              className="w-32 h-auto md:w-48 lg:w-64 object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/logoo.png'
               }}
@@ -134,10 +146,10 @@ export default function LoginPage() {
           
           {/* Title and Subtitle */}
           <div className="space-y-2">
-            <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight whitespace-nowrap">
+            <h1 className="text-lg md:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight whitespace-nowrap">
               Fall in love with art — take one home today.
             </h1>
-            <p className="text-base md:text-xl lg:text-2xl text-slate-600 font-medium whitespace-nowrap">
+            <p className="text-xs md:text-base lg:text-lg text-slate-600 font-medium whitespace-nowrap">
               Turn Empty Walls into Expressions
             </p>
           </div>
@@ -308,12 +320,12 @@ export default function LoginPage() {
             </button>
           </p>
         </div>
+        
+        {/* Banner Ad after sign in box */}
+        <div className="w-full py-4 md:py-6">
+          <BannerAd inline={true} />
         </div>
-      </div>
-
-      {/* Banner Ad after sign in box */}
-      <div className="w-full py-6 md:py-8">
-        <BannerAd />
+        </div>
       </div>
     </div>
   )

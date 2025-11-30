@@ -11,51 +11,55 @@ const dockLinks = [
     label: 'Home', 
     icon: FiHome, 
     iconActive: FaHome,
-    color: 'blue' 
+    color: 'orange-light' 
   },
   { 
     href: '/messages', 
     label: 'Chat', 
     icon: FiMessageCircle, 
     iconActive: FaComments,
-    color: 'green' 
+    color: 'orange-medium' 
   },
   { 
     href: '/user?tab=orders', 
     label: 'Orders', 
     icon: FiShoppingBag, 
     iconActive: FaShoppingBag,
-    color: 'orange' 
+    color: 'orange-dark' 
   },
   { 
     href: '/user?tab=profile', 
     label: 'Profile', 
     icon: FiUser, 
     iconActive: FaUser,
-    color: 'pink' 
+    color: 'orange-accent' 
   }
 ]
 
-const colorMap: Record<string, { active: string; inactive: string; bg: string }> = {
-  blue: {
-    active: 'from-blue-500 to-blue-600',
-    inactive: 'text-blue-600',
-    bg: 'bg-blue-50'
+const colorMap: Record<string, { active: string; inactive: string; bg: string; shadow: string }> = {
+  'orange-light': {
+    active: 'from-orange-400 via-orange-500 to-orange-600',
+    inactive: 'text-orange-500',
+    bg: 'bg-orange-50',
+    shadow: 'shadow-orange-500/30'
   },
-  green: {
-    active: 'from-green-500 to-green-600',
-    inactive: 'text-green-600',
-    bg: 'bg-green-50'
-  },
-  orange: {
-    active: 'from-orange-500 to-orange-600',
+  'orange-medium': {
+    active: 'from-orange-500 via-orange-600 to-amber-600',
     inactive: 'text-orange-600',
-    bg: 'bg-orange-50'
+    bg: 'bg-orange-100',
+    shadow: 'shadow-orange-600/40'
   },
-  pink: {
-    active: 'from-pink-500 to-pink-600',
-    inactive: 'text-pink-600',
-    bg: 'bg-pink-50'
+  'orange-dark': {
+    active: 'from-orange-600 via-amber-600 to-orange-700',
+    inactive: 'text-orange-700',
+    bg: 'bg-orange-100',
+    shadow: 'shadow-orange-700/50'
+  },
+  'orange-accent': {
+    active: 'from-amber-500 via-orange-600 to-orange-700',
+    inactive: 'text-amber-600',
+    bg: 'bg-amber-50',
+    shadow: 'shadow-amber-600/40'
   }
 }
 
@@ -87,62 +91,78 @@ export default function MobileDock() {
   }
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-4 pb-4 md:hidden safe-area-bottom">
-      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-0.5 rounded-2xl border border-gray-200/60 bg-white/95 px-1.5 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-3 md:hidden safe-area-bottom">
+      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-1 rounded-3xl border border-orange-200/50 bg-gradient-to-b from-white via-orange-50/30 to-white/95 px-2 py-2.5 shadow-[0_-8px_30px_rgba(249,115,22,0.15)] backdrop-blur-xl">
         {dockLinks.map((item) => {
           const Icon = item.icon
           const IconActive = item.iconActive || item.icon
           const active = isActive(item.href)
-          const colors = colorMap[item.color] || colorMap.blue
+          const colors = colorMap[item.color] || colorMap['orange-medium']
           
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`group relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1.5 py-1.5 transition-all duration-200 active:scale-95 touch-manipulation ${
+              className={`group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 transition-all duration-300 active:scale-90 touch-manipulation ${
                 active
-                  ? `bg-gradient-to-br ${colors.active} text-white shadow-sm`
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? `bg-gradient-to-br ${colors.active} text-white shadow-lg ${colors.shadow}`
+                  : `${colors.inactive} hover:bg-orange-50/50`
               }`}
             >
-              {/* Active indicator dot */}
+              {/* Active indicator - animated top dot */}
               {active && (
-                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-sm"></div>
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-md animate-pulse"></div>
               )}
               
+              {/* Icon container with enhanced styling */}
               <span
-                className={`relative flex h-7 w-7 items-center justify-center rounded-lg text-sm transition-all duration-200 ${
+                className={`relative flex h-8 w-8 items-center justify-center rounded-xl text-base transition-all duration-300 ${
                   active
-                    ? 'text-white'
-                    : `${colors.inactive} group-hover:scale-105`
+                    ? 'text-white scale-110'
+                    : `${colors.inactive} group-hover:scale-110`
                 }`}
               >
+                {/* Glow effect for active state */}
+                {active && (
+                  <span className="absolute inset-0 rounded-xl bg-white/20 blur-md"></span>
+                )}
+                
                 {active ? (
                   <IconActive 
                     className="relative z-10" 
                     style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.15))',
+                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
                       strokeWidth: 0
                     }}
                   />
                 ) : (
                   <Icon 
-                    className="relative z-10" 
+                    className="relative z-10 transition-all duration-300" 
                     style={{ 
-                      filter: 'drop-shadow(0 0.5px 1px rgba(0,0,0,0.08))',
-                      strokeWidth: 2
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                      strokeWidth: 2.5
                     }}
                   />
                 )}
               </span>
               
-              <span className={`leading-tight transition-colors text-[9px] font-medium ${active ? 'text-white' : 'text-gray-500'}`}>
+              {/* Label with enhanced typography */}
+              <span className={`leading-tight transition-all duration-300 text-[10px] font-semibold tracking-wide ${
+                active 
+                  ? 'text-white drop-shadow-sm' 
+                  : `${colors.inactive} group-hover:font-bold`
+              }`}>
                 {item.label}
               </span>
               
-              {/* Hover effect overlay */}
+              {/* Hover effect overlay with orange tint */}
               {!active && (
-                <span className="absolute inset-0 rounded-xl bg-gray-100/0 group-hover:bg-gray-100/30 transition-all duration-200"></span>
+                <span className={`absolute inset-0 rounded-2xl ${colors.bg} opacity-0 group-hover:opacity-40 transition-all duration-300`}></span>
+              )}
+              
+              {/* Ripple effect on active */}
+              {active && (
+                <span className="absolute inset-0 rounded-2xl bg-white/10 animate-ping opacity-75"></span>
               )}
             </Link>
           )

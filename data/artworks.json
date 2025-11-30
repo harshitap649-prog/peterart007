@@ -121,8 +121,10 @@
     "artistCommissionRate": null,
     "createdAt": "2025-11-17T14:05:03.883Z",
     "updatedAt": "2025-11-17T14:05:03.883Z",
-    "likes": 0,
+    "likes": 1,
     "comments": [],
-    "likedBy": []
+    "likedBy": [
+      "lg0ZnnpUZVYeQdQAVc1Rd1tByCk1"
+    ]
   }
 ]

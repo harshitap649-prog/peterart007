@@ -49,16 +49,34 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Background image optimized for mobile */
+  /* Background image optimized for both desktop and mobile */
   background-image: url('https://t4.ftcdn.net/jpg/02/42/23/93/360_F_242239379_ChJ2nNXxlxuhq6EzolfjcFcvuMFL8zdA.jpg');
-  background-attachment: fixed;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   position: relative;
   overflow-x: hidden;
   min-height: 100vh;
   width: 100%;
+}
+
+/* Mobile-specific background optimization */
+@media (max-width: 768px) {
+  body {
+    background-size: cover;
+    background-position: center center;
+    background-attachment: scroll; /* Better performance on mobile */
+  }
+}
+
+/* Desktop-specific background optimization */
+@media (min-width: 769px) {
+  body {
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+  }
 }
 
 body::before,
