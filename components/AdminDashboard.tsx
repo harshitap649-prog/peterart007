@@ -430,7 +430,7 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="pb-24 md:pb-0">
+    <div className="pb-28 md:pb-0 min-h-screen">
       {/* Top Bar with Menu Icon */}
       <div className="flex items-center justify-between mb-2 md:mb-6 px-3 md:px-0">
         <button
@@ -2007,16 +2007,23 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Bottom Navigation Bar - Mobile Only */}
+      {/* Bottom Navigation Bar - Mobile Only - Fixed at Bottom */}
       <nav 
-        className="fixed inset-x-0 bottom-0 z-[100] px-4 pb-4 md:hidden safe-area-bottom pointer-events-none" 
+        className="fixed inset-x-0 bottom-0 z-[9999] px-4 pb-4 md:hidden safe-area-bottom pointer-events-none" 
         style={{ 
           position: 'fixed', 
           bottom: 0, 
           left: 0, 
           right: 0,
+          width: '100%',
           transform: 'translateZ(0)',
-          WebkitTransform: 'translateZ(0)'
+          WebkitTransform: 'translateZ(0)',
+          WebkitBackfaceVisibility: 'hidden',
+          backfaceVisibility: 'hidden',
+          margin: 0,
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
         }}
       >
         <div 
@@ -2024,7 +2031,9 @@ export default function AdminDashboard() {
           style={{ 
             willChange: 'transform',
             transform: 'translateZ(0)',
-            WebkitTransform: 'translateZ(0)'
+            WebkitTransform: 'translateZ(0)',
+            WebkitBackfaceVisibility: 'hidden',
+            backfaceVisibility: 'hidden'
           }}
         >
           <button

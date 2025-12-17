@@ -91,7 +91,7 @@ export default function MobileDock() {
   }
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-3 md:hidden safe-area-bottom">
+    <nav className="mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-3 md:hidden safe-area-bottom">
       <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-1 rounded-3xl border border-orange-200/50 bg-gradient-to-b from-white via-orange-50/30 to-white/95 px-2 py-2.5 shadow-[0_-8px_30px_rgba(249,115,22,0.15)] backdrop-blur-xl">
         {dockLinks.map((item) => {
           const Icon = item.icon

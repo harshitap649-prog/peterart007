@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { loginWithEmail, signUpWithEmail, loginWithGoogle, isAdmin } from '@/lib/auth'
 import toast from 'react-hot-toast'
@@ -104,31 +104,8 @@ export default function LoginPage() {
     }
   }
 
-  // Detect mobile for background optimization
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
   return (
-    <div 
-      className="min-h-screen flex flex-col relative overflow-hidden" 
-      style={{
-        backgroundImage: 'url("https://t4.ftcdn.net/jpg/02/42/23/93/360_F_242239379_ChJ2nNXxlxuhq6EzolfjcFcvuMFL8zdA.jpg")',
-        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
-        minHeight: '100vh',
-        width: '100%'
-      }}
-    >
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-white">
       {/* Hero Section with Image and Quote */}
       <div className="relative w-full py-12 md:py-16 px-4 z-10">
         <div className="mx-auto max-w-4xl text-center">
@@ -168,7 +145,8 @@ export default function LoginPage() {
                 activeTab === 'signin' 
                   ? 'bg-black text-white shadow-lg shadow-black/30' 
                   : 'text-gray-600 hover:text-gray-900'
-              }`}
+              }`
+            }
             >
               Sign In
             </button>

@@ -343,13 +343,16 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   useEffect(() => {
     const overlayActive = sidebarOpen
     if (overlayActive) {
+      document.body.classList.add('menu-open')
       document.documentElement.classList.add('overflow-hidden')
       document.body.classList.add('overflow-hidden')
     } else {
+      document.body.classList.remove('menu-open')
       document.documentElement.classList.remove('overflow-hidden')
       document.body.classList.remove('overflow-hidden')
     }
     return () => {
+      document.body.classList.remove('menu-open')
       document.documentElement.classList.remove('overflow-hidden')
       document.body.classList.remove('overflow-hidden')
     }
@@ -515,7 +518,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   }
 
   const handleNavClick = (tab: string) => {
-    if (tab === 'wishlist' || tab === 'orders' || tab === 'reviews' || tab === 'support' || tab === 'profile') {
+    if (tab === 'wishlist' || tab === 'orders' || tab === 'reviews' || tab === 'support' || tab === 'profile' || tab === 'following') {
       // Check if user is logged in - if not, show login modal
       if (!user || !user.uid) {
         setSidebarOpen(false)
@@ -537,12 +540,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   }
 
   const handleBuyClick = (artworkId: string) => {
-    // Check if user is logged in - if not, show login modal
-    if (!user || !user.uid) {
-      setLoginModalOpen(true)
-      toast.error(`${t.pleaseSignIn} ${t.purchaseArtworks}`)
-      return
-    }
+    // Always open artwork detail; inside the detail page protected actions will prompt login
     router.push(`/artwork/${artworkId}`)
   }
 

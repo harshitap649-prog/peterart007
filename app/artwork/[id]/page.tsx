@@ -61,6 +61,37 @@ export default function ArtworkDetailsPage() {
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+  const [authPrompt, setAuthPrompt] = useState<{ open: boolean; message: string }>({
+    open: false,
+    message: ''
+  })
+
+  const requireAuth = (message: string) => {
+    setAuthPrompt({
+      open: true,
+      message: message || 'To complete this action you need to login first.'
+    })
+  }
+
+  const handleAuthRedirect = () => {
+    const next = typeof window !== 'undefined' ? window.location.pathname : '/'
+    router.push(`/login?next=${encodeURIComponent(next)}`)
+    setAuthPrompt({ open: false, message: '' })
+  }
+
+  const closeAuthPrompt = () => setAuthPrompt({ open: false, message: '' })
+
+  // Prevent background scroll when auth prompt is open
+  useEffect(() => {
+    if (authPrompt.open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [authPrompt.open])
 
   useEffect(() => {
     checkAuth()
@@ -255,8 +286,7 @@ export default function ArtworkDetailsPage() {
 
   const handleBuyNow = () => {
     if (!user) {
-      setLoginModalOpen(true)
-      toast.error('Please sign in to purchase artworks')
+      requireAuth('To complete this purchase you need to login first.')
       return
     }
     setShowCheckout(true)
@@ -343,8 +373,7 @@ export default function ArtworkDetailsPage() {
 
   const handleLike = async () => {
     if (!user || !user.uid) {
-      setLoginModalOpen(true)
-      toast.error('Please sign in to like artworks')
+      requireAuth('To like this artwork you need to login first.')
       return
     }
 
@@ -390,8 +419,7 @@ export default function ArtworkDetailsPage() {
 
   const handleLikeReview = async (commentId: string) => {
     if (!user || !user.uid) {
-      setLoginModalOpen(true)
-      toast.error('Please sign in to like reviews')
+      requireAuth('To like this review you need to login first.')
       return
     }
 
@@ -416,7 +444,7 @@ export default function ArtworkDetailsPage() {
 
   const handleCommentOnReview = async (commentId: string) => {
     if (!user || !user.uid) {
-      setLoginModalOpen(true)
+      requireAuth('To comment on reviews you need to login first.')
       toast.error('Please sign in to comment on reviews')
       return
     }
@@ -539,7 +567,7 @@ export default function ArtworkDetailsPage() {
   const totalPrice = (artwork.price * quantity).toFixed(2)
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-white">
       {/* Sticky Top Bar - Mobile Optimized */}
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-3 py-3 md:px-4 md:py-4">
         <div className="flex justify-between items-center w-full md:max-w-6xl md:mx-auto">
@@ -559,7 +587,7 @@ export default function ArtworkDetailsPage() {
           {/* Artwork Images */}
           <div className="space-y-3 md:space-y-4">
             {artwork.images && artwork.images.length > 0 ? (
-              <div className="bg-transparent rounded-none md:rounded-2xl overflow-hidden">
+              <div className="bg-white rounded-none md:rounded-2xl overflow-hidden">
                 <div 
                   className={`relative w-full h-[70vh] sm:h-[75vh] md:h-96 rounded-none md:rounded-xl bg-gray-50 flex items-center justify-center ${imageZoomed ? 'overflow-auto cursor-move' : 'overflow-hidden'}`}
                   onTouchStart={(e) => {
@@ -688,7 +716,7 @@ export default function ArtworkDetailsPage() {
 
           {/* Artwork Details */}
           <div className="space-y-4 md:space-y-6 px-3 md:px-0">
-            <div className="bg-transparent rounded-none md:rounded-2xl p-3 md:p-6 lg:p-8">
+            <div className="bg-white rounded-none md:rounded-2xl p-3 md:p-6 lg:p-8">
               <div className="flex items-start justify-between mb-2 md:mb-4">
                 <div className="flex-1 min-w-0">
                   {artwork.artistId && (
@@ -762,8 +790,7 @@ export default function ArtworkDetailsPage() {
                       <button
                         onClick={() => {
                           if (!user) {
-                            setLoginModalOpen(true)
-                            toast.error('Please sign in to add items to cart')
+                            requireAuth('To add items to cart you need to login first.')
                             return
                           }
                           addToCart({
@@ -986,7 +1013,7 @@ export default function ArtworkDetailsPage() {
             </div>
 
             {/* Reviews Section */}
-            <div className="bg-transparent rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8 mt-4 md:mt-6">
+            <div className="bg-white rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8 mt-4 md:mt-6">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-900">
                 Reviews
               </h2>
@@ -1168,9 +1195,14 @@ export default function ArtworkDetailsPage() {
                                 <span>{comment.likes || 0}</span>
                               </button>
                               <button
-                                onClick={() => setExpandedComments({ ...expandedComments, [comment.id]: !expandedComments[comment.id] })}
-                                disabled={!user}
-                                className={`flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                onClick={() => {
+                                  if (!user) {
+                                    requireAuth('To comment on reviews you need to login first.')
+                                    return
+                                  }
+                                  setExpandedComments({ ...expandedComments, [comment.id]: !expandedComments[comment.id] })
+                                }}
+                                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
                               >
                                 <FiMessageCircle className="text-xs" />
                                 <span>{comment.replies?.length || 0}</span>
@@ -1224,6 +1256,35 @@ export default function ArtworkDetailsPage() {
           </div>
         </div>
       </div>
+
+      {authPrompt.open && (
+        <div className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm transition-opacity duration-200">
+          <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm px-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full p-6 space-y-4">
+              <div className="space-y-2">
+                <p className="text-lg font-semibold text-gray-900">Login required</p>
+                <p className="text-sm text-gray-600">
+                  {authPrompt.message || 'To complete this action you need to login first.'}
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={closeAuthPrompt}
+                  className="btn-secondary px-4 py-2 text-sm font-semibold"
+                >
+                  Not now
+                </button>
+                <button
+                  onClick={handleAuthRedirect}
+                  className="btn-primary px-4 py-2 text-sm font-semibold"
+                >
+                  Go to login
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Login Modal */}
       <LoginModal

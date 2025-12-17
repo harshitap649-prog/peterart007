@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import UserDashboard from '@/components/UserDashboard'
-import LogoutButton from '@/components/LogoutButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,14 +27,13 @@ export default function UserPage() {
         setUser(currentUser)
         setLoading(false)
       } else {
-        console.log('No user found, redirecting to login')
-        // Redirect to login page if not authenticated
-        router.push('/')
+        console.log('No user found, continuing as guest')
+        setLoading(false)
       }
     } catch (error) {
       console.error('Auth check error:', error)
-      // Redirect to login on error
-      router.push('/')
+      setUser(null)
+      setLoading(false)
     }
   }
 
