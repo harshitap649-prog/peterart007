@@ -1214,54 +1214,61 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 md:gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4 px-0 md:px-0">
                 {artworks
                   .filter((artwork: any) => wishlist.includes(artwork.id))
                   .map((artwork: any) => (
-                    <div key={artwork.id} className="card p-2 md:p-3 hover:shadow-lg transition-shadow">
+                    <div key={artwork.id} className="group bg-white rounded-lg md:rounded-2xl border border-gray-100 p-1.5 md:p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
                       {artwork.images && artwork.images[0] ? (
-                        <div className="relative w-full h-32 md:h-40 mb-2 rounded-lg overflow-hidden group">
+                        <div className="relative mb-2 md:mb-3 h-24 md:h-40 w-full overflow-hidden rounded-lg md:rounded-xl bg-gray-100">
                           <img
                             src={artwork.images[0]}
                             alt={artwork.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
-                          }}
-                        />
-                          <div className="absolute top-2 right-2">
-                            <div className="p-1.5 bg-white rounded-full shadow-md">
-                              <FaHeart className="text-sm text-red-500" />
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
+                            }}
+                          />
+                          <div className="absolute top-1.5 right-1.5 md:top-2 md:right-2">
+                            <div className="p-1 bg-white rounded-full shadow-md">
+                              <FaHeart className="text-xs md:text-sm text-red-500" />
                             </div>
                           </div>
-                      </div>
-                    ) : (
-                        <div className="w-full h-32 md:h-40 mb-2 rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">{t.noImage}</span>
-                      </div>
-                    )}
-                      <h3 className="font-semibold text-sm md:text-base mb-1 line-clamp-1">{artwork.title}</h3>
-                      {artwork.artistId && (
-                        <div className="mb-1">
-                          <ArtistBadge artistId={artwork.artistId} />
+                        </div>
+                      ) : (
+                        <div className="w-full h-24 md:h-40 mb-2 md:mb-3 rounded-lg md:rounded-xl bg-gray-100 flex items-center justify-center">
+                          <span className="text-gray-400 text-[10px] md:text-xs">{t.noImage}</span>
                         </div>
                       )}
-                      <p className="text-gray-600 text-xs mb-2 line-clamp-2 hidden md:block">{artwork.description}</p>
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-orange-600 font-bold text-base md:text-lg">₹{artwork.price}</p>
-                        {artwork.likes > 0 && (
-                          <div className="flex items-center gap-1 text-gray-500 text-xs">
-                            <FiThumbsUp className="text-xs" />
-                            <span>{artwork.likes}</span>
-                          </div>
-                        )}
+                      <h3 className="font-semibold text-[11px] md:text-sm mb-0.5 md:mb-1 line-clamp-1 text-gray-900">{artwork.title}</h3>
+                      <p className="text-gray-600 text-[10px] md:text-xs mb-1.5 md:mb-2 line-clamp-1 md:line-clamp-2 min-h-[1rem] md:min-h-[2.5rem]">{artwork.description}</p>
+                      <div className="flex items-center justify-between mb-2 md:mb-3">
+                        <p className="text-gray-900 font-bold text-xs md:text-base">₹{artwork.price}</p>
+                        <div className="flex items-center gap-1">
+                          <FiThumbsUp className={`text-xs md:text-sm ${artwork.likedBy?.includes(user?.uid) ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
+                          <span className="text-[10px] md:text-xs text-gray-500">{artwork.likes || 0}</span>
+                        </div>
                       </div>
-                      <button
-                        onClick={() => handleBuyClick(artwork.id)}
-                        className="btn-primary w-full text-xs md:text-sm py-2 font-semibold"
-                      >
-                        {t.buyNow}
-                      </button>
+                      <div className="flex gap-1.5 md:gap-2">
+                        <button
+                          onClick={() => handleWishlist(artwork.id)}
+                          className={`flex-1 flex items-center justify-center gap-1 rounded-lg md:rounded-xl py-1.5 md:py-2.5 text-[10px] md:text-xs font-semibold transition-all border ${
+                            wishlist.includes(artwork.id) 
+                              ? 'bg-red-50 text-red-600 border-red-200' 
+                              : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          {wishlist.includes(artwork.id)
+                            ? <FaHeart className="text-xs md:text-sm text-red-500" />
+                            : <FiHeart className="text-xs md:text-sm text-gray-500" />}
+                        </button>
+                        <button
+                          onClick={() => handleBuyClick(artwork.id)}
+                          className="flex-1 bg-gray-900 text-white rounded-lg md:rounded-xl py-1.5 md:py-2.5 text-[10px] md:text-xs font-semibold hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
+                        >
+                          {t.buy}
+                        </button>
+                      </div>
                     </div>
                   ))}
               </div>

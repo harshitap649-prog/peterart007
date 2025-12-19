@@ -17,6 +17,7 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   const isMessagesPage = pathname === '/messages' || pathname?.startsWith('/chat/')
   const isAdminPage = pathname === '/admin'
   const isArtistPage = pathname?.startsWith('/artist/')
+  const isArtistApplyPage = pathname === '/artist/apply'
 
   // All pages - no header or footer, but show mobile dock
   if (isUserPage) {
@@ -95,6 +96,17 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
     return (
       <div className="app-shell">
         <main className="app-main pb-0 md:pb-8">
+          <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
+        </main>
+      </div>
+    )
+  }
+
+  // Artist apply page - no mobile dock on mobile (registration form)
+  if (isArtistApplyPage) {
+    return (
+      <div className="app-shell">
+        <main className="app-main pb-4 md:pb-8">
           <div className="w-full md:mx-auto md:max-w-6xl md:space-y-6">{children}</div>
         </main>
       </div>
