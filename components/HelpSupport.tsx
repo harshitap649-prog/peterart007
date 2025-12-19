@@ -5,6 +5,7 @@ import { createSupportMessage } from '@/lib/support'
 import { getUserOrders } from '@/lib/orders'
 import toast from 'react-hot-toast'
 import { FiHelpCircle, FiSend, FiMessageSquare, FiChevronDown, FiChevronUp, FiPackage, FiCreditCard, FiTruck, FiShield, FiMail, FiImage, FiX } from 'react-icons/fi'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface FAQ {
   question: string
@@ -12,7 +13,9 @@ interface FAQ {
   category: 'order' | 'payment' | 'shipping' | 'general'
 }
 
-export default function HelpSupport({ user, language = 'en' }: { user: any; language?: 'en' | 'hi' }) {
+export default function HelpSupport({ user, language: languageProp }: { user: any; language?: 'en' | 'hi' }) {
+  const { language: contextLanguage } = useLanguage()
+  const language = languageProp || contextLanguage
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)

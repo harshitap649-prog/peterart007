@@ -6,6 +6,7 @@ import { getUserProfile, updateUserProfile, uploadProfilePicture, getSavedAddres
 import { exportOrdersToPDF } from '@/lib/pdfExport'
 import { getUserOrders } from '@/lib/orders'
 import toast from 'react-hot-toast'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface UserProfileProps {
   user: any
@@ -13,7 +14,9 @@ interface UserProfileProps {
   language?: 'en' | 'hi'
 }
 
-export default function UserProfile({ user, onProfileUpdate, language = 'en' }: UserProfileProps) {
+export default function UserProfile({ user, onProfileUpdate, language: languageProp }: UserProfileProps) {
+  const { language: contextLanguage } = useLanguage()
+  const language = languageProp || contextLanguage
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -185,6 +188,11 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
     const file = e.target.files?.[0]
     if (!file) return
 
+    if (!user || !user.uid) {
+      toast.error('Please login to upload profile picture')
+      return
+    }
+
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file')
       return
@@ -204,7 +212,8 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
       }
       toast.success(t.pictureUploaded)
     } catch (error: any) {
-      toast.error(error.message || 'Failed to upload picture')
+      console.error('Upload error:', error)
+      toast.error(error.message || 'Failed to upload picture. Please try again.')
     } finally {
       setUploadingPhoto(false)
       if (fileInputRef.current) {
@@ -383,9 +392,19 @@ export default function UserProfile({ user, onProfileUpdate, language = 'en' }: 
                 )}
               </div>
               <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadingPhoto}
-                className="absolute bottom-0 right-0 p-1 md:p-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors shadow-lg"
+                onClick={() => {
+                  if (!user || !user.uid) {
+                    toast.error('Please login to upload profile picture')
+                    return
+                  }
+                  fileInputRef.current?.click()
+                }}
+                disabled={uploadingPhoto || !user || !user.uid}
+                className={`absolute bottom-0 right-0 p-1 md:p-2 rounded-full transition-colors shadow-lg ${
+                  !user || !user.uid
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                }`}
               >
                 {uploadingPhoto ? (
                   <div className="w-3 h-3 md:w-4 md:h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

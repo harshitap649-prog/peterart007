@@ -241,7 +241,7 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-700 font-semibold text-lg">Loading cart...</p>
@@ -251,7 +251,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-2 md:px-4 py-2 md:py-6">
         {/* Header - Mobile Optimized */}
         <div className="flex items-center justify-between mb-3 md:mb-6 gap-1.5 md:gap-2">

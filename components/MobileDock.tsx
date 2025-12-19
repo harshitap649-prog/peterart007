@@ -91,8 +91,8 @@ export default function MobileDock() {
   }
 
   return (
-    <nav className="mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-3 md:hidden safe-area-bottom">
-      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-1 rounded-3xl border border-orange-200/50 bg-gradient-to-b from-white via-orange-50/30 to-white/95 px-2 py-2.5 shadow-[0_-8px_30px_rgba(249,115,22,0.15)] backdrop-blur-xl">
+    <nav className="mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-2 pb-2 md:hidden safe-area-bottom">
+      <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-0.5 rounded-2xl border border-orange-200/50 bg-gradient-to-b from-white via-orange-50/30 to-white/95 px-1.5 py-1.5 shadow-[0_-6px_20px_rgba(249,115,22,0.12)] backdrop-blur-xl">
         {dockLinks.map((item) => {
           const Icon = item.icon
           const IconActive = item.iconActive || item.icon
@@ -103,35 +103,35 @@ export default function MobileDock() {
             <Link
               key={item.href}
               href={item.href}
-              className={`group relative flex flex-1 flex-col items-center gap-1 rounded-2xl px-2 py-2 transition-all duration-300 active:scale-90 touch-manipulation ${
+              className={`group relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-300 active:scale-90 touch-manipulation ${
                 active
-                  ? `bg-gradient-to-br ${colors.active} text-white shadow-lg ${colors.shadow}`
+                  ? `bg-gradient-to-br ${colors.active} text-white shadow-md ${colors.shadow}`
                   : `${colors.inactive} hover:bg-orange-50/50`
               }`}
             >
               {/* Active indicator - animated top dot */}
               {active && (
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white shadow-md animate-pulse"></div>
+                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white shadow-sm animate-pulse"></div>
               )}
               
               {/* Icon container with enhanced styling */}
               <span
-                className={`relative flex h-8 w-8 items-center justify-center rounded-xl text-base transition-all duration-300 ${
+                className={`relative flex h-6 w-6 items-center justify-center rounded-lg text-sm transition-all duration-300 ${
                   active
-                    ? 'text-white scale-110'
-                    : `${colors.inactive} group-hover:scale-110`
+                    ? 'text-white scale-105'
+                    : `${colors.inactive} group-hover:scale-105`
                 }`}
               >
                 {/* Glow effect for active state */}
                 {active && (
-                  <span className="absolute inset-0 rounded-xl bg-white/20 blur-md"></span>
+                  <span className="absolute inset-0 rounded-lg bg-white/20 blur-sm"></span>
                 )}
                 
                 {active ? (
                   <IconActive 
                     className="relative z-10" 
                     style={{ 
-                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
                       strokeWidth: 0
                     }}
                   />
@@ -139,7 +139,7 @@ export default function MobileDock() {
                   <Icon 
                     className="relative z-10 transition-all duration-300" 
                     style={{ 
-                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                      filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))',
                       strokeWidth: 2.5
                     }}
                   />
@@ -147,7 +147,7 @@ export default function MobileDock() {
               </span>
               
               {/* Label with enhanced typography */}
-              <span className={`leading-tight transition-all duration-300 text-[10px] font-semibold tracking-wide ${
+              <span className={`leading-tight transition-all duration-300 text-[9px] font-semibold tracking-wide ${
                 active 
                   ? 'text-white drop-shadow-sm' 
                   : `${colors.inactive} group-hover:font-bold`
@@ -157,12 +157,12 @@ export default function MobileDock() {
               
               {/* Hover effect overlay with orange tint */}
               {!active && (
-                <span className={`absolute inset-0 rounded-2xl ${colors.bg} opacity-0 group-hover:opacity-40 transition-all duration-300`}></span>
+                <span className={`absolute inset-0 rounded-xl ${colors.bg} opacity-0 group-hover:opacity-40 transition-all duration-300`}></span>
               )}
               
               {/* Ripple effect on active */}
               {active && (
-                <span className="absolute inset-0 rounded-2xl bg-white/10 animate-ping opacity-75"></span>
+                <span className="absolute inset-0 rounded-xl bg-white/10 animate-ping opacity-75"></span>
               )}
             </Link>
           )

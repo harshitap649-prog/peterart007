@@ -36,12 +36,16 @@ import {
   FiMail
 } from 'react-icons/fi'
 
+import { useLanguage } from '@/contexts/LanguageContext'
+
 interface ArtistDashboardProps {
   userId: string
   language?: 'en' | 'hi'
 }
 
-export default function ArtistDashboard({ userId, language = 'en' }: ArtistDashboardProps) {
+export default function ArtistDashboard({ userId, language: languageProp }: ArtistDashboardProps) {
+  const { language: contextLanguage } = useLanguage()
+  const language = languageProp || contextLanguage
   const router = useRouter()
   const [artist, setArtist] = useState<any>(null)
   const [artworks, setArtworks] = useState<any[]>([])

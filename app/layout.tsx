@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import { CartProvider } from '@/contexts/CartContext'
+import { LanguageProvider } from '@/contexts/LanguageContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import SiteHeader from '@/components/SiteHeader'
 import SiteFooter from '@/components/SiteFooter'
@@ -41,11 +42,13 @@ export default function RootLayout({
       </head>
       <body className="bg-[var(--page-bg)] text-[var(--text-primary)] antialiased">
         <ThemeProvider>
-          <CartProvider>
-            <ConditionalLayout>
-              {children}
-            </ConditionalLayout>
-          </CartProvider>
+          <LanguageProvider>
+            <CartProvider>
+              <ConditionalLayout>
+                {children}
+              </ConditionalLayout>
+            </CartProvider>
+          </LanguageProvider>
         </ThemeProvider>
         <Toaster
           position="top-center"

@@ -13,6 +13,7 @@ import {
 import { getUserWishlist, isInWishlist } from '@/lib/wishlist'
 import ArtistBadge from './ArtistBadge'
 import toast from 'react-hot-toast'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface RecommendationSectionProps {
   userId?: string
@@ -21,7 +22,7 @@ interface RecommendationSectionProps {
   title?: string
   subtitle?: string
   limit?: number
-  language?: 'en' | 'hi'
+  language?: 'en' | 'hi' // Keep for backward compatibility, but use context instead
 }
 
 export default function RecommendationSection({
@@ -31,8 +32,10 @@ export default function RecommendationSection({
   title,
   subtitle,
   limit = 10,
-  language = 'en'
+  language: languageProp
 }: RecommendationSectionProps) {
+  const { language: contextLanguage } = useLanguage()
+  const language = languageProp || contextLanguage
   const router = useRouter()
   const [artworks, setArtworks] = useState<any[]>([])
   const [allArtworks, setAllArtworks] = useState<any[]>([])
@@ -254,7 +257,9 @@ export default function RecommendationSection({
                   className="text-gray-900 hover:text-orange-700 transition-colors"
                   aria-label="Add to wishlist"
                 >
-                  {wishlist.includes(artwork.id) ? <FaHeart className="text-lg" /> : <FiHeart className="text-lg" />}
+                  {wishlist.includes(artwork.id)
+                    ? <FaHeart className="text-lg text-red-500" />
+                    : <FiHeart className="text-lg text-gray-600" />}
                 </button>
               </div>
             </div>
@@ -309,7 +314,9 @@ export default function RecommendationSection({
                       className="text-gray-900 hover:text-orange-700 transition-colors"
                       aria-label="Add to wishlist"
                     >
-                      {wishlist.includes(artwork.id) ? <FaHeart className="text-sm" /> : <FiHeart className="text-sm" />}
+                      {wishlist.includes(artwork.id)
+                        ? <FaHeart className="text-sm text-red-500" />
+                        : <FiHeart className="text-sm text-gray-600" />}
                     </button>
                   </div>
                 </div>

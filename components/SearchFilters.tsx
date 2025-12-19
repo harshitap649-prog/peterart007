@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { FiFilter, FiX, FiChevronDown, FiChevronUp, FiSearch, FiSliders } from 'react-icons/fi'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface SearchFiltersProps {
   artworks: any[]
@@ -17,9 +18,11 @@ export default function SearchFilters({
   onFilterChange, 
   searchTerm, 
   onSearchChange,
-  language = 'en',
+  language: languageProp,
   filteredCount
 }: SearchFiltersProps) {
+  const { language: contextLanguage } = useLanguage()
+  const language = languageProp || contextLanguage
   const [showFilters, setShowFilters] = useState(false)
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])

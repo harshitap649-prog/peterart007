@@ -5,13 +5,16 @@ import { getUserGiftCards } from '@/lib/giftcards'
 import { FiGift, FiCalendar, FiDollarSign, FiCheckCircle, FiXCircle, FiCopy, FiPlus } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import GiftCardPurchase from './GiftCardPurchase'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface GiftCardManagementProps {
   userId: string
   language?: 'en' | 'hi'
 }
 
-export default function GiftCardManagement({ userId, language = 'en' }: GiftCardManagementProps) {
+export default function GiftCardManagement({ userId, language: languageProp }: GiftCardManagementProps) {
+  const { language: contextLanguage } = useLanguage()
+  const language = languageProp || contextLanguage
   const [giftCards, setGiftCards] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showPurchase, setShowPurchase] = useState(false)

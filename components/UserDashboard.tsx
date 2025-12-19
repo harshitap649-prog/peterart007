@@ -28,6 +28,7 @@ import BannerAd from './BannerAd'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtistByUserId, getArtistById } from '@/lib/artists'
 import { getUserFollowing } from '@/lib/follows'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 interface UserDashboardProps {
   user: any
@@ -52,7 +53,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  const [language, setLanguage] = useState<'en' | 'hi'>('en')
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null)
   const [isArtist, setIsArtist] = useState(false)
   const [artistProfile, setArtistProfile] = useState<any>(null)
@@ -63,6 +63,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [expandedArtistId, setExpandedArtistId] = useState<string | null>(null)
   const [artistArtworks, setArtistArtworks] = useState<Record<string, any[]>>({})
   const [loadingArtworks, setLoadingArtworks] = useState<Record<string, boolean>>({})
+
+  const { language, setLanguage } = useLanguage()
 
   // Translations
   const translations = {
@@ -264,18 +266,9 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   const t = translations[language]
 
-  // Load language from localStorage on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as 'en' | 'hi' | null
-    if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'hi')) {
-      setLanguage(savedLanguage)
-    }
-  }, [])
-
   // Save language to localStorage when changed
   const changeLanguage = (lang: 'en' | 'hi') => {
     setLanguage(lang)
-    localStorage.setItem('language', lang)
     toast.success(lang === 'en' ? 'Language changed to English' : 'भाषा हिंदी में बदली गई')
   }
 
@@ -418,7 +411,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   }
 
   const handleWishlist = async (artworkId: string) => {
-    // Check if user is logged in - if not, show login modal
+    // Check if user is logged in - if not, show login prompt
     if (!user || !user.uid) {
       setLoginModalOpen(true)
       toast.error(`${t.pleaseSignIn} ${t.addToWishlist}`)
@@ -445,7 +438,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   }
 
   const handleLike = async (artworkId: string) => {
-    // Check if user is logged in - if not, show login modal
+    // Check if user is logged in - if not, show login prompt
     if (!user || !user.uid) {
       setLoginModalOpen(true)
       toast.error(`${t.pleaseSignIn} ${t.likeArtworks}`)
@@ -788,16 +781,16 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   return (
     <div className="space-y-4 md:space-y-6 pb-24">
       {/* Centered Logo Image - Hidden on mobile for profile and orders tabs */}
-      <div className={`flex flex-col justify-center items-center py-4 md:py-6 ${(activeTab === 'profile' || activeTab === 'orders') ? 'hidden md:flex' : ''}`}>
+      <div className={`flex flex-col justify-center items-center pt-2 pb-1 md:pt-3 md:pb-3 ${(activeTab === 'profile' || activeTab === 'orders') ? 'hidden md:flex' : ''}`}>
         <img
           src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
           alt="Peter Art"
-          className="w-36 h-36 md:w-32 md:h-32 object-contain"
+          className="w-16 h-16 md:w-20 md:h-20 object-contain"
           onError={(e) => {
             (e.target as HTMLImageElement).src = '/logoo.png'
           }}
         />
-        <h1 className="text-lg md:text-2xl font-bold text-gray-700 mt-3">{t.peterArt}</h1>
+        <h1 className="text-sm md:text-lg font-bold text-gray-700 mt-1">{t.peterArt}</h1>
       </div>
 
       {/* Sidebar */}
@@ -964,7 +957,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                         onClick={() => changeLanguage('en')}
                         className={`flex-1 px-2.5 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 active:scale-95 touch-manipulation ${
                           language === 'en'
-                            ? 'bg-gray-900 text-white shadow-md'
+                            ? 'bg-orange-500 text-white shadow-md'
                             : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-sm'
                         }`}
                       >
@@ -974,7 +967,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                         onClick={() => changeLanguage('hi')}
                         className={`flex-1 px-2.5 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all duration-300 active:scale-95 touch-manipulation ${
                           language === 'hi'
-                            ? 'bg-gray-900 text-white shadow-md'
+                            ? 'bg-orange-500 text-white shadow-md'
                             : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow-sm'
                         }`}
                       >
@@ -1133,7 +1126,9 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                             : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                         }`}
                       >
-                        {wishlist.includes(artwork.id) ? <FaHeart className="text-xs md:text-sm" /> : <FiHeart className="text-xs md:text-sm" />}
+                        {wishlist.includes(artwork.id)
+                          ? <FaHeart className="text-xs md:text-sm text-red-500" />
+                          : <FiHeart className="text-xs md:text-sm text-gray-500" />}
                       </button>
                       <button
                         onClick={() => handleBuyClick(artwork.id)}

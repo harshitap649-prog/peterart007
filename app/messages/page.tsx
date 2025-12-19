@@ -179,7 +179,7 @@ export default function MessagesPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-3 md:mb-4"></div>
           <p className="text-gray-700 font-semibold text-sm md:text-lg">Loading messages...</p>
@@ -189,7 +189,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fff3eb] via-white to-white">
+    <div className="min-h-screen bg-white">
       {/* Header - Mobile Optimized */}
       <div className="glass-panel border-b border-white/20 backdrop-blur-xl bg-white/60 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5">

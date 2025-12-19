@@ -15,11 +15,13 @@ import ArtistBadge from '@/components/ArtistBadge'
 import BannerAd from '@/components/BannerAd'
 import { likeArtwork } from '@/lib/comments'
 import { useCart } from '@/contexts/CartContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function ArtworkDetailsPage() {
   const params = useParams()
   const router = useRouter()
   const { addToCart } = useCart()
+  const { language } = useLanguage()
   const [user, setUser] = useState<any>(null)
   const [artwork, setArtwork] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -1377,6 +1379,7 @@ export default function ArtworkDetailsPage() {
             title="Similar Artworks"
             subtitle="You might also like these"
             limit={6}
+            language={language}
           />
         </div>
       )}
