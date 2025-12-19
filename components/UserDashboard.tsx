@@ -276,6 +276,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     const tab = searchParams.get('tab')
     if (tab && ['artworks', 'wishlist', 'orders', 'reviews', 'support', 'profile', 'giftcards', 'artist', 'following'].includes(tab)) {
       setActiveTab(tab)
+      // Scroll to top instantly when tab changes for faster navigation
+      window.scrollTo({ top: 0, behavior: 'instant' })
     }
   }, [searchParams])
 
@@ -780,8 +782,12 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   return (
     <div className="space-y-4 md:space-y-6 pb-24">
-      {/* Centered Logo Image - Hidden on mobile for profile and orders tabs */}
-      <div className={`flex flex-col justify-center items-center pt-2 pb-1 md:pt-3 md:pb-3 ${(activeTab === 'profile' || activeTab === 'orders') ? 'hidden md:flex' : ''}`}>
+      {/* Centered Logo Image - Only show on artworks/home screen on mobile, show on all tabs on desktop */}
+      <div className={`flex flex-col justify-center items-center pt-2 pb-1 md:pt-3 md:pb-3 ${
+        // On mobile: only show on artworks tab (or when no tab is selected, which defaults to artworks)
+        // On desktop: show on all tabs
+        (activeTab === 'artworks' || !activeTab) ? '' : 'hidden md:flex'
+      }`}>
         <img
           src="https://png.pngtree.com/png-vector/20240618/ourmid/pngtree-a-cute-girl-dancing-colorful-art-design-png-image_12793513.png"
           alt="Peter Art"

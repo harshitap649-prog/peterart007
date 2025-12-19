@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import { FiHome, FiMessageCircle, FiShoppingBag, FiUser } from 'react-icons/fi'
 import { FaHome, FaComments, FaShoppingBag, FaUser } from 'react-icons/fa'
 
@@ -64,8 +64,10 @@ const colorMap: Record<string, { active: string; inactive: string; bg: string; s
 }
 
 export default function MobileDock() {
+  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [navigating, setNavigating] = useState<string | null>(null)
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -90,6 +92,30 @@ export default function MobileDock() {
     return pathname === href
   }
 
+  const handleNavigation = (href: string) => {
+    // Prevent navigation if already on the same page/tab
+    if (isActive(href)) {
+      return
+    }
+
+    setNavigating(href)
+    
+    // Scroll to top immediately for instant feedback
+    window.scrollTo({ top: 0, behavior: 'instant' })
+    
+    // Use replace for same-page tab switches, push for different pages
+    if (href.startsWith('/user') && pathname === '/user') {
+      // Same page, just changing tab - use replace for instant switch
+      router.replace(href)
+    } else {
+      // Different page - use push
+      router.push(href)
+    }
+    
+    // Reset navigating state after a short delay
+    setTimeout(() => setNavigating(null), 200)
+  }
+
   return (
     <nav className="mobile-dock pointer-events-none fixed inset-x-0 bottom-0 z-50 px-2 pb-2 md:hidden safe-area-bottom">
       <div className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-0.5 rounded-2xl border border-orange-200/50 bg-gradient-to-b from-white via-orange-50/30 to-white/95 px-1.5 py-1.5 shadow-[0_-6px_20px_rgba(249,115,22,0.12)] backdrop-blur-xl">
@@ -100,14 +126,15 @@ export default function MobileDock() {
           const colors = colorMap[item.color] || colorMap['orange-medium']
           
           return (
-            <Link
+            <button
               key={item.href}
-              href={item.href}
-              className={`group relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-300 active:scale-90 touch-manipulation ${
+              onClick={() => handleNavigation(item.href)}
+              disabled={navigating === item.href}
+              className={`group relative flex flex-1 flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-150 active:scale-90 touch-manipulation ${
                 active
                   ? `bg-gradient-to-br ${colors.active} text-white shadow-md ${colors.shadow}`
                   : `${colors.inactive} hover:bg-orange-50/50`
-              }`}
+              } ${navigating === item.href ? 'opacity-70' : ''}`}
             >
               {/* Active indicator - animated top dot */}
               {active && (
@@ -164,7 +191,14 @@ export default function MobileDock() {
               {active && (
                 <span className="absolute inset-0 rounded-xl bg-white/10 animate-ping opacity-75"></span>
               )}
-            </Link>
+              
+              {/* Loading indicator when navigating */}
+              {navigating === item.href && (
+                <span className="absolute inset-0 rounded-xl bg-white/20 flex items-center justify-center">
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                </span>
+              )}
+            </button>
           )
         })}
       </div>

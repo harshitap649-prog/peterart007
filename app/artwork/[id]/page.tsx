@@ -76,22 +76,28 @@ export default function ArtworkDetailsPage() {
   }
 
   const handleAuthRedirect = () => {
-    const next = typeof window !== 'undefined' ? window.location.pathname : '/'
-    router.push(`/login?next=${encodeURIComponent(next)}`)
+    // Close prompt immediately for instant feedback
     setAuthPrompt({ open: false, message: '' })
+    
+    // Use window.location.href for instant navigation (faster than router.push)
+    const next = typeof window !== 'undefined' ? window.location.pathname : '/'
+    window.location.href = `/login?next=${encodeURIComponent(next)}`
   }
 
   const closeAuthPrompt = () => setAuthPrompt({ open: false, message: '' })
 
-  // Prevent background scroll when auth prompt is open
+  // Prevent background scroll and fade mobile dock when auth prompt is open
   useEffect(() => {
     if (authPrompt.open) {
       document.body.style.overflow = 'hidden'
+      document.body.classList.add('auth-prompt-open')
     } else {
       document.body.style.overflow = ''
+      document.body.classList.remove('auth-prompt-open')
     }
     return () => {
       document.body.style.overflow = ''
+      document.body.classList.remove('auth-prompt-open')
     }
   }, [authPrompt.open])
 
@@ -286,11 +292,20 @@ export default function ArtworkDetailsPage() {
     }
   }
 
-  const handleBuyNow = () => {
-    if (!user) {
-      requireAuth('To complete this purchase you need to login first.')
+  const handleBuyNow = (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    
+    if (!user || !user.uid) {
+      requireAuth('To purchase artworks, you need to login first.')
       return
     }
+    
+    if (!artwork) {
+      toast.error('Artwork not loaded')
+      return
+    }
+    
     setShowCheckout(true)
   }
 
@@ -373,21 +388,47 @@ export default function ArtworkDetailsPage() {
     }))
   }
 
-  const handleLike = async () => {
+  const handleLike = async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    
     if (!user || !user.uid) {
-      requireAuth('To like this artwork you need to login first.')
+      requireAuth('To like artworks, you need to login first.')
       return
     }
 
-    if (!artwork) return
+    if (!artwork || !artwork.id) {
+      toast.error('Artwork not loaded')
+      return
+    }
+
+    if (liking) {
+      return // Prevent multiple clicks
+    }
 
     setLiking(true)
     try {
+      const wasLiked = artwork.likedBy?.includes(user.uid) || false
       await likeArtwork(artwork.id, user.uid)
-      await loadArtwork() // Reload to get updated like count
-      toast.success(artwork.likedBy?.includes(user.uid) ? 'Removed like' : 'Liked artwork')
-    } catch (error) {
-      toast.error('Failed to like artwork')
+      // Update artwork state optimistically
+      setArtwork((prev: any) => {
+        if (!prev) return prev
+        const newLikedBy = prev.likedBy || []
+        const isLiked = newLikedBy.includes(user.uid)
+        return {
+          ...prev,
+          likedBy: isLiked 
+            ? newLikedBy.filter((id: string) => id !== user.uid)
+            : [...newLikedBy, user.uid],
+          likes: (prev.likes || 0) + (isLiked ? -1 : 1)
+        }
+      })
+      toast.success(wasLiked ? 'Removed like' : 'Liked artwork')
+    } catch (error: any) {
+      console.error('Like error:', error)
+      toast.error(error.message || 'Failed to like artwork')
+      // Reload artwork on error to sync state
+      await loadArtwork()
     } finally {
       setLiking(false)
     }
@@ -736,9 +777,9 @@ export default function ArtworkDetailsPage() {
                     artwork.likedBy?.includes(user?.uid)
                       ? 'bg-red-50 text-red-600'
                       : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
-                  }`}
+                  } ${liking ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  <FiThumbsUp className={`text-base ${artwork.likedBy?.includes(user?.uid) ? 'fill-current' : ''}`} />
+                  <FiThumbsUp className={`text-base ${artwork.likedBy?.includes(user?.uid) ? 'fill-current text-red-500' : ''}`} />
                   <span className="text-xs font-medium hidden sm:inline">{artwork.likes || 0}</span>
                 </button>
               </div>
@@ -812,7 +853,8 @@ export default function ArtworkDetailsPage() {
                       </button>
                       <button
                         onClick={handleBuyNow}
-                        className="flex-1 flex items-center justify-center gap-1.5 text-xs md:text-base py-2.5 md:py-4 rounded-lg md:rounded-xl font-bold bg-black text-white hover:bg-gray-900 transition-all shadow-lg"
+                        type="button"
+                        className="flex-1 flex items-center justify-center gap-1.5 text-xs md:text-base py-2.5 md:py-4 rounded-lg md:rounded-xl font-bold bg-black text-white hover:bg-gray-900 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <FiShoppingCart className="text-sm md:text-lg" />
                         Buy Now
@@ -1260,29 +1302,44 @@ export default function ArtworkDetailsPage() {
       </div>
 
       {authPrompt.open && (
-        <div className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm transition-opacity duration-200">
-          <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm px-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full p-6 space-y-4">
-              <div className="space-y-2">
-                <p className="text-lg font-semibold text-gray-900">Login required</p>
-                <p className="text-sm text-gray-600">
-                  {authPrompt.message || 'To complete this action you need to login first.'}
-                </p>
-              </div>
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={closeAuthPrompt}
-                  className="btn-secondary px-4 py-2 text-sm font-semibold"
-                >
-                  Not now
-                </button>
-                <button
-                  onClick={handleAuthRedirect}
-                  className="btn-primary px-4 py-2 text-sm font-semibold"
-                >
-                  Go to login
-                </button>
-              </div>
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center px-4" 
+          style={{ 
+            backdropFilter: 'blur(8px)', 
+            backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+            transition: 'background-color 0.3s ease, backdrop-filter 0.3s ease',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4 relative z-10" style={{ margin: 'auto' }}>
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-gray-900">Login required</p>
+              <p className="text-sm text-gray-600">
+                {authPrompt.message || 'To complete this action you need to login first.'}
+              </p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={closeAuthPrompt}
+                className="btn-secondary px-4 py-2 text-sm font-semibold"
+              >
+                Not now
+              </button>
+              <button
+                onClick={handleAuthRedirect}
+                className="bg-black text-white hover:bg-gray-800 px-4 py-2 text-sm font-semibold rounded-lg transition-colors"
+              >
+                Go to login
+              </button>
             </div>
           </div>
         </div>

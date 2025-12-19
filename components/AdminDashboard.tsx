@@ -2009,7 +2009,7 @@ export default function AdminDashboard() {
 
       {/* Bottom Navigation Bar - Mobile Only - Fixed at Bottom */}
       <nav 
-        className="fixed inset-x-0 bottom-0 z-[9999] px-4 pb-4 md:hidden safe-area-bottom pointer-events-none" 
+        className="fixed inset-x-0 bottom-0 z-50 px-2 pb-2 md:hidden safe-area-bottom pointer-events-none" 
         style={{ 
           position: 'fixed', 
           bottom: 0, 
@@ -2021,13 +2021,11 @@ export default function AdminDashboard() {
           WebkitBackfaceVisibility: 'hidden',
           backfaceVisibility: 'hidden',
           margin: 0,
-          paddingLeft: '1rem',
-          paddingRight: '1rem',
-          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
+          paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0.5rem))'
         }}
       >
         <div 
-          className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-2 rounded-2xl border border-gray-200/60 bg-white/95 px-2 py-2 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-xl"
+          className="pointer-events-auto mx-auto flex w-full max-w-xl items-center justify-between gap-0.5 rounded-2xl border border-orange-200/50 bg-gradient-to-b from-white via-orange-50/30 to-white/95 px-1.5 py-1.5 shadow-[0_-6px_20px_rgba(249,115,22,0.12)] backdrop-blur-xl" 
           style={{ 
             willChange: 'transform',
             transform: 'translateZ(0)',
@@ -2038,36 +2036,36 @@ export default function AdminDashboard() {
         >
           <button
             onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 transition-all duration-200 active:scale-95 ${
+            className={`flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-150 active:scale-90 touch-manipulation ${
               activeTab === 'home'
-                ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30'
+                : 'text-orange-500 hover:text-orange-600 hover:bg-orange-50/50'
             }`}
           >
-            <FiHome className="text-lg" />
-            <span className="text-xs font-medium">Home</span>
+            <FiHome className={`text-sm ${activeTab === 'home' ? 'scale-105' : ''}`} />
+            <span className="text-[9px] font-semibold tracking-wide">Home</span>
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 transition-all duration-200 active:scale-95 ${
+            className={`flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-150 active:scale-90 touch-manipulation ${
               activeTab === 'orders'
-                ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30'
+                : 'text-orange-500 hover:text-orange-600 hover:bg-orange-50/50'
             }`}
           >
-            <FiPackage className="text-lg" />
-            <span className="text-xs font-medium">Orders</span>
+            <FiPackage className={`text-sm ${activeTab === 'orders' ? 'scale-105' : ''}`} />
+            <span className="text-[9px] font-semibold tracking-wide">Orders</span>
           </button>
           <button
             onClick={() => setActiveTab('artists')}
-            className={`flex flex-col items-center gap-1 rounded-xl px-4 py-2 transition-all duration-200 active:scale-95 ${
+            className={`flex flex-col items-center gap-0.5 rounded-xl px-1 py-1.5 transition-all duration-150 active:scale-90 touch-manipulation ${
               activeTab === 'artists'
-                ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30'
+                : 'text-orange-500 hover:text-orange-600 hover:bg-orange-50/50'
             }`}
           >
-            <FiUser className="text-lg" />
-            <span className="text-xs font-medium">Artists</span>
+            <FiUser className={`text-sm ${activeTab === 'artists' ? 'scale-105' : ''}`} />
+            <span className="text-[9px] font-semibold tracking-wide">Artists</span>
           </button>
         </div>
       </nav>
