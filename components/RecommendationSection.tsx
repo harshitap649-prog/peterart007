@@ -18,7 +18,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 interface RecommendationSectionProps {
   userId?: string
   type: 'personalized' | 'trending' | 'becauseYouLiked' | 'similar'
-  artworkId?: string
+  artworkId?: string  
   title?: string
   subtitle?: string
   limit?: number

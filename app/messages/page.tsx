@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtistByUserId } from '@/lib/artists'
 import toast from 'react-hot-toast'
-import { FiMessageCircle, FiUser, FiSearch, FiArrowLeft } from 'react-icons/fi'
+import { FiMessageCircle, FiUser, FiSearch, FiArrowLeft, FiX } from 'react-icons/fi'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,21 +16,45 @@ export default function MessagesPage() {
   const [conversations, setConversations] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileModalImage, setProfileModalImage] = useState<string | null>(null)
+  const [profileModalName, setProfileModalName] = useState<string>('')
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const isPageVisibleRef = useRef(true)
 
   useEffect(() => {
     loadUser()
+    
+    // Handle page visibility to pause refresh when tab is hidden
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
   }, [])
 
   useEffect(() => {
     if (user) {
       loadConversations()
-      // Auto-refresh conversations every 5 seconds
-      const interval = setInterval(() => {
-        loadConversations()
-      }, 5000)
-      return () => clearInterval(interval)
+      // Auto-refresh conversations every 10 seconds (reduced from 5s) only when page is visible
+      intervalRef.current = setInterval(() => {
+        if (isPageVisibleRef.current) {
+          loadConversations()
+        }
+      }, 10000)
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+      }
     }
-  }, [user])
+  }, [user, loadConversations])
 
   const loadUser = async () => {
     try {
@@ -54,7 +78,7 @@ export default function MessagesPage() {
     }
   }
 
-  const loadConversations = async () => {
+  const loadConversations = useCallback(async () => {
     if (!user) return
 
     try {
@@ -112,45 +136,83 @@ export default function MessagesPage() {
           )
         
         // Load user info for each conversation
-        const conversationsWithInfo = await Promise.all(
-          conversationsList.map(async (conv) => {
-            try {
-              const userResponse = await fetch(`/api/users/${conv.userId}`)
-              if (userResponse.ok) {
-                const userData = await userResponse.json()
-                return {
-                  ...conv,
-                  userName: userData.displayName || userData.email?.split('@')[0] || 'User',
-                  userEmail: userData.email,
-                  profileImage: userData.profileImage || null
-                }
-              } else {
-                // Try to get artist info
-                const artistData = await getArtistByUserId(conv.userId)
-                if (artistData) {
-                  return {
-                    ...conv,
-                    userName: artistData.artistName,
-                    userEmail: artistData.email || null,
-                    profileImage: artistData.profileImage || null
-                  }
-                }
-              }
-            } catch (error) {
-              console.error('Error loading user info:', error)
+        setConversations(prevConversations => {
+          const userInfoCache = new Map()
+          prevConversations.forEach(conv => {
+            if (conv.userName !== 'Loading...') {
+              userInfoCache.set(conv.userId, {
+                userName: conv.userName,
+                userEmail: conv.userEmail,
+                profileImage: conv.profileImage
+              })
+            }
+          })
+          
+          return conversationsList.map(conv => {
+            const cached = userInfoCache.get(conv.userId)
+            if (cached) {
+              return { ...conv, ...cached }
             }
             return conv
           })
-        )
+        })
         
-        setConversations(conversationsWithInfo)
+        // Load user info for conversations that don't have it cached
+        const conversationsToLoad = conversationsList.filter(conv => {
+          const cached = conversations.find(c => c.userId === conv.userId && c.userName !== 'Loading...')
+          return !cached
+        })
+        
+        if (conversationsToLoad.length > 0) {
+          const conversationsWithInfo = await Promise.all(
+            conversationsToLoad.map(async (conv) => {
+              try {
+                const userResponse = await fetch(`/api/users/${conv.userId}`)
+                if (userResponse.ok) {
+                  const userData = await userResponse.json()
+                  return {
+                    ...conv,
+                    userName: userData.displayName || userData.email?.split('@')[0] || 'User',
+                    userEmail: userData.email,
+                    profileImage: userData.profileImage || null
+                  }
+                } else {
+                  // Try to get artist info
+                  const artistData = await getArtistByUserId(conv.userId)
+                  if (artistData) {
+                    return {
+                      ...conv,
+                      userName: artistData.artistName,
+                      userEmail: artistData.email || null,
+                      profileImage: artistData.profileImage || null
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('Error loading user info:', error)
+              }
+              return conv
+            })
+          )
+          
+          setConversations(prev => {
+            const updated = [...prev]
+            conversationsWithInfo.forEach(newConv => {
+              const index = updated.findIndex(c => c.userId === newConv.userId)
+              if (index >= 0) {
+                updated[index] = newConv
+              }
+            })
+            return updated
+          })
+        }
       }
     } catch (error) {
       console.error('Error loading conversations:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
   const formatTime = (date: string) => {
     const msgDate = new Date(date)
@@ -189,10 +251,10 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white w-full">
       {/* Header - Mobile Optimized */}
-      <div className="glass-panel border-b border-white/20 backdrop-blur-xl bg-white/60 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5">
+      <div className="glass-panel border-b border-white/20 backdrop-blur-xl bg-white/60 sticky top-0 z-50 w-full">
+        <div className="w-full max-w-4xl mx-auto px-3 md:px-4 py-3 md:py-5">
           <div className="flex items-center gap-2 md:gap-4 mb-3 md:mb-5">
             <button
               onClick={() => router.back()}
@@ -225,7 +287,7 @@ export default function MessagesPage() {
       </div>
 
       {/* Conversations List - Mobile Optimized */}
-      <div className="max-w-4xl mx-auto px-3 md:px-4 py-4 md:py-6">
+      <div className="w-full max-w-4xl mx-auto px-0 md:px-4 py-4 md:py-6">
         {loading ? (
           <div className="text-center py-12 md:py-16">
             <div className="w-10 h-10 md:w-12 md:h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-3 md:mb-4"></div>
@@ -251,11 +313,21 @@ export default function MessagesPage() {
               <div
                 key={conv.userId}
                 onClick={() => router.push(`/chat/${conv.userId}`)}
-                className="glass-panel p-3 md:p-5 rounded-none md:rounded-xl hover:shadow-lg md:hover:shadow-xl cursor-pointer transition-all border border-white/20 active:scale-[0.98]"
+                className="glass-panel p-3 md:p-5 rounded-none md:rounded-xl hover:shadow-lg md:hover:shadow-xl cursor-pointer transition-all border-b md:border border-white/20 active:scale-[0.98] mx-0 md:mx-0"
               >
                 <div className="flex items-start gap-3 md:gap-4">
                   {/* Avatar - Mobile Optimized */}
-                  <div className="relative flex-shrink-0">
+                  <div 
+                    className="relative flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (conv.profileImage) {
+                        setProfileModalImage(conv.profileImage)
+                        setProfileModalName(conv.userName)
+                        setShowProfileModal(true)
+                      }
+                    }}
+                  >
                     {conv.profileImage ? (
                       <img
                         src={conv.profileImage}
@@ -299,6 +371,41 @@ export default function MessagesPage() {
           </div>
         )}
       </div>
+
+      {/* Profile Image Modal */}
+      {showProfileModal && profileModalImage && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowProfileModal(false)}
+        >
+          <div 
+            className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowProfileModal(false)}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+              aria-label="Close"
+            >
+              <FiX className="text-xl md:text-2xl" />
+            </button>
+            
+            {/* Large Image */}
+            <div className="text-center">
+              <img
+                src={profileModalImage}
+                alt={profileModalName}
+                className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage%3C/text%3E%3C/svg%3E'
+                }}
+              />
+              <p className="mt-4 text-white text-lg font-semibold">{profileModalName}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

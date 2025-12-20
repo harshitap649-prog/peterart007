@@ -7,7 +7,7 @@ import { getArtworkById } from '@/lib/artworks'
 import { createOrder } from '@/lib/orders'
 import { loadPopunderAd } from '@/lib/popunderAd'
 import toast from 'react-hot-toast'
-import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiThumbsUp, FiTrash2, FiMessageCircle, FiChevronLeft, FiChevronRight, FiShare2 } from 'react-icons/fi'
+import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiThumbsUp, FiTrash2, FiMessageCircle, FiChevronLeft, FiChevronRight, FiShare2, FiUser } from 'react-icons/fi'
 import LoginModal from '@/components/LoginModal'
 import Cart from '@/components/Cart'
 import RecommendationSection from '@/components/RecommendationSection'
@@ -55,6 +55,7 @@ export default function ArtworkDetailsPage() {
   const [touchEnd, setTouchEnd] = useState(0)
   const [pinchStart, setPinchStart] = useState(0)
   const [initialScale, setInitialScale] = useState(1)
+  const [lastTap, setLastTap] = useState(0)
   const [showDeleteReviewConfirm, setShowDeleteReviewConfirm] = useState(false)
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null)
   const [authChecked, setAuthChecked] = useState(false)
@@ -67,6 +68,10 @@ export default function ArtworkDetailsPage() {
     open: false,
     message: ''
   })
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileModalImage, setProfileModalImage] = useState<string | null>(null)
+  const [profileModalName, setProfileModalName] = useState<string>('')
+  const [userProfileImages, setUserProfileImages] = useState<{ [key: string]: string | null }>({})
 
   const requireAuth = (message: string) => {
     setAuthPrompt({
@@ -105,6 +110,35 @@ export default function ArtworkDetailsPage() {
     checkAuth()
     loadArtwork()
   }, [params.id])
+
+  // Load profile images for review authors
+  useEffect(() => {
+    if (artwork && artwork.comments) {
+      const loadProfileImages = async () => {
+        const profileMap: { [key: string]: string | null } = {}
+        const uniqueUserIds = [...new Set(artwork.comments.map((c: any) => c.userId))]
+        
+        await Promise.all(
+          uniqueUserIds.map(async (userId: string) => {
+            try {
+              const response = await fetch(`/api/users/${userId}`)
+              if (response.ok) {
+                const userData = await response.json()
+                profileMap[userId] = userData.profileImage || userData.photoURL || null
+              }
+            } catch (error) {
+              console.error('Error loading user profile:', error)
+              profileMap[userId] = null
+            }
+          })
+        )
+        
+        setUserProfileImages(profileMap)
+      }
+      
+      loadProfileImages()
+    }
+  }, [artwork])
 
   const checkAuth = async () => {
     try {
@@ -163,25 +197,48 @@ export default function ArtworkDetailsPage() {
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX)
+    if (e.touches.length === 1 && !imageZoomed) {
+      setTouchStart(e.targetTouches[0].clientX)
+    }
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
+    if (e.touches.length === 1 && !imageZoomed) {
+      setTouchEnd(e.targetTouches[0].clientX)
+    }
   }
 
   const handleTouchEnd = () => {
+    if (imageZoomed) return
+    
+    // Handle double tap for mobile zoom
+    const currentTime = new Date().getTime()
+    const tapLength = currentTime - lastTap
+    
+    if (tapLength < 300 && tapLength > 0) {
+      // Double tap detected
+      handleImageDoubleClick()
+      setLastTap(0)
+      return
+    }
+    
+    setLastTap(currentTime)
+    
+    // Handle swipe for image navigation
     if (!touchStart || !touchEnd) return
     const distance = touchStart - touchEnd
     const isLeftSwipe = distance > 50
     const isRightSwipe = distance < -50
 
-    if (isLeftSwipe && !imageZoomed) {
+    if (isLeftSwipe) {
       handleNextImage()
     }
-    if (isRightSwipe && !imageZoomed) {
+    if (isRightSwipe) {
       handlePreviousImage()
     }
+    
+    setTouchStart(0)
+    setTouchEnd(0)
   }
 
   const handleImageDoubleClick = () => {
@@ -191,7 +248,7 @@ export default function ArtworkDetailsPage() {
       setImagePosition({ x: 0, y: 0 })
     } else {
       setImageZoomed(true)
-      setImageScale(2)
+      setImageScale(1.5) // Reduced from 2 to 1.5 for better initial zoom
     }
   }
 
@@ -199,7 +256,7 @@ export default function ArtworkDetailsPage() {
     if (!imageZoomed) return
     e.preventDefault()
     const delta = e.deltaY > 0 ? -0.1 : 0.1
-    const newScale = Math.min(Math.max(imageScale + delta, 1), 4)
+    const newScale = Math.min(Math.max(imageScale + delta, 1), 2.5) // Reduced max zoom from 4 to 2.5
     setImageScale(newScale)
     if (newScale === 1) {
       setImageZoomed(false)
@@ -215,10 +272,24 @@ export default function ArtworkDetailsPage() {
 
   const handleImageMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !imageZoomed) return
-    setImagePosition({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y
-    })
+    const newX = e.clientX - dragStart.x
+    const newY = e.clientY - dragStart.y
+    
+    // Constrain image position to prevent dragging too far
+    // Calculate max bounds based on image scale
+    const container = e.currentTarget.parentElement
+    if (container) {
+      const containerRect = container.getBoundingClientRect()
+      const maxX = (containerRect.width * (imageScale - 1)) / 2
+      const maxY = (containerRect.height * (imageScale - 1)) / 2
+      
+      setImagePosition({
+        x: Math.max(-maxX, Math.min(maxX, newX)),
+        y: Math.max(-maxY, Math.min(maxY, newY))
+      })
+    } else {
+      setImagePosition({ x: newX, y: newY })
+    }
   }
 
   const handleImageMouseUp = () => {
@@ -227,6 +298,7 @@ export default function ArtworkDetailsPage() {
 
   const handleTouchPinch = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
+      e.preventDefault()
       const touch1 = e.touches[0]
       const touch2 = e.touches[1]
       const distance = Math.hypot(
@@ -236,17 +308,18 @@ export default function ArtworkDetailsPage() {
       
       if (pinchStart === 0) {
         setPinchStart(distance)
-        setInitialScale(imageScale)
+        setInitialScale(imageScale || 1)
         return
       }
       
       const scale = distance / pinchStart
-      const newScale = Math.min(Math.max(initialScale * scale, 1), 4)
+      const newScale = Math.min(Math.max(initialScale * scale, 1), 2.5) // Reduced max zoom from 4 to 2.5
       setImageScale(newScale)
-      setImageZoomed(newScale > 1)
+      setImageZoomed(newScale > 1.1) // Only set zoomed if scale is significantly above 1
       
-      if (newScale === 1) {
+      if (newScale <= 1.1) {
         setImagePosition({ x: 0, y: 0 })
+        setImageZoomed(false)
       }
     } else {
       setPinchStart(0)
@@ -632,25 +705,51 @@ export default function ArtworkDetailsPage() {
             {artwork.images && artwork.images.length > 0 ? (
               <div className="bg-white rounded-none md:rounded-2xl overflow-hidden">
                 <div 
-                  className={`relative w-full h-[70vh] sm:h-[75vh] md:h-96 rounded-none md:rounded-xl bg-gray-50 flex items-center justify-center ${imageZoomed ? 'overflow-auto cursor-move' : 'overflow-hidden'}`}
+                  className={`relative w-full h-[70vh] sm:h-[75vh] md:h-96 rounded-none md:rounded-xl bg-gray-50 flex items-center justify-center ${imageZoomed ? 'overflow-hidden cursor-move touch-none' : 'overflow-hidden'}`}
                   onTouchStart={(e) => {
                     if (e.touches.length === 2) {
+                      e.preventDefault()
                       handleTouchPinch(e)
                     } else if (e.touches.length === 1 && !imageZoomed) {
                       handleTouchStart(e)
+                    } else if (e.touches.length === 1 && imageZoomed) {
+                      // Start dragging when zoomed
+                      const touch = e.touches[0]
+                      setIsDragging(true)
+                      setDragStart({ x: touch.clientX - imagePosition.x, y: touch.clientY - imagePosition.y })
                     }
                   }}
                   onTouchMove={(e) => {
                     if (e.touches.length === 2) {
+                      e.preventDefault()
                       handleTouchPinch(e)
-                    } else {
+                    } else if (e.touches.length === 1 && imageZoomed && isDragging) {
+                      e.preventDefault()
+                      const touch = e.touches[0]
+                      const newX = touch.clientX - dragStart.x
+                      const newY = touch.clientY - dragStart.y
+                      
+                      // Constrain position
+                      const container = e.currentTarget
+                      const containerRect = container.getBoundingClientRect()
+                      const maxX = (containerRect.width * (imageScale - 1)) / 2
+                      const maxY = (containerRect.height * (imageScale - 1)) / 2
+                      
+                      setImagePosition({
+                        x: Math.max(-maxX, Math.min(maxX, newX)),
+                        y: Math.max(-maxY, Math.min(maxY, newY))
+                      })
+                    } else if (e.touches.length === 1 && !imageZoomed) {
                       handleTouchMove(e)
                     }
                   }}
                   onTouchEnd={(e) => {
                     if (e.touches.length === 0) {
                       setPinchStart(0)
+                      setIsDragging(false)
                       handleTouchEnd()
+                    } else if (e.touches.length === 1) {
+                      setIsDragging(false)
                     }
                   }}
                   onWheel={handleImageWheel}
@@ -665,11 +764,13 @@ export default function ArtworkDetailsPage() {
                     className={`select-none transition-transform duration-200 ${imageZoomed ? 'cursor-move' : 'cursor-zoom-in'}`}
                     style={{
                       transform: `scale(${imageScale}) translate(${imagePosition.x / imageScale}px, ${imagePosition.y / imageScale}px)`,
+                      transformOrigin: 'center center',
                       maxWidth: imageZoomed ? 'none' : '100%',
                       maxHeight: imageZoomed ? 'none' : '100%',
                       width: imageZoomed ? 'auto' : '100%',
                       height: imageZoomed ? 'auto' : '100%',
-                      objectFit: 'contain'
+                      objectFit: 'contain',
+                      willChange: imageZoomed ? 'transform' : 'auto'
                     }}
                     draggable={false}
                     onDoubleClick={handleImageDoubleClick}
@@ -737,14 +838,14 @@ export default function ArtworkDetailsPage() {
                     </>
                   )}
                   
-                  {/* Share Button */}
+                  {/* Share Button - Top Right Corner */}
                   <button
                     onClick={handleShare}
-                    className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white rounded-full p-2 md:p-2.5 transition-all z-10 backdrop-blur-sm"
+                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white rounded-full p-2.5 md:p-2.5 transition-all z-20 backdrop-blur-sm shadow-lg"
                     aria-label="Share artwork"
                     title="Share this artwork"
                   >
-                    <FiShare2 className="text-base md:text-lg" />
+                    <FiShare2 className="text-lg md:text-lg" />
                   </button>
                 </div>
               </div>
@@ -1179,6 +1280,35 @@ export default function ArtworkDetailsPage() {
                     .map((comment: any) => (
                       <div key={comment.id} className="pb-4 border-b border-gray-100 last:border-0">
                         <div className="flex items-start gap-3 mb-2">
+                          {/* Profile Image */}
+                          <div 
+                            className="flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => {
+                              const profileImage = userProfileImages[comment.userId]
+                              if (profileImage) {
+                                setProfileModalImage(profileImage)
+                                setProfileModalName(comment.userName)
+                                setShowProfileModal(true)
+                              }
+                            }}
+                          >
+                            {userProfileImages[comment.userId] ? (
+                              <img
+                                src={userProfileImages[comment.userId]!}
+                                alt={comment.userName}
+                                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover border-2 border-gray-200 shadow-sm"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage%3C/text%3E%3C/svg%3E'
+                                }}
+                              />
+                            ) : (
+                              <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center border-2 border-gray-200 shadow-sm">
+                                <span className="text-white text-xs md:text-sm font-bold">
+                                  {comment.userName[0]?.toUpperCase() || 'U'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1 justify-between">
                               <div className="flex items-center gap-2">
@@ -1417,6 +1547,41 @@ export default function ArtworkDetailsPage() {
               >
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Profile Image Modal */}
+      {showProfileModal && profileModalImage && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowProfileModal(false)}
+        >
+          <div 
+            className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowProfileModal(false)}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+              aria-label="Close"
+            >
+              <FiX className="text-xl md:text-2xl" />
+            </button>
+            
+            {/* Large Image */}
+            <div className="text-center">
+              <img
+                src={profileModalImage}
+                alt={profileModalName}
+                className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage%3C/text%3E%3C/svg%3E'
+                }}
+              />
+              <p className="mt-4 text-white text-lg font-semibold">{profileModalName}</p>
             </div>
           </div>
         </div>

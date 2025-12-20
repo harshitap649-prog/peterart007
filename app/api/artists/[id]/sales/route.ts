@@ -46,17 +46,20 @@ export async function GET(
       .filter((a: any) => a.artistId === params.id)
       .map((a: any) => a.id)
     
-    // Get all orders for artist's artworks
-    const artistOrders = orders.filter((o: any) => 
+    // Get all orders for artist's artworks (including all statuses for admin view)
+    const allArtistOrders = orders.filter((o: any) => 
       artistArtworkIds.includes(o.artworkId) && 
       o.status !== 'cancelled' && 
       o.status !== 'returned'
     )
     
-    // Calculate statistics
-    const totalSales = artistOrders.length
-    const totalRevenue = artistOrders.reduce((sum: number, order: any) => sum + (order.total || 0), 0)
-    const totalQuantity = artistOrders.reduce((sum: number, order: any) => sum + (order.quantity || 1), 0)
+    // Only count DELIVERED orders for earnings and revenue (for artist dashboard)
+    const deliveredOrders = allArtistOrders.filter((o: any) => o.status === 'delivered')
+    
+    // Calculate statistics - ONLY for delivered orders
+    const totalSales = deliveredOrders.length
+    const totalRevenue = deliveredOrders.reduce((sum: number, order: any) => sum + (order.total || 0), 0)
+    const totalQuantity = deliveredOrders.reduce((sum: number, order: any) => sum + (order.quantity || 1), 0)
     
     // Get artist commission rate
     const artistArtwork = artworks.find((a: any) => a.artistId === params.id)
@@ -65,16 +68,16 @@ export async function GET(
     const totalEarnings = totalRevenue * (commissionRate / 100)
     const platformFee = totalRevenue - totalEarnings
     
-    // Group by status
+    // Group by status (for all orders)
     const byStatus = {
-      pending: artistOrders.filter((o: any) => o.status === 'pending' || o.status === 'confirmed').length,
-      delivered: artistOrders.filter((o: any) => o.status === 'delivered').length
+      pending: allArtistOrders.filter((o: any) => o.status === 'pending' || o.status === 'confirmed').length,
+      delivered: deliveredOrders.length
     }
     
-    // Recent sales (last 30 days)
+    // Recent sales (last 30 days) - only delivered
     const thirtyDaysAgo = new Date()
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-    const recentSales = artistOrders.filter((o: any) => 
+    const recentSales = deliveredOrders.filter((o: any) => 
       new Date(o.createdAt) >= thirtyDaysAgo
     ).length
     
@@ -87,7 +90,7 @@ export async function GET(
       commissionRate,
       byStatus,
       recentSales,
-      orders: artistOrders.slice(0, 10) // Last 10 orders
+      orders: deliveredOrders.slice(0, 10) // Last 10 DELIVERED orders only
     })
   } catch (error) {
     console.error('Error fetching artist sales:', error)

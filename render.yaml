@@ -25,4 +25,5 @@ services:
         sync: false
       - key: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
         sync: false
+    # Render will automatically detect Next.js and use the correct settings
 

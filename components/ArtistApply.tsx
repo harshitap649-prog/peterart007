@@ -86,7 +86,7 @@ export default function ArtistApply() {
       if (artist) {
         toast.success('Welcome back! Redirecting to dashboard...')
         setTimeout(() => {
-          router.push('/user')
+          router.push('/user?tab=artist')
         }, 1000)
         return
       }
@@ -113,7 +113,7 @@ export default function ArtistApply() {
       if (artist) {
         toast.success('Welcome back! Redirecting to dashboard...')
         setTimeout(() => {
-          router.push('/user')
+          router.push('/user?tab=artist')
         }, 1000)
         return
       }
@@ -140,14 +140,14 @@ export default function ArtistApply() {
 
   if (currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-4xl">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-4 md:py-8 px-2 md:px-4">
+        <div className="w-full max-w-4xl mx-auto">
           <ArtistRegistration
             user={currentUser}
             onSuccess={() => {
               toast.success('Artist registration submitted! Redirecting to dashboard...')
               setTimeout(() => {
-                router.push('/user')
+                router.push('/user?tab=artist')
               }, 2000)
             }}
           />

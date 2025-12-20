@@ -23,7 +23,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
     instagram: '',
     facebook: '',
     twitter: '',
-    commissionRate: '70',
+    commissionRate: '89',
     accountName: '',
     accountNumber: '',
     ifscCode: '',
@@ -63,7 +63,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
       portfolio: 'Portfolio Links (Optional)',
       socialLinks: 'Social Media Links',
       commission: 'Commission Rate',
-      commissionNote: 'You will receive this percentage of each sale (default: 70%)',
+      commissionNote: 'You will receive this percentage of each sale (default: 89%)',
       bankDetails: 'Bank Details (for payouts)',
       accountName: 'Account Holder Name *',
       accountNumber: 'Account Number *',
@@ -92,7 +92,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
       portfolio: 'पोर्टफोलियो लिंक (वैकल्पिक)',
       socialLinks: 'सोशल मीडिया लिंक',
       commission: 'कमीशन दर',
-      commissionNote: 'आपको प्रत्येक बिक्री का यह प्रतिशत मिलेगा (डिफ़ॉल्ट: 70%)',
+      commissionNote: 'आपको प्रत्येक बिक्री का यह प्रतिशत मिलेगा (डिफ़ॉल्ट: 89%)',
       bankDetails: 'बैंक विवरण (भुगतान के लिए)',
       accountName: 'खाता धारक का नाम *',
       accountNumber: 'खाता संख्या *',
@@ -152,7 +152,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
           facebook: formData.facebook,
           twitter: formData.twitter
         },
-        commissionRate: parseFloat(formData.commissionRate) || 70,
+        commissionRate: parseFloat(formData.commissionRate) || 89,
         bankDetails: (formData.accountName && formData.accountNumber && formData.ifscCode && formData.bankName) ? {
           accountName: formData.accountName,
           accountNumber: formData.accountNumber,
@@ -181,9 +181,9 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
       setRegistrationSuccess(true)
       onSuccess?.(artist)
       
-      // Redirect to user dashboard after 3 seconds
+      // Redirect to artist dashboard tab after 3 seconds
       setTimeout(() => {
-        router.push('/user')
+        router.push('/user?tab=artist')
       }, 3000)
     } catch (error: any) {
       toast.error(error.message || t.error)
@@ -391,23 +391,24 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
   }
 
   return (
-    <div className="card p-6 md:p-8 max-w-3xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-3 bg-gradient-to-br from-purple-500 to-orange-500 rounded-lg">
-          <FiUser className="text-2xl text-white" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">{t.title}</h2>
-          <p className="text-gray-600 text-sm">{t.subtitle}</p>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Info */}
-        <div className="space-y-4">
+    <div className="w-full max-w-4xl mx-auto px-3 md:px-6 py-4 md:py-8">
+      <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-lg p-4 md:p-6 lg:p-8">
+        <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+          <div className="p-2 md:p-3 bg-gradient-to-br from-purple-500 to-orange-500 rounded-lg flex-shrink-0">
+            <FiUser className="text-xl md:text-2xl text-white" />
+          </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-              <FiUser className="text-base" />
+            <h2 className="text-lg md:text-2xl font-bold text-gray-900">{t.title}</h2>
+            <p className="text-gray-600 text-xs md:text-sm">{t.subtitle}</p>
+          </div>
+        </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+        {/* Basic Info */}
+        <div className="space-y-3 md:space-y-4">
+          <div>
+            <label className="block text-xs md:text-sm font-semibold text-gray-900 mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
+              <FiUser className="text-sm md:text-base" />
               {t.artistName}
             </label>
             <input
@@ -415,20 +416,20 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
               value={formData.artistName}
               onChange={(e) => setFormData({ ...formData, artistName: e.target.value })}
               required
-              className="input-field"
+              className="w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
               placeholder="Your artist name or studio name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-xs md:text-sm font-semibold text-gray-900 mb-1.5 md:mb-2">
               {t.bio}
             </label>
             <textarea
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              rows={4}
-              className="input-field"
+              rows={3}
+              className="w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
               placeholder="Tell us about yourself and your art..."
               maxLength={1000}
               required
@@ -438,90 +439,90 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
         </div>
 
         {/* Artworks Upload Section */}
-        <div className="border-t border-gray-200 pt-6">
-          <label className="block text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <FiImage className="text-base" />
+        <div className="border-t border-gray-200 pt-4 md:pt-6">
+          <label className="block text-xs md:text-sm font-semibold text-gray-900 mb-2 md:mb-4 flex items-center gap-1.5 md:gap-2">
+            <FiImage className="text-sm md:text-base" />
             {t.artworks}
           </label>
-          <p className="text-xs text-gray-600 mb-4">
+          <p className="text-xs text-gray-600 mb-3 md:mb-4">
             {language === 'hi' ? 'कृपया अपनी 2 सर्वश्रेष्ठ कलाकृतियां अपलोड करें' : 'Please upload your 2 best artworks'}
           </p>
           
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {artworks.map((artwork, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4 md:p-6">
-                <h4 className="text-sm font-semibold text-gray-900 mb-4">
+              <div key={index} className="border border-gray-200 rounded-lg md:rounded-xl p-3 md:p-4 lg:p-6 bg-gray-50/50">
+                <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-3 md:mb-4">
                   {language === 'hi' ? `कलाकृति ${index + 1}` : `Artwork ${index + 1}`}
                 </h4>
                 
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">{t.artworkTitle} *</label>
+                    <label className="block text-xs text-gray-700 mb-1 font-medium">{t.artworkTitle} *</label>
                     <input
                       type="text"
                       value={artwork.title}
                       onChange={(e) => handleArtworkChange(index, 'title', e.target.value)}
-                      className="input-field text-sm"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                       placeholder={language === 'hi' ? 'कलाकृति का शीर्षक' : 'Artwork title'}
                       required
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">{t.artworkDescription} *</label>
+                    <label className="block text-xs text-gray-700 mb-1 font-medium">{t.artworkDescription} *</label>
                     <textarea
                       value={artwork.description}
                       onChange={(e) => handleArtworkChange(index, 'description', e.target.value)}
-                      rows={3}
-                      className="input-field text-sm"
+                      rows={2}
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none bg-white"
                       placeholder={language === 'hi' ? 'कलाकृति का विवरण' : 'Describe your artwork'}
                       required
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-2 md:gap-4">
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">{t.artworkPrice} *</label>
+                      <label className="block text-xs text-gray-700 mb-1 font-medium">{t.artworkPrice} *</label>
                       <input
                         type="number"
                         value={artwork.price}
                         onChange={(e) => handleArtworkChange(index, 'price', e.target.value)}
-                        className="input-field text-sm"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                         placeholder="0"
                         min="1"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">{t.artworkCategory}</label>
+                      <label className="block text-xs text-gray-700 mb-1 font-medium">{t.artworkCategory}</label>
                       <input
                         type="text"
                         value={artwork.category}
                         onChange={(e) => handleArtworkChange(index, 'category', e.target.value)}
-                        className="input-field text-sm"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                         placeholder={language === 'hi' ? 'श्रेणी' : 'Category (optional)'}
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-xs text-gray-600 mb-2">{t.artworkImages} *</label>
+                    <label className="block text-xs text-gray-700 mb-2 font-medium">{t.artworkImages} *</label>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {artwork.imagePreviews.map((preview, imgIndex) => (
-                        <div key={imgIndex} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                        <div key={imgIndex} className="relative w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm">
                           <img src={preview} alt={`Preview ${imgIndex + 1}`} className="w-full h-full object-cover" />
                           <button
                             type="button"
                             onClick={() => removeImage(index, imgIndex)}
-                            className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-bl-lg"
+                            className="absolute top-0 right-0 bg-red-500 text-white p-0.5 md:p-1 rounded-bl-lg hover:bg-red-600 transition-colors"
                           >
                             <FiX className="text-xs" />
                           </button>
                         </div>
                       ))}
                     </div>
-                    <label className="btn-secondary text-sm py-2 px-4 cursor-pointer inline-block">
-                      <FiUpload className="inline mr-2" />
+                    <label className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                      <FiUpload className="text-sm md:text-base" />
                       {t.addImages}
                       <input
                         type="file"
@@ -532,7 +533,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
                       />
                     </label>
                     {artwork.images.length === 0 && (
-                      <p className="text-xs text-red-500 mt-1">{t.atLeastOneImage}</p>
+                      <p className="text-xs text-red-500 mt-1.5">{t.atLeastOneImage}</p>
                     )}
                   </div>
                 </div>
@@ -542,8 +543,8 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
         </div>
 
         {/* Portfolio Links */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2">
+        <div className="border-t border-gray-200 pt-4 md:pt-6">
+          <label className="block text-xs md:text-sm font-semibold text-gray-900 mb-2 md:mb-3">
             {t.portfolio}
           </label>
           <div className="space-y-2">
@@ -553,13 +554,13 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
                   type="url"
                   value={link}
                   onChange={(e) => updatePortfolioLink(index, e.target.value)}
-                  className="input-field flex-1"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                   placeholder="https://..."
                 />
                 <button
                   type="button"
                   onClick={() => removePortfolioLink(index)}
-                  className="btn-secondary px-4"
+                  className="px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Remove
                 </button>
@@ -568,7 +569,7 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
             <button
               type="button"
               onClick={addPortfolioLink}
-              className="btn-secondary text-sm py-2"
+              className="text-xs md:text-sm py-2 px-3 md:px-4 font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               + Add Portfolio Link
             </button>
@@ -576,49 +577,49 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
         </div>
 
         {/* Social Links */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <FiLink className="text-base" />
+        <div className="border-t border-gray-200 pt-4 md:pt-6">
+          <label className="block text-xs md:text-sm font-semibold text-gray-900 mb-2 md:mb-3 flex items-center gap-1.5 md:gap-2">
+            <FiLink className="text-sm md:text-base" />
             {t.socialLinks}
           </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Website</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">Website</label>
               <input
                 type="url"
                 value={formData.website}
                 onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 placeholder="https://yourwebsite.com"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Instagram</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">Instagram</label>
               <input
                 type="text"
                 value={formData.instagram}
                 onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 placeholder="@yourusername"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Facebook</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">Facebook</label>
               <input
                 type="url"
                 value={formData.facebook}
                 onChange={(e) => setFormData({ ...formData, facebook: e.target.value })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 placeholder="https://facebook.com/..."
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">Twitter</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">Twitter</label>
               <input
                 type="text"
                 value={formData.twitter}
                 onChange={(e) => setFormData({ ...formData, twitter: e.target.value })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 placeholder="@yourusername"
               />
             </div>
@@ -626,9 +627,9 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
         </div>
 
         {/* Commission Rate */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <FiPercent className="text-base" />
+        <div className="border-t border-gray-200 pt-4 md:pt-6">
+          <label className="block text-xs md:text-sm font-semibold text-gray-900 mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
+            <FiPercent className="text-sm md:text-base" />
             {t.commission}
           </label>
           <input
@@ -637,59 +638,59 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
             onChange={(e) => setFormData({ ...formData, commissionRate: e.target.value })}
             min="50"
             max="90"
-            className="input-field"
+            className="w-full px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base border border-gray-300 rounded-lg md:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
           />
-          <p className="text-xs text-gray-500 mt-1">{t.commissionNote}</p>
+          <p className="text-xs text-gray-500 mt-1.5">{t.commissionNote}</p>
         </div>
 
         {/* Bank Details - Optional */}
-        <div className="border-t border-gray-200 pt-6">
-          <label className="block text-sm font-semibold text-gray-900 mb-2 flex items-center gap-2">
-            <FiCreditCard className="text-base" />
+        <div className="border-t border-gray-200 pt-4 md:pt-6">
+          <label className="block text-xs md:text-sm font-semibold text-gray-900 mb-1.5 md:mb-2 flex items-center gap-1.5 md:gap-2">
+            <FiCreditCard className="text-sm md:text-base" />
             {t.bankDetails} <span className="text-xs text-gray-500 font-normal">({language === 'hi' ? 'वैकल्पिक' : 'Optional'})</span>
           </label>
-          <p className="text-xs text-gray-600 mb-4">
+          <p className="text-xs text-gray-600 mb-3 md:mb-4">
             {language === 'hi' ? 'आप बाद में भुगतान विवरण जोड़ सकते हैं' : 'You can add payment details later'}
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div>
-              <label className="block text-xs text-gray-600 mb-1">{t.accountName}</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">{t.accountName}</label>
               <input
                 type="text"
                 value={formData.accountName}
                 onChange={(e) => setFormData({ ...formData, accountName: e.target.value })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 placeholder={language === 'hi' ? 'वैकल्पिक' : 'Optional'}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">{t.accountNumber}</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">{t.accountNumber}</label>
               <input
                 type="text"
                 value={formData.accountNumber}
                 onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 placeholder={language === 'hi' ? 'वैकल्पिक' : 'Optional'}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">{t.ifscCode}</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">{t.ifscCode}</label>
               <input
                 type="text"
                 value={formData.ifscCode}
                 onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value.toUpperCase() })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 maxLength={11}
                 placeholder={language === 'hi' ? 'वैकल्पिक' : 'Optional'}
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 mb-1">{t.bankName}</label>
+              <label className="block text-xs text-gray-700 mb-1 font-medium">{t.bankName}</label>
               <input
                 type="text"
                 value={formData.bankName}
                 onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                className="input-field text-sm"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all bg-white"
                 placeholder={language === 'hi' ? 'वैकल्पिक' : 'Optional'}
               />
             </div>
@@ -697,21 +698,24 @@ export default function ArtistRegistration({ user, onSuccess, language = 'en' }:
         </div>
 
         {/* Submit */}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="btn-primary w-full py-3 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {submitting ? (
-            <span className="flex items-center justify-center gap-2">
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              {language === 'hi' ? 'सबमिट हो रहा है...' : 'Submitting...'}
-            </span>
-          ) : (
-            t.register
-          )}
-        </button>
+        <div className="border-t border-gray-200 pt-4 md:pt-6">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full py-3 md:py-3.5 text-sm md:text-base font-bold bg-black text-white rounded-lg md:rounded-xl hover:bg-gray-900 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-black"
+          >
+            {submitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                {language === 'hi' ? 'सबमिट हो रहा है...' : 'Submitting...'}
+              </span>
+            ) : (
+              t.register
+            )}
+          </button>
+        </div>
       </form>
+      </div>
     </div>
   )
 }

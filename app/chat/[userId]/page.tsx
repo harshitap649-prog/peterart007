@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtistByUserId } from '@/lib/artists'
 import toast from 'react-hot-toast'
-import { FiArrowLeft, FiSend, FiUser, FiMessageCircle, FiCheck, FiMoreVertical } from 'react-icons/fi'
+import { FiArrowLeft, FiSend, FiUser, FiMessageCircle, FiCheck, FiMoreVertical, FiX } from 'react-icons/fi'
 
 export default function ChatPage() {
   const params = useParams()
@@ -16,24 +16,49 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileModalImage, setProfileModalImage] = useState<string | null>(null)
+  const [profileModalName, setProfileModalName] = useState<string>('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const isPageVisibleRef = useRef(true)
+  const lastMessageIdRef = useRef<string | null>(null)
   const conversationId = params.userId as string
 
   useEffect(() => {
     loadUser()
+    
+    // Handle page visibility to pause refresh when tab is hidden
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
   }, [])
 
   useEffect(() => {
     if (user && conversationId) {
       loadOtherUser()
       loadMessages()
-      // Auto-refresh messages every 2 seconds
-      const interval = setInterval(() => {
-        loadMessages()
-      }, 2000)
-      return () => clearInterval(interval)
+      // Auto-refresh messages every 5 seconds (reduced from 2s) only when page is visible
+      intervalRef.current = setInterval(() => {
+        if (isPageVisibleRef.current) {
+          loadMessages(true) // Silent refresh
+        }
+      }, 5000)
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+      }
     }
-  }, [user, conversationId])
+  }, [user, conversationId, loadMessages])
 
   useEffect(() => {
     scrollToBottom()
@@ -155,12 +180,12 @@ export default function ChatPage() {
     }
   }
 
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async (silent = false) => {
     if (!user || !conversationId) return
 
     const convId = `${user.uid}_${conversationId}_direct`
     
-    if (messages.length === 0) {
+    if (!silent) {
       setLoading(true)
     }
     
@@ -168,16 +193,23 @@ export default function ChatPage() {
       const response = await fetch(`/api/messages?conversationId=${convId}`)
       if (response.ok) {
         const data = await response.json()
-        setMessages(data)
-        // Mark messages as read
-        try {
-          await fetch('/api/messages', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ conversationId: convId, userId: user.uid })
-          })
-        } catch (e) {
-          // Silently fail if marking as read fails
+        
+        // Only update if there are new messages (check last message ID)
+        const latestMessageId = data.length > 0 ? data[data.length - 1].id : null
+        if (latestMessageId !== lastMessageIdRef.current) {
+          setMessages(data)
+          lastMessageIdRef.current = latestMessageId
+          
+          // Mark messages as read
+          try {
+            await fetch('/api/messages', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ conversationId: convId, userId: user.uid })
+            })
+          } catch (e) {
+            // Silently fail if marking as read fails
+          }
         }
       }
     } catch (error) {
@@ -185,14 +217,36 @@ export default function ChatPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, conversationId])
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !user || !conversationId || sending) return
 
+    const messageText = newMessage.trim()
+    const convId = `${user.uid}_${conversationId}_direct`
+    
+    // Optimistic update - add message immediately
+    const tempMessage = {
+      id: `temp-${Date.now()}`,
+      senderId: user.uid,
+      receiverId: conversationId,
+      conversationId: convId,
+      message: messageText,
+      type: 'direct',
+      createdAt: new Date().toISOString(),
+      read: false
+    }
+    
+    setMessages(prev => [...prev, tempMessage])
+    setNewMessage('')
     setSending(true)
+    
+    // Scroll to bottom immediately
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
+    
     try {
-      const convId = `${user.uid}_${conversationId}_direct`
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -200,18 +254,22 @@ export default function ChatPage() {
           senderId: user.uid,
           receiverId: conversationId,
           conversationId: convId,
-          message: newMessage,
+          message: messageText,
           type: 'direct'
         })
       })
 
       if (response.ok) {
-        setNewMessage('')
-        loadMessages()
+        // Reload messages to get the real message with proper ID
+        await loadMessages(true)
       } else {
+        // Remove optimistic message on error
+        setMessages(prev => prev.filter(m => m.id !== tempMessage.id))
         toast.error('Failed to send message')
       }
     } catch (error) {
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(m => m.id !== tempMessage.id))
       toast.error('Failed to send message')
     } finally {
       setSending(false)
@@ -230,7 +288,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-white md:bg-gradient-to-b md:from-[#fff4ee] md:via-white md:to-white">
+    <div className="fixed inset-0 flex flex-col bg-white md:bg-gradient-to-b md:from-[#fff4ee] md:via-white md:to-white w-full">
       <div className="flex h-full w-full flex-col md:mx-auto md:max-w-5xl md:gap-4 md:px-4 md:py-4">
         {/* Header - Full Width on Mobile, Square Corners, Smaller Fonts */}
         <div className="rounded-none border-b border-gray-200 bg-white p-2.5 shadow-sm md:rounded-3xl md:border md:border-white/70 md:bg-white/90 md:p-4 md:shadow-[0_25px_80px_-40px_rgba(15,23,42,0.35)] md:backdrop-blur">
@@ -243,7 +301,16 @@ export default function ChatPage() {
               <span className="hidden md:inline text-xs font-semibold">Back</span>
             </button>
             <div className="flex flex-1 items-center gap-2.5 min-w-0">
-              <div className="relative flex-shrink-0">
+              <div 
+                className="relative flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => {
+                  if (otherUser?.profileImage) {
+                    setProfileModalImage(otherUser.profileImage)
+                    setProfileModalName(otherUser.name)
+                    setShowProfileModal(true)
+                  }
+                }}
+              >
                 {otherUser?.profileImage ? (
                   <img
                     src={otherUser.profileImage}
@@ -309,14 +376,32 @@ export default function ChatPage() {
                           <div className={`w-6 flex-shrink-0 ${showAvatar ? 'opacity-100' : 'opacity-0'}`}>
                           {isOwn ? (
                             user.photoURL ? (
-                                <img src={user.photoURL} alt="You" className="h-6 w-6 rounded-full object-cover shadow-sm" />
+                                <img 
+                                  src={user.photoURL} 
+                                  alt="You" 
+                                  className="h-6 w-6 rounded-full object-cover shadow-sm cursor-pointer hover:opacity-90 transition-opacity" 
+                                  onClick={() => {
+                                    setProfileModalImage(user.photoURL)
+                                    setProfileModalName(user.displayName || user.email?.split('@')[0] || 'You')
+                                    setShowProfileModal(true)
+                                  }}
+                                />
                               ) : (
                                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-slate-500 to-slate-700 text-white text-[10px] font-bold shadow-sm">
                                   {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
                               </div>
                             )
                           ) : otherUser?.profileImage ? (
-                              <img src={otherUser.profileImage} alt={otherUser.name} className="h-6 w-6 rounded-full object-cover shadow-sm" />
+                              <img 
+                                src={otherUser.profileImage} 
+                                alt={otherUser.name} 
+                                className="h-6 w-6 rounded-full object-cover shadow-sm cursor-pointer hover:opacity-90 transition-opacity" 
+                                onClick={() => {
+                                  setProfileModalImage(otherUser.profileImage)
+                                  setProfileModalName(otherUser.name)
+                                  setShowProfileModal(true)
+                                }}
+                              />
                             ) : (
                               <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white text-[10px] font-bold shadow-sm">
                                 {otherUser?.name?.[0]?.toUpperCase() || 'U'}
@@ -390,6 +475,41 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+
+      {/* Profile Image Modal */}
+      {showProfileModal && profileModalImage && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowProfileModal(false)}
+        >
+          <div 
+            className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowProfileModal(false)}
+              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+              aria-label="Close"
+            >
+              <FiX className="text-xl md:text-2xl" />
+            </button>
+            
+            {/* Large Image */}
+            <div className="text-center">
+              <img
+                src={profileModalImage}
+                alt={profileModalName}
+                className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage%3C/text%3E%3C/svg%3E'
+                }}
+              />
+              <p className="mt-4 text-white text-lg font-semibold">{profileModalName}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

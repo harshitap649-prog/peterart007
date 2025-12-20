@@ -19,7 +19,6 @@ import SearchFilters from './SearchFilters'
 import OrderTracking from './OrderTracking'
 import UserProfile from './UserProfile'
 import RecommendationSection from './RecommendationSection'
-import GiftCardManagement from './GiftCardManagement'
 import ArtistDashboard from './ArtistDashboard'
 import ArtistBadge from './ArtistBadge'
 import ArtistFeed from './ArtistFeed'
@@ -84,7 +83,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       myReviews: 'My Reviews',
       helpSupport: 'Help & Support',
       myProfile: 'My Profile',
-      myGiftCards: 'My Gift Cards',
       artistDashboard: 'Artist Dashboard',
       buy: 'Buy',
       buyNow: 'Buy Now',
@@ -180,7 +178,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       myOrders: 'मेरे ऑर्डर',
       myReviews: 'मेरी समीक्षाएं',
       helpSupport: 'सहायता और समर्थन',
-      myGiftCards: 'मेरे गिफ्ट कार्ड',
       myProfile: 'मेरी प्रोफ़ाइल',
       artistDashboard: 'कलाकार डैशबोर्ड',
       buy: 'खरीदें',
@@ -274,7 +271,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   useEffect(() => {
     const tab = searchParams.get('tab')
-    if (tab && ['artworks', 'wishlist', 'orders', 'reviews', 'support', 'profile', 'giftcards', 'artist', 'following'].includes(tab)) {
+    if (tab && ['artworks', 'wishlist', 'orders', 'reviews', 'support', 'profile', 'artist', 'following'].includes(tab)) {
       setActiveTab(tab)
       // Scroll to top instantly when tab changes for faster navigation
       window.scrollTo({ top: 0, behavior: 'instant' })
@@ -513,7 +510,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   }
 
   const handleNavClick = (tab: string) => {
-    if (tab === 'wishlist' || tab === 'orders' || tab === 'reviews' || tab === 'support' || tab === 'profile' || tab === 'following') {
+    if (tab === 'wishlist' || tab === 'orders' || tab === 'reviews' || tab === 'support' || tab === 'following') {
       // Check if user is logged in - if not, show login modal
       if (!user || !user.uid) {
         setSidebarOpen(false)
@@ -774,7 +771,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     { id: 'reviews', label: t.myReviews, icon: FiStar },
     { id: 'support', label: t.helpSupport, icon: FiHelpCircle },
     { id: 'profile', label: t.myProfile, icon: FiSettings, hidden: !user },
-    { id: 'giftcards', label: t.myGiftCards, icon: FiDollarSign, hidden: !user },
     { id: 'artist', label: t.artistDashboard, icon: FiTrendingUp, hidden: !isArtist },
   ].filter(tab => !tab.hidden)
 
@@ -866,7 +862,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     reviews: isActiveTab ? FaStar : HiStar,
                     support: isActiveTab ? FaQuestionCircle : HiQuestionMarkCircle,
                     profile: isActiveTab ? FaCog : HiCog,
-                    giftcards: isActiveTab ? FaDollarSign : HiCurrencyDollar,
                     artist: isActiveTab ? FaChartLine : HiTrendingUp,
                   }
                   
@@ -1035,7 +1030,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 reviews: 'text-amber-600',
                 support: 'text-green-600',
                 profile: 'text-indigo-600',
-                giftcards: 'text-emerald-600',
                 artist: 'text-cyan-600',
               }
               
@@ -1323,7 +1317,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-4">{t.noOrders}</p>
                 <button
                   onClick={() => handleNavClick('artworks')}
-                  className="btn-primary flex items-center gap-1 md:gap-2 mx-auto text-xs md:text-sm py-1.5 md:py-2.5 px-4 md:px-6"
+                  className="flex items-center gap-1 md:gap-2 mx-auto text-xs md:text-sm py-1.5 md:py-2.5 px-4 md:px-6 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition-colors"
                 >
                   <FiArrowRight className="text-xs md:text-sm" />
                   {t.startShopping}
@@ -1500,7 +1494,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                 <p className="text-sm text-gray-600 mb-4">{t.noReviews}</p>
                 <button
                   onClick={() => handleNavClick('artworks')}
-                  className="btn-primary flex items-center gap-2 mx-auto text-sm py-2.5 px-6"
+                  className="flex items-center gap-2 mx-auto text-sm py-2.5 px-6 bg-black text-white rounded-full font-semibold hover:bg-gray-800 transition-colors"
                 >
                   <FiArrowRight className="text-sm" />
                   {t.browseArtworks}
@@ -1630,12 +1624,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           </div>
         )}
 
-        {/* Gift Cards Tab */}
-        {activeTab === 'giftcards' && user && (
-          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
-          <GiftCardManagement userId={user.uid} language={language} />
-          </div>
-        )}
 
         {/* Artist Dashboard Tab */}
         {activeTab === 'artist' && isArtist && user && (

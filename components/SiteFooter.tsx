@@ -45,7 +45,6 @@ export default function SiteFooter() {
               <li><Link href="/user?tab=artworks" className="transition hover:text-[var(--text-primary)]">Discover Artworks</Link></li>
               <li><Link href="/user?tab=wishlist" className="transition hover:text-[var(--text-primary)]">Wishlist</Link></li>
               <li><Link href="/user?tab=orders" className="transition hover:text-[var(--text-primary)]">Orders & Tracking</Link></li>
-              <li><Link href="/user?tab=giftcards" className="transition hover:text-[var(--text-primary)]">Gift Cards</Link></li>
             </ul>
           </div>
 

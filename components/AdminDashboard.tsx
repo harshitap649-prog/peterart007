@@ -9,7 +9,7 @@ import { getAllSupportMessages, updateSupportMessage, deleteSupportMessage } fro
 import { getAllArtists, updateArtistProfile, getArtistArtworks, deleteArtist } from '@/lib/artists'
 import { logout } from '@/lib/auth'
 import toast from 'react-hot-toast'
-import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiUser, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch, FiImage, FiEye, FiMail, FiMenu, FiLogOut } from 'react-icons/fi'
+import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiUser, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch, FiImage, FiEye, FiMail, FiMenu, FiLogOut, FiDollarSign } from 'react-icons/fi'
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -46,6 +46,9 @@ export default function AdminDashboard() {
   const [showArtistDeleteConfirm, setShowArtistDeleteConfirm] = useState(false)
   const [artistToDelete, setArtistToDelete] = useState<any>(null)
   const [deletingArtist, setDeletingArtist] = useState(false)
+  const [commissions, setCommissions] = useState<any[]>([])
+  const [payouts, setPayouts] = useState<any[]>([])
+  const [payoutsSubTab, setPayoutsSubTab] = useState<'pending' | 'completed'>('pending')
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -72,6 +75,24 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadData()
   }, [activeTab])
+
+  // Prevent body scroll when sidebar is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add('menu-open')
+      document.documentElement.classList.add('overflow-hidden')
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('menu-open')
+      document.documentElement.classList.remove('overflow-hidden')
+      document.body.classList.remove('overflow-hidden')
+    }
+    return () => {
+      document.body.classList.remove('menu-open')
+      document.documentElement.classList.remove('overflow-hidden')
+      document.body.classList.remove('overflow-hidden')
+    }
+  }, [sidebarOpen])
 
   useEffect(() => {
     if (searchTerm) {
@@ -119,6 +140,28 @@ export default function AdminDashboard() {
           map.set(artist.id, artist)
         })
         setArtistsMap(map)
+      }
+      if (activeTab === 'commissions' || activeTab === 'home') {
+        // Load all commissions
+        try {
+          const commissionsResponse = await fetch('/api/commissions')
+          if (commissionsResponse.ok) {
+            const commissionsData = await commissionsResponse.json()
+            setCommissions(commissionsData)
+          }
+        } catch (error) {
+          console.error('Error loading commissions:', error)
+        }
+        // Load all payouts
+        try {
+          const payoutsResponse = await fetch('/api/commissions/payout')
+          if (payoutsResponse.ok) {
+            const payoutsData = await payoutsResponse.json()
+            setPayouts(payoutsData)
+          }
+        } catch (error) {
+          console.error('Error loading payouts:', error)
+        }
       }
     } catch (error) {
       toast.error('Failed to load data')
@@ -419,12 +462,15 @@ export default function AdminDashboard() {
   const approvedArtists = artists.filter((artist: any) => artist.status === 'approved')
   const rejectedArtists = artists.filter((artist: any) => artist.status === 'rejected')
 
+  const pendingPayouts = payouts.filter((p: any) => p.status === 'pending' || p.status === 'processing')
+  
   const navTabs = [
     { id: 'home', label: 'Home', icon: FiHome },
     { id: 'artworks', label: 'All Artworks', icon: FiShoppingBag },
     { id: 'orders', label: 'All Orders', icon: FiPackage },
     { id: 'users', label: 'Users', icon: FiUsers },
     { id: 'artists', label: 'Artists', icon: FiUser },
+    { id: 'commissions', label: 'Commissions & Payouts', icon: FiDollarSign, badge: pendingPayouts.length },
     { id: 'deletedOrders', label: 'Deleted Orders', icon: FiTrash2, badge: deletedOrders.length },
     { id: 'support', label: 'Support Messages', icon: FiMessageSquare, badge: supportMessages.filter((m: any) => m.status === 'pending').length },
   ]
@@ -470,23 +516,23 @@ export default function AdminDashboard() {
           ></div>
           
           <div className="fixed inset-0 z-[201] flex items-start justify-start md:justify-center p-0 md:p-8 pointer-events-none">
-            <div className="w-[75vw] max-w-[280px] md:w-[280px] bg-white h-full md:h-auto md:rounded-xl md:max-h-[90vh] shadow-2xl overflow-hidden pointer-events-auto animate-slideInLeft border-r border-gray-100 md:border-r-0 md:border md:border-gray-200">
+            <div className="w-[75vw] max-w-[280px] md:w-[280px] bg-white h-full md:h-auto md:rounded-xl md:max-h-[90vh] shadow-2xl overflow-hidden pointer-events-auto animate-slideInLeft border-r border-gray-100 md:border-r-0 md:border md:border-gray-200 flex flex-col">
               {/* Sidebar Header */}
-              <div className="p-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 via-white to-gray-50">
+              <div className="p-3 md:p-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 via-white to-gray-50 flex-shrink-0">
                 <div className="flex items-center justify-between gap-2">
-                  <h2 className="text-base font-bold text-gray-900">Admin Menu</h2>
-        <button
+                  <h2 className="text-sm md:text-base font-bold text-gray-900">Admin Menu</h2>
+                  <button
                     onClick={() => setSidebarOpen(false)}
-                    className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-lg transition-all duration-200 flex-shrink-0 active:scale-95"
+                    className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded-lg transition-all duration-200 flex-shrink-0 active:scale-95 touch-manipulation"
                     aria-label="Close menu"
                   >
                     <FiX className="text-lg" />
-        </button>
+                  </button>
                 </div>
               </div>
               
               {/* Navigation Menu */}
-              <nav className="py-3 max-h-[calc(100vh-250px)] overflow-y-auto overscroll-contain">
+              <nav className="py-2 md:py-3 flex-1 overflow-y-auto overscroll-contain min-h-0">
                 {navTabs.map((tab) => {
                   const isActiveTab = activeTab === tab.id
                   const Icon = tab.icon
@@ -498,7 +544,7 @@ export default function AdminDashboard() {
                         setActiveTab(tab.id)
                         setSidebarOpen(false)
                       }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all duration-300 mx-2 rounded-lg mb-1.5 relative overflow-hidden active:scale-[0.98] ${
+                      className={`w-full flex items-center gap-2.5 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm font-semibold transition-all duration-300 mx-2 rounded-lg mb-1.5 relative overflow-hidden active:scale-[0.98] touch-manipulation ${
                         isActiveTab
                           ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-amber-600 text-white shadow-lg shadow-orange-500/40'
                           : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
@@ -529,13 +575,13 @@ export default function AdminDashboard() {
               </nav>
 
               {/* Logout Button */}
-              <div className="border-t border-gray-200 mt-2 pt-2 px-2">
+              <div className="border-t border-gray-200 mt-auto pt-2 px-2 flex-shrink-0">
                 <button
                   onClick={() => {
                     setShowLogoutConfirm(true)
                     setSidebarOpen(false)
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all duration-300 rounded-lg mb-1.5 relative overflow-hidden active:scale-[0.98] text-red-600 hover:bg-red-50 active:bg-red-100"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all duration-300 rounded-lg mb-1.5 relative overflow-hidden active:scale-[0.98] text-red-600 hover:bg-red-50 active:bg-red-100 touch-manipulation"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 relative z-10 transition-all bg-red-100 border border-red-200/50">
                     <FiLogOut 
@@ -1355,6 +1401,262 @@ export default function AdminDashboard() {
               <p className="text-gray-400 text-sm md:text-base">No artists found for this filter.</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Commissions & Payouts Tab */}
+      {activeTab === 'commissions' && (
+        <div className="px-2 md:px-0">
+          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Commissions & Payouts</h2>
+          
+          {/* Sub-tabs */}
+          <div className="flex gap-2 border-b border-gray-200 mb-4 overflow-x-auto scrollbar-hide">
+            <button
+              onClick={() => setPayoutsSubTab('pending')}
+              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+                payoutsSubTab === 'pending'
+                  ? 'border-orange-600 text-gray-900'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Pending Payouts ({payouts.filter((p: any) => p.status === 'pending' || p.status === 'processing').length})
+            </button>
+            <button
+              onClick={() => setPayoutsSubTab('completed')}
+              className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+                payoutsSubTab === 'completed'
+                  ? 'border-orange-600 text-gray-900'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Completed Payouts ({payouts.filter((p: any) => p.status === 'completed').length})
+            </button>
+          </div>
+
+          {payoutsSubTab === 'pending' ? (
+            <div className="space-y-3 md:space-y-4">
+              {payouts.filter((p: any) => p.status === 'pending' || p.status === 'processing').length === 0 ? (
+                <div className="text-center py-12">
+                  <FiDollarSign className="text-6xl text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-400">No pending payouts</p>
+                </div>
+              ) : (
+                payouts
+                  .filter((p: any) => p.status === 'pending' || p.status === 'processing')
+                  .map((payout: any) => {
+                    const artist = artists.find((a: any) => a.id === payout.artistId)
+                    const payoutCommissions = commissions.filter((c: any) => payout.commissionIds.includes(c.id))
+                    return (
+                      <div key={payout.id} className="card p-4 md:p-6">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4">
+                          <div>
+                            <h3 className="font-bold text-base md:text-lg mb-1">
+                              {artist?.artistName || 'Unknown Artist'}
+                            </h3>
+                            <p className="text-gray-500 text-xs md:text-sm">
+                              Payout ID: #{payout.id.slice(-8)} | Requested: {new Date(payout.requestedAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl md:text-3xl font-bold text-green-600">
+                              ₹{payout.totalAmount.toFixed(2)}
+                            </p>
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
+                              payout.status === 'processing' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {payout.status.charAt(0).toUpperCase() + payout.status.slice(1)}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="border-t border-gray-200 pt-3 md:pt-4 mt-3 md:mt-4">
+                          <p className="text-xs md:text-sm text-gray-600 mb-2">
+                            Commissions included ({payoutCommissions.length}):
+                          </p>
+                          <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {payoutCommissions.map((commission: any) => (
+                              <div key={commission.id} className="flex justify-between items-center text-xs md:text-sm bg-gray-50 p-2 rounded">
+                                <span className="text-gray-600">
+                                  Order #{commission.orderId?.slice(-6) || 'N/A'} - ₹{commission.orderAmount.toFixed(2)}
+                                </span>
+                                <span className="font-semibold text-green-600">
+                                  ₹{commission.commissionAmount.toFixed(2)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {artist?.bankDetails && (
+                          <div className="border-t border-gray-200 pt-3 md:pt-4 mt-3 md:mt-4">
+                            <p className="text-xs md:text-sm font-medium text-gray-700 mb-2">Bank Details:</p>
+                            <div className="text-xs md:text-sm text-gray-600 space-y-1">
+                              <p><strong>Account Name:</strong> {artist.bankDetails.accountName}</p>
+                              <p><strong>Account Number:</strong> {artist.bankDetails.accountNumber}</p>
+                              <p><strong>IFSC:</strong> {artist.bankDetails.ifscCode}</p>
+                              <p><strong>Bank:</strong> {artist.bankDetails.bankName}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 mt-4">
+                          {payout.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    const response = await fetch('/api/commissions/payout', {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ payoutId: payout.id, status: 'completed' })
+                                    })
+                                    if (response.ok) {
+                                      toast.success('Payout marked as completed')
+                                      await loadData()
+                                    } else {
+                                      toast.error('Failed to update payout')
+                                    }
+                                  } catch (error) {
+                                    toast.error('Error updating payout')
+                                  }
+                                }}
+                                className="btn-primary flex-1 text-sm"
+                              >
+                                <FiCheck className="inline mr-2" />
+                                Mark as Completed
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    const response = await fetch('/api/commissions/payout', {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ payoutId: payout.id, status: 'failed' })
+                                    })
+                                    if (response.ok) {
+                                      toast.success('Payout marked as failed')
+                                      await loadData()
+                                    } else {
+                                      toast.error('Failed to update payout')
+                                    }
+                                  } catch (error) {
+                                    toast.error('Error updating payout')
+                                  }
+                                }}
+                                className="btn-secondary flex-1 text-sm text-red-600 hover:text-red-700"
+                              >
+                                <FiX className="inline mr-2" />
+                                Mark as Failed
+                              </button>
+                            </>
+                          )}
+                          {payout.status === 'processing' && (
+                            <button
+                              onClick={async () => {
+                                try {
+                                  const response = await fetch('/api/commissions/payout', {
+                                    method: 'PUT',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ payoutId: payout.id, status: 'completed' })
+                                  })
+                                  if (response.ok) {
+                                    toast.success('Payout marked as completed')
+                                    await loadData()
+                                  } else {
+                                    toast.error('Failed to update payout')
+                                  }
+                                } catch (error) {
+                                  toast.error('Error updating payout')
+                                }
+                              }}
+                              className="btn-primary flex-1 text-sm"
+                            >
+                              <FiCheck className="inline mr-2" />
+                              Mark as Completed
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3 md:space-y-4">
+              {payouts.filter((p: any) => p.status === 'completed').length === 0 ? (
+                <div className="text-center py-12">
+                  <FiDollarSign className="text-6xl text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-400">No completed payouts</p>
+                </div>
+              ) : (
+                payouts
+                  .filter((p: any) => p.status === 'completed')
+                  .map((payout: any) => {
+                    const artist = artists.find((a: any) => a.id === payout.artistId)
+                    return (
+                      <div key={payout.id} className="card p-4 md:p-6">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                          <div>
+                            <h3 className="font-bold text-base md:text-lg mb-1">
+                              {artist?.artistName || 'Unknown Artist'}
+                            </h3>
+                            <p className="text-gray-500 text-xs md:text-sm">
+                              Payout ID: #{payout.id.slice(-8)} | Completed: {payout.completedAt ? new Date(payout.completedAt).toLocaleDateString() : 'N/A'}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl md:text-3xl font-bold text-green-600">
+                              ₹{payout.totalAmount.toFixed(2)}
+                            </p>
+                            <span className="inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 bg-green-100 text-green-800">
+                              Completed
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })
+              )}
+            </div>
+          )}
+
+          {/* All Commissions Summary */}
+          <div className="mt-6 md:mt-8 card p-4 md:p-6">
+            <h3 className="text-lg md:text-xl font-bold mb-4">All Commissions Summary</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-xs md:text-sm text-gray-500 mb-1">Total Commissions</p>
+                <p className="text-xl md:text-2xl font-bold text-gray-900">{commissions.length}</p>
+              </div>
+              <div>
+                <p className="text-xs md:text-sm text-gray-500 mb-1">Pending</p>
+                <p className="text-xl md:text-2xl font-bold text-yellow-600">
+                  {commissions.filter((c: any) => c.status === 'pending').length}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs md:text-sm text-gray-500 mb-1">Processing</p>
+                <p className="text-xl md:text-2xl font-bold text-blue-600">
+                  {commissions.filter((c: any) => c.status === 'processing').length}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs md:text-sm text-gray-500 mb-1">Paid</p>
+                <p className="text-xl md:text-2xl font-bold text-green-600">
+                  {commissions.filter((c: any) => c.status === 'paid').length}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-xs md:text-sm text-gray-500 mb-1">Total Amount Pending</p>
+              <p className="text-2xl md:text-3xl font-bold text-orange-600">
+                ₹{commissions
+                  .filter((c: any) => c.status === 'pending')
+                  .reduce((sum: number, c: any) => sum + c.commissionAmount, 0)
+                  .toFixed(2)}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

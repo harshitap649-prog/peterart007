@@ -100,6 +100,8 @@ export default function ArtistDashboard({ userId, language: languageProp }: Arti
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [artworkToDelete, setArtworkToDelete] = useState<string | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const [showCongratulations, setShowCongratulations] = useState(false)
+  const [previousStatus, setPreviousStatus] = useState<string | null>(null)
 
   const translations = {
     en: {
@@ -213,7 +215,13 @@ export default function ArtistDashboard({ userId, language: languageProp }: Arti
       messageText: 'Message',
       messageDate: 'Date',
       reply: 'Reply',
-      viewProfile: 'View Profile'
+      viewProfile: 'View Profile',
+      pendingApproval: 'Your form is not approved yet',
+      pendingApprovalMessage: 'Your artist registration is pending admin approval. You can view your profile and artworks, but you cannot upload new artworks or receive payouts until you are approved.',
+      congratulations: 'Congratulations!',
+      artistApproved: 'You Got Approved!',
+      artistApprovedMessage: 'Great news! Your artist registration has been approved. You can now start uploading artworks and earning money.',
+      close: 'Close'
     },
     hi: {
       overview: 'अवलोकन',
@@ -326,7 +334,13 @@ export default function ArtistDashboard({ userId, language: languageProp }: Arti
       messageText: 'संदेश',
       messageDate: 'तारीख',
       reply: 'जवाब दें',
-      viewProfile: 'प्रोफ़ाइल देखें'
+      viewProfile: 'प्रोफ़ाइल देखें',
+      pendingApproval: 'आपका फॉर्म अभी तक मंजूर नहीं हुआ है',
+      pendingApprovalMessage: 'आपका कलाकार पंजीकरण व्यवस्थापक अनुमोदन के लिए लंबित है। आप अपनी प्रोफ़ाइल और कलाकृतियां देख सकते हैं, लेकिन जब तक आपको मंजूरी नहीं मिलती, तब तक आप नई कलाकृतियां अपलोड नहीं कर सकते या भुगतान प्राप्त नहीं कर सकते।',
+      congratulations: 'बधाई हो!',
+      artistApproved: 'आपको मंजूरी मिल गई!',
+      artistApprovedMessage: 'बढ़िया खबर! आपके कलाकार पंजीकरण को मंजूरी मिल गई है। अब आप कलाकृतियां अपलोड करना और पैसा कमाना शुरू कर सकते हैं।',
+      close: 'बंद करें'
     }
   }
 
@@ -335,6 +349,42 @@ export default function ArtistDashboard({ userId, language: languageProp }: Arti
   useEffect(() => {
     loadData()
   }, [userId])
+
+  // Track artist status changes for congratulations
+  useEffect(() => {
+    if (artist) {
+      const currentStatus = artist.status
+      const storageKey = `artist_approval_shown_${userId}_${artist.id}`
+      const lastKnownStatusKey = `artist_last_status_${userId}_${artist.id}`
+      
+      // Get last known status from localStorage
+      const lastKnownStatus = localStorage.getItem(lastKnownStatusKey)
+      
+      // Check if status changed from pending to approved
+      if (currentStatus === 'approved') {
+        const alreadyShown = localStorage.getItem(storageKey)
+        
+        // Show congratulations if:
+        // 1. Status is approved AND
+        // 2. Previous status was pending (either from state or localStorage) AND
+        // 3. We haven't shown it before
+        if (!alreadyShown && (previousStatus === 'pending' || lastKnownStatus === 'pending')) {
+          setShowCongratulations(true)
+          localStorage.setItem(storageKey, 'true')
+        }
+      }
+      
+      // Update previous status and localStorage
+      if (currentStatus !== previousStatus) {
+        setPreviousStatus(currentStatus)
+        localStorage.setItem(lastKnownStatusKey, currentStatus)
+      } else if (previousStatus === null && currentStatus) {
+        // First time loading, set initial status
+        setPreviousStatus(currentStatus)
+        localStorage.setItem(lastKnownStatusKey, currentStatus)
+      }
+    }
+  }, [artist, previousStatus, userId])
 
   const loadData = async () => {
     setLoading(true)
@@ -904,6 +954,25 @@ export default function ArtistDashboard({ userId, language: languageProp }: Arti
 
   return (
     <div className="space-y-6">
+      {/* Approval Status Banner */}
+      {artist && artist.status === 'pending' && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <FiClock className="h-5 w-5 text-yellow-400" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">
+                {t.pendingApproval}
+              </h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p>{t.pendingApprovalMessage}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-start gap-4">
@@ -967,95 +1036,97 @@ export default function ArtistDashboard({ userId, language: languageProp }: Arti
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'overview'
-              ? 'border-orange-600 text-gray-900'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t.overview}
-        </button>
-        <button
-          onClick={() => setActiveTab('portfolio')}
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'portfolio'
-              ? 'border-orange-600 text-gray-900'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t.portfolio} ({artworks.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('analytics')}
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'analytics'
-              ? 'border-orange-600 text-gray-900'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t.analytics}
-        </button>
-        <button
-          onClick={() => setActiveTab('commissions')}
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'commissions'
-              ? 'border-orange-600 text-gray-900'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t.commissions}
-          {pendingCommissions.length > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 bg-orange-600 text-white text-xs rounded-full">
-              {pendingCommissions.length}
-            </span>
-          )}
-        </button>
-        {artist.status === 'approved' && (
+      {/* Tabs - Scrollable on Mobile */}
+      <div className="border-b border-gray-200 overflow-x-auto scroll-smooth scrollbar-hide">
+        <div className="flex gap-2 min-w-max md:min-w-0">
           <button
-            onClick={() => setActiveTab('payouts')}
-            className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'payouts'
+            onClick={() => setActiveTab('overview')}
+            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'overview'
                 ? 'border-orange-600 text-gray-900'
                 : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
-            {t.payouts}
+            {t.overview}
           </button>
-        )}
-        <button
-          onClick={() => setActiveTab('followers')}
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'followers'
-              ? 'border-orange-600 text-gray-900'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t.followers} ({followers.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('messages')}
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'messages'
-              ? 'border-orange-600 text-gray-900'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t.messages} ({messages.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('profile')}
-          className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
-            activeTab === 'profile'
-              ? 'border-orange-600 text-gray-900'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          {t.profile}
-        </button>
+          <button
+            onClick={() => setActiveTab('portfolio')}
+            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'portfolio'
+                ? 'border-orange-600 text-gray-900'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t.portfolio} ({artworks.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'analytics'
+                ? 'border-orange-600 text-gray-900'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t.analytics}
+          </button>
+          <button
+            onClick={() => setActiveTab('commissions')}
+            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'commissions'
+                ? 'border-orange-600 text-gray-900'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t.commissions}
+            {pendingCommissions.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 bg-orange-600 text-white text-xs rounded-full">
+                {pendingCommissions.length}
+              </span>
+            )}
+          </button>
+          {artist.status === 'approved' && (
+            <button
+              onClick={() => setActiveTab('payouts')}
+              className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+                activeTab === 'payouts'
+                  ? 'border-orange-600 text-gray-900'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {t.payouts}
+            </button>
+          )}
+          <button
+            onClick={() => setActiveTab('followers')}
+            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'followers'
+                ? 'border-orange-600 text-gray-900'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t.followers} ({followers.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('messages')}
+            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'messages'
+                ? 'border-orange-600 text-gray-900'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t.messages} ({messages.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`px-3 md:px-4 py-2 text-xs md:text-sm font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+              activeTab === 'profile'
+                ? 'border-orange-600 text-gray-900'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            {t.profile}
+          </button>
+        </div>
       </div>
 
       {/* Overview Tab */}
@@ -2119,6 +2190,54 @@ export default function ArtistDashboard({ userId, language: languageProp }: Arti
                 className="btn-secondary flex-1 text-sm md:text-base py-2 disabled:opacity-50"
               >
                 {t.cancelEdit}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Congratulations Modal - Artist Approved */}
+      {showCongratulations && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative animate-fadeIn">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowCongratulations(false)}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <FiX className="text-xl text-gray-600" />
+            </button>
+
+            {/* Success Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                  <FiCheckCircle className="text-white text-5xl md:text-6xl" />
+                </div>
+                <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
+              </div>
+            </div>
+
+            {/* Congratulations Message */}
+            <div className="text-center space-y-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                {t.congratulations}
+              </h2>
+              <h3 className="text-xl md:text-2xl font-semibold text-green-600">
+                {t.artistApproved}
+              </h3>
+              <p className="text-gray-600 text-base md:text-lg leading-relaxed">
+                {t.artistApprovedMessage}
+              </p>
+            </div>
+
+            {/* Action Button */}
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={() => setShowCongratulations(false)}
+                className="btn-primary px-8 py-3 text-base font-semibold"
+              >
+                {t.close}
               </button>
             </div>
           </div>

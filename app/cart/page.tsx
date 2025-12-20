@@ -13,7 +13,6 @@ import PaymentMethods from '@/components/PaymentMethods'
 import { updateOrderStatus } from '@/lib/orders'
 import { getSavedAddresses } from '@/lib/profile'
 import CouponInput from '@/components/CouponInput'
-import GiftCardInput from '@/components/GiftCardInput'
 import { calculateBulkDiscount } from '@/lib/coupons'
 
 export default function CartPage() {
@@ -46,8 +45,6 @@ export default function CartPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
   const [couponDiscount, setCouponDiscount] = useState(0)
   const [bulkDiscount, setBulkDiscount] = useState(0)
-  const [appliedGiftCard, setAppliedGiftCard] = useState<any>(null)
-  const [giftCardDiscount, setGiftCardDiscount] = useState(0)
   const [isGift, setIsGift] = useState(false)
   const [giftMessage, setGiftMessage] = useState('')
   const [scheduledDeliveryDate, setScheduledDeliveryDate] = useState('')
@@ -179,14 +176,12 @@ export default function CartPage() {
           artworkImage: item.artworkImage,
           quantity: item.quantity,
           unitPrice: item.unitPrice || item.price || 0,
-          total: Math.max(0, ((item.unitPrice || item.price || 0) * item.quantity) - (bulkDiscount / cart.length) - (couponDiscount / cart.length) - (giftCardDiscount / cart.length)),
+          total: Math.max(0, ((item.unitPrice || item.price || 0) * item.quantity) - (bulkDiscount / cart.length) - (couponDiscount / cart.length)),
           paymentMethod: paymentMethod,
           paymentStatus: paymentMethod === 'cod' ? 'pending' : 'pending',
           couponCode: appliedCoupon?.code || null,
           couponDiscount: couponDiscount / cart.length,
           bulkDiscount: bulkDiscount / cart.length,
-          giftCardCode: appliedGiftCard?.code || null,
-          giftCardDiscount: giftCardDiscount / cart.length,
           isGift: isGift,
           giftMessage: isGift ? giftMessage : null,
           scheduledDeliveryDate: scheduledDeliveryDate || null,
@@ -205,18 +200,6 @@ export default function CartPage() {
       const orders = await Promise.all(orderPromises)
       const createdOrderIds = orders.map((o: any) => o.id)
       setOrderIds(createdOrderIds)
-
-      // Redeem gift card if applied
-      if (appliedGiftCard && giftCardDiscount > 0) {
-        try {
-          const { redeemGiftCard } = await import('@/lib/giftcards')
-          // Redeem for the first order (or split across orders if needed)
-          await redeemGiftCard(appliedGiftCard.code, createdOrderIds[0] as any, giftCardDiscount as any)
-        } catch (error) {
-          console.error('Error redeeming gift card:', error)
-          // Continue even if gift card redemption fails
-        }
-      }
 
       // If COD, complete the order
       if (paymentMethod === 'cod') {
@@ -397,18 +380,6 @@ export default function CartPage() {
                       cartTotal={cartTotal - bulkDiscount}
                       userId={user.uid}
                     />
-                    <GiftCardInput
-                      onApply={(giftCard, amount) => {
-                        setAppliedGiftCard({ ...giftCard, appliedAmount: amount })
-                        setGiftCardDiscount(amount)
-                      }}
-                      onRemove={() => {
-                        setAppliedGiftCard(null)
-                        setGiftCardDiscount(0)
-                      }}
-                      appliedGiftCard={appliedGiftCard}
-                      maxAmount={cartTotal - bulkDiscount - couponDiscount}
-                    />
                   </div>
                 )}
                 
@@ -429,12 +400,6 @@ export default function CartPage() {
                       <span className="font-medium">-₹{couponDiscount.toFixed(2)}</span>
                     </div>
                   )}
-                  {giftCardDiscount > 0 && (
-                    <div className="flex justify-between text-[10px] md:text-sm text-green-600">
-                      <span>Gift Card ({appliedGiftCard?.code}):</span>
-                      <span className="font-medium">-₹{giftCardDiscount.toFixed(2)}</span>
-                    </div>
-                  )}
                   <div className="flex justify-between text-[10px] md:text-sm">
                     <span className="text-gray-600">Shipping:</span>
                     <span className="font-medium">Free</span>
@@ -443,7 +408,7 @@ export default function CartPage() {
                     <div className="flex justify-between text-xs md:text-base">
                       <span className="font-bold text-gray-900">Total:</span>
                       <span className="font-bold text-orange-600">
-                        ₹{Math.max(0, cartTotal - bulkDiscount - couponDiscount - giftCardDiscount).toFixed(2)}
+                        ₹{Math.max(0, cartTotal - bulkDiscount - couponDiscount).toFixed(2)}
                       </span>
                     </div>
                   </div>

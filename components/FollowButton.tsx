@@ -73,7 +73,9 @@ export default function FollowButton({ userId, artistId, className = '', languag
     <button
       onClick={handleFollow}
       disabled={updating || !userId}
-      className={`${isFollowing ? 'btn-secondary' : 'btn-primary'} ${className} flex items-center gap-2`}
+      className={`${isFollowing 
+        ? 'bg-white hover:bg-gray-50 text-gray-900 border-2 border-gray-300 hover:border-gray-400' 
+        : 'bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white border-2 border-orange-500'} ${className} flex items-center gap-2`}
     >
       {isFollowing ? (
         <>

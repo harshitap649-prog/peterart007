@@ -147,9 +147,9 @@ export default function ArtistProfilePage() {
                 <h1 className="text-lg md:text-3xl font-bold text-gray-900">{artist.artistName}</h1>
               </div>
               
-              {/* Bio - Enhanced - Before stats on mobile */}
+              {/* Bio - Enhanced - Centered on mobile */}
               {artist.bio && (
-                <div className="mb-3 md:mb-5">
+                <div className="mb-3 md:mb-5 text-center md:text-left">
                   <p className="text-xs md:text-base text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-2 md:p-4 border border-gray-200/50">
                     {artist.bio}
                   </p>
@@ -174,7 +174,7 @@ export default function ArtistProfilePage() {
                 </div>
               </div>
 
-              {/* Premium Action Buttons - Same line, same size on mobile */}
+              {/* Premium Action Buttons - Rectangular, less curved */}
               {user && user.uid !== artist.userId && (
                 <div className="flex gap-2 md:gap-3 mb-3 md:mb-4">
                   <div className="flex-1">
@@ -182,12 +182,12 @@ export default function ArtistProfilePage() {
                       userId={user.uid}
                       artistId={artist.id}
                       language="en"
-                      className="!bg-gradient-to-r !from-orange-400 !to-orange-500 hover:!from-orange-500 hover:!to-orange-600 !text-white !border-0 w-full px-2 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] justify-center"
+                      className="w-full px-2 md:px-6 py-2 md:py-3 rounded-md text-xs md:text-sm font-semibold transition-all shadow-md hover:shadow-lg transform hover:scale-[1.01] justify-center"
                     />
                   </div>
                   <button
                     onClick={() => router.push(`/chat/${artist.userId}`)}
-                    className="flex-1 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white px-2 md:px-6 py-2 md:py-3 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-1.5 md:gap-2"
+                    className="flex-1 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white px-2 md:px-6 py-2 md:py-3 rounded-md md:rounded-md text-xs md:text-sm font-semibold transition-all shadow-md hover:shadow-lg transform hover:scale-[1.01] flex items-center justify-center gap-1.5 md:gap-2 border-2 border-orange-500"
                   >
                     <FiMessageCircle className="text-sm md:text-lg" />
                     <span>Message</span>
