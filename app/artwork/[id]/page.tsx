@@ -116,7 +116,7 @@ export default function ArtworkDetailsPage() {
     if (artwork && artwork.comments) {
       const loadProfileImages = async () => {
         const profileMap: { [key: string]: string | null } = {}
-        const uniqueUserIds = [...new Set(artwork.comments.map((c: any) => c.userId))]
+        const uniqueUserIds = Array.from(new Set(artwork.comments.map((c: any) => c.userId)))
         
         await Promise.all(
           uniqueUserIds.map(async (userId: string) => {
