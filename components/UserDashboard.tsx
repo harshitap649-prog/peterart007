@@ -1080,7 +1080,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               <div className="text-center py-12">
                 <FiSearch className="text-6xl text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-600 text-sm">
-                  {t.noResultsFound} "<span className="font-semibold">{searchTerm}</span>"
+                  {t.noResultsFound} &quot;<span className="font-semibold">{searchTerm}</span>&quot;
                 </p>
               </div>
             ) : filteredArtworks.length === 0 ? (
