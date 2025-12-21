@@ -25,101 +25,6 @@ export default function ChatPage() {
   const lastMessageIdRef = useRef<string | null>(null)
   const conversationId = params.userId as string
 
-  useEffect(() => {
-    loadUser()
-    
-    // Handle page visibility to pause refresh when tab is hidden
-    const handleVisibilityChange = () => {
-      isPageVisibleRef.current = !document.hidden
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (user && conversationId) {
-      loadOtherUser()
-      loadMessages()
-      // Auto-refresh messages every 5 seconds (reduced from 2s) only when page is visible
-      intervalRef.current = setInterval(() => {
-        if (isPageVisibleRef.current) {
-          loadMessages(true) // Silent refresh
-        }
-      }, 5000)
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-        }
-      }
-    }
-  }, [user, conversationId, loadMessages])
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, 100)
-  }
-
-  const formatMessageTime = (date: string) => {
-    const msgDate = new Date(date)
-    const now = new Date()
-    const diffInHours = (now.getTime() - msgDate.getTime()) / (1000 * 60 * 60)
-    
-    if (diffInHours < 24) {
-      return msgDate.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
-    } else if (diffInHours < 48) {
-      return 'Yesterday'
-    } else {
-      return msgDate.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: msgDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-      })
-    }
-  }
-
-  const formatDateSeparator = (date: string) => {
-    const msgDate = new Date(date)
-    const now = new Date()
-    const diffInDays = Math.floor((now.getTime() - msgDate.getTime()) / (1000 * 60 * 60 * 24))
-    
-    if (diffInDays === 0) return 'Today'
-    if (diffInDays === 1) return 'Yesterday'
-    if (diffInDays < 7) return msgDate.toLocaleDateString('en-US', { weekday: 'long' })
-    return msgDate.toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: msgDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-    })
-  }
-
-  const shouldShowAvatar = (currentMsg: any, prevMsg: any) => {
-    if (!prevMsg) return true
-    if (currentMsg.senderId !== prevMsg.senderId) return true
-    const timeDiff = new Date(currentMsg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime()
-    return timeDiff > 5 * 60 * 1000 // 5 minutes
-  }
-
-  const shouldShowDateSeparator = (currentMsg: any, prevMsg: any) => {
-    if (!prevMsg) return true
-    const currentDate = new Date(currentMsg.createdAt).toDateString()
-    const prevDate = new Date(prevMsg.createdAt).toDateString()
-    return currentDate !== prevDate
-  }
-
   const loadUser = async () => {
     try {
       const currentUser = await getCurrentUser()
@@ -218,6 +123,101 @@ export default function ChatPage() {
       setLoading(false)
     }
   }, [user, conversationId])
+
+  useEffect(() => {
+    loadUser()
+    
+    // Handle page visibility to pause refresh when tab is hidden
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (user && conversationId) {
+      loadOtherUser()
+      loadMessages()
+      // Auto-refresh messages every 5 seconds (reduced from 2s) only when page is visible
+      intervalRef.current = setInterval(() => {
+        if (isPageVisibleRef.current) {
+          loadMessages(true) // Silent refresh
+        }
+      }, 5000)
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+      }
+    }
+  }, [user, conversationId, loadMessages])
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
+  }
+
+  const formatMessageTime = (date: string) => {
+    const msgDate = new Date(date)
+    const now = new Date()
+    const diffInHours = (now.getTime() - msgDate.getTime()) / (1000 * 60 * 60)
+    
+    if (diffInHours < 24) {
+      return msgDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } else if (diffInHours < 48) {
+      return 'Yesterday'
+    } else {
+      return msgDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: msgDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+      })
+    }
+  }
+
+  const formatDateSeparator = (date: string) => {
+    const msgDate = new Date(date)
+    const now = new Date()
+    const diffInDays = Math.floor((now.getTime() - msgDate.getTime()) / (1000 * 60 * 60 * 24))
+    
+    if (diffInDays === 0) return 'Today'
+    if (diffInDays === 1) return 'Yesterday'
+    if (diffInDays < 7) return msgDate.toLocaleDateString('en-US', { weekday: 'long' })
+    return msgDate.toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: msgDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+    })
+  }
+
+  const shouldShowAvatar = (currentMsg: any, prevMsg: any) => {
+    if (!prevMsg) return true
+    if (currentMsg.senderId !== prevMsg.senderId) return true
+    const timeDiff = new Date(currentMsg.createdAt).getTime() - new Date(prevMsg.createdAt).getTime()
+    return timeDiff > 5 * 60 * 1000 // 5 minutes
+  }
+
+  const shouldShowDateSeparator = (currentMsg: any, prevMsg: any) => {
+    if (!prevMsg) return true
+    const currentDate = new Date(currentMsg.createdAt).toDateString()
+    const prevDate = new Date(prevMsg.createdAt).toDateString()
+    return currentDate !== prevDate
+  }
 
   const sendMessage = async () => {
     if (!newMessage.trim() || !user || !conversationId || sending) return
