@@ -22,40 +22,6 @@ export default function MessagesPage() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const isPageVisibleRef = useRef(true)
 
-  useEffect(() => {
-    loadUser()
-    
-    // Handle page visibility to pause refresh when tab is hidden
-    const handleVisibilityChange = () => {
-      isPageVisibleRef.current = !document.hidden
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (user) {
-      loadConversations()
-      // Auto-refresh conversations every 10 seconds (reduced from 5s) only when page is visible
-      intervalRef.current = setInterval(() => {
-        if (isPageVisibleRef.current) {
-          loadConversations()
-        }
-      }, 10000)
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-        }
-      }
-    }
-  }, [user, loadConversations])
-
   const loadUser = async () => {
     try {
       const currentUser = await getCurrentUser()
@@ -213,6 +179,40 @@ export default function MessagesPage() {
       setLoading(false)
     }
   }, [user])
+
+  useEffect(() => {
+    loadUser()
+    
+    // Handle page visibility to pause refresh when tab is hidden
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      loadConversations()
+      // Auto-refresh conversations every 10 seconds (reduced from 5s) only when page is visible
+      intervalRef.current = setInterval(() => {
+        if (isPageVisibleRef.current) {
+          loadConversations()
+        }
+      }, 10000)
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+      }
+    }
+  }, [user, loadConversations])
 
   const formatTime = (date: string) => {
     const msgDate = new Date(date)
