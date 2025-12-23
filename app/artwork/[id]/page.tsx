@@ -72,6 +72,10 @@ export default function ArtworkDetailsPage() {
   const [profileModalImage, setProfileModalImage] = useState<string | null>(null)
   const [profileModalName, setProfileModalName] = useState<string>('')
   const [userProfileImages, setUserProfileImages] = useState<{ [key: string]: string | null }>({})
+  const [showReviewImageModal, setShowReviewImageModal] = useState(false)
+  const [reviewImageModalSrc, setReviewImageModalSrc] = useState<string | null>(null)
+  const [reviewImageModalIndex, setReviewImageModalIndex] = useState(0)
+  const [reviewImageModalImages, setReviewImageModalImages] = useState<string[]>([])
 
   const requireAuth = (message: string) => {
     setAuthPrompt({
@@ -1298,11 +1302,9 @@ export default function ArtworkDetailsPage() {
                             className="flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
                             onClick={() => {
                               const profileImage = userProfileImages[comment.userId]
-                              if (profileImage) {
-                                setProfileModalImage(profileImage)
-                                setProfileModalName(comment.userName)
-                                setShowProfileModal(true)
-                              }
+                              setProfileModalImage(profileImage || null)
+                              setProfileModalName(comment.userName)
+                              setShowProfileModal(true)
                             }}
                           >
                             {userProfileImages[comment.userId] ? (
@@ -1357,7 +1359,16 @@ export default function ArtworkDetailsPage() {
                             {comment.images && comment.images.length > 0 && (
                               <div className="flex gap-2 mt-2 flex-wrap">
                                 {comment.images.map((img: string, idx: number) => (
-                                  <div key={idx} className="w-16 h-16 rounded overflow-hidden">
+                                  <div 
+                                    key={idx} 
+                                    className="w-16 h-16 rounded overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-sm border border-gray-200"
+                                    onClick={() => {
+                                      setReviewImageModalImages(comment.images)
+                                      setReviewImageModalIndex(idx)
+                                      setReviewImageModalSrc(img)
+                                      setShowReviewImageModal(true)
+                                    }}
+                                  >
                                     <img src={img} alt={`Review ${idx + 1}`} className="w-full h-full object-cover" />
                                   </div>
                                 ))}
@@ -1566,35 +1577,142 @@ export default function ArtworkDetailsPage() {
       )}
 
       {/* Profile Image Modal */}
-      {showProfileModal && profileModalImage && (
+      {showProfileModal && (
         <div 
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: 0,
+            padding: '1rem'
+          }}
           onClick={() => setShowProfileModal(false)}
         >
           <div 
-            className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center"
+            className="relative max-w-2xl w-full flex flex-col items-center justify-center"
+            style={{ margin: 'auto' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setShowProfileModal(false)}
-              className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+              className="absolute -top-12 right-0 md:top-4 md:right-4 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
               aria-label="Close"
             >
               <FiX className="text-xl md:text-2xl" />
             </button>
             
+            {/* Large Image or Placeholder */}
+            <div className="text-center w-full">
+              {profileModalImage ? (
+                <img
+                  src={profileModalImage}
+                  alt={profileModalName}
+                  className="max-w-full max-h-[70vh] md:max-h-[80vh] w-auto h-auto object-contain rounded-lg shadow-2xl mx-auto"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage%3C/text%3E%3C/svg%3E'
+                  }}
+                />
+              ) : (
+                <div className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center shadow-2xl mx-auto">
+                  <span className="text-white text-6xl md:text-8xl font-bold">
+                    {profileModalName[0]?.toUpperCase() || 'U'}
+                  </span>
+                </div>
+              )}
+              <p className="mt-4 text-white text-lg md:text-xl font-semibold">{profileModalName}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Image Modal */}
+      {showReviewImageModal && reviewImageModalSrc && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: 0,
+            padding: '1rem'
+          }}
+          onClick={() => setShowReviewImageModal(false)}
+        >
+          <div 
+            className="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center justify-center"
+            style={{ margin: 'auto' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setShowReviewImageModal(false)}
+              className="absolute -top-12 right-0 md:top-4 md:right-4 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+              aria-label="Close"
+            >
+              <FiX className="text-xl md:text-2xl" />
+            </button>
+
+            {/* Navigation Arrows - Only show if multiple images */}
+            {reviewImageModalImages.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const prevIndex = reviewImageModalIndex === 0 ? reviewImageModalImages.length - 1 : reviewImageModalIndex - 1
+                    setReviewImageModalIndex(prevIndex)
+                    setReviewImageModalSrc(reviewImageModalImages[prevIndex])
+                  }}
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+                  aria-label="Previous image"
+                >
+                  <FiChevronLeft className="text-xl md:text-2xl" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const nextIndex = reviewImageModalIndex === reviewImageModalImages.length - 1 ? 0 : reviewImageModalIndex + 1
+                    setReviewImageModalIndex(nextIndex)
+                    setReviewImageModalSrc(reviewImageModalImages[nextIndex])
+                  }}
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-gray-900 rounded-full p-3 md:p-4 transition-all shadow-lg"
+                  aria-label="Next image"
+                >
+                  <FiChevronRight className="text-xl md:text-2xl" />
+                </button>
+              </>
+            )}
+            
             {/* Large Image */}
-            <div className="text-center">
+            <div className="text-center w-full">
               <img
-                src={profileModalImage}
-                alt={profileModalName}
-                className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+                src={reviewImageModalSrc}
+                alt={`Review image ${reviewImageModalIndex + 1}`}
+                className="max-w-full max-h-[70vh] md:max-h-[80vh] w-auto h-auto object-contain rounded-lg shadow-2xl mx-auto"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage%3C/text%3E%3C/svg%3E'
+                  (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23e5e7eb" width="400" height="400"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="16"%3EImage not found%3C/text%3E%3C/svg%3E'
                 }}
               />
-              <p className="mt-4 text-white text-lg font-semibold">{profileModalName}</p>
+              {reviewImageModalImages.length > 1 && (
+                <p className="mt-4 text-white text-sm md:text-base font-medium">
+                  {reviewImageModalIndex + 1} / {reviewImageModalImages.length}
+                </p>
+              )}
             </div>
           </div>
         </div>
