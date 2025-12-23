@@ -838,16 +838,28 @@ export default function ArtworkDetailsPage() {
                     </>
                   )}
                   
-                  {/* Share Button - Top Right Corner */}
+                  {/* Share Button - Desktop */}
                   <button
                     onClick={handleShare}
-                    className="absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white rounded-full p-2.5 md:p-2.5 transition-all z-20 backdrop-blur-sm shadow-lg"
+                    className="hidden md:flex absolute top-2 right-2 bg-black/70 hover:bg-black/90 text-white rounded-full p-2.5 transition-all z-20 backdrop-blur-sm shadow-lg"
                     aria-label="Share artwork"
                     title="Share this artwork"
                   >
-                    <FiShare2 className="text-lg md:text-lg" />
+                    <FiShare2 className="text-lg" />
                   </button>
                 </div>
+              </div>
+              {/* Share Button - Mobile (placed below image for clean view) */}
+              <div className="flex justify-end md:hidden px-2 mt-2">
+                <button
+                  onClick={handleShare}
+                  className="bg-black text-white rounded-full px-3 py-2 shadow-md flex items-center gap-2"
+                  aria-label="Share artwork on mobile"
+                  title="Share this artwork"
+                >
+                  <FiShare2 className="text-base" />
+                  <span className="text-sm font-medium">Share</span>
+                </button>
               </div>
             ) : (
               <div className="card p-4">
