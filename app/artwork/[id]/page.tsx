@@ -703,8 +703,9 @@ export default function ArtworkDetailsPage() {
           {/* Artwork Images */}
           <div className="space-y-3 md:space-y-4">
             {artwork.images && artwork.images.length > 0 ? (
-              <div className="bg-white rounded-none md:rounded-2xl overflow-hidden">
-                <div 
+              <>
+                <div className="bg-white rounded-none md:rounded-2xl overflow-hidden">
+                  <div 
                   className={`relative w-full h-[70vh] sm:h-[75vh] md:h-96 rounded-none md:rounded-xl bg-gray-50 flex items-center justify-center ${imageZoomed ? 'overflow-hidden cursor-move touch-none' : 'overflow-hidden'}`}
                   onTouchStart={(e) => {
                     if (e.touches.length === 2) {
@@ -848,19 +849,19 @@ export default function ArtworkDetailsPage() {
                     <FiShare2 className="text-lg" />
                   </button>
                 </div>
-              </div>
-              {/* Share Button - Mobile (placed below image for clean view) */}
-              <div className="flex justify-end md:hidden px-2 mt-2">
-                <button
-                  onClick={handleShare}
-                  className="bg-black text-white rounded-full px-3 py-2 shadow-md flex items-center gap-2"
-                  aria-label="Share artwork on mobile"
-                  title="Share this artwork"
-                >
-                  <FiShare2 className="text-base" />
-                  <span className="text-sm font-medium">Share</span>
-                </button>
-              </div>
+                {/* Share Button - Mobile (placed below image for clean view) */}
+                <div className="flex justify-end md:hidden px-2 mt-2">
+                  <button
+                    onClick={handleShare}
+                    className="bg-black text-white rounded-full px-3 py-2 shadow-md flex items-center gap-2"
+                    aria-label="Share artwork on mobile"
+                    title="Share this artwork"
+                  >
+                    <FiShare2 className="text-base" />
+                    <span className="text-sm font-medium">Share</span>
+                  </button>
+                </div>
+              </>
             ) : (
               <div className="card p-4">
                 <div className="relative w-full h-96 rounded-lg overflow-hidden mb-4 bg-gray-200 flex items-center justify-center">
