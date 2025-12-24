@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtworkById } from '@/lib/artworks'
@@ -684,10 +684,6 @@ export default function ArtworkDetailsPage() {
     return null
   }
 
-  const totalPrice = useMemo(() => {
-    return (artwork.price * quantity).toFixed(2)
-  }, [artwork.price, quantity])
-
   return (
     <div className="min-h-screen bg-white">
       {/* Sticky Top Bar - Mobile Optimized */}
@@ -942,10 +938,10 @@ export default function ArtworkDetailsPage() {
                     <div className="mb-3 md:mb-6 p-2 md:p-5 bg-gray-50 rounded-lg md:rounded-xl border border-gray-200">
                       <div className="flex justify-between items-center mb-1 md:mb-2">
                         <span className="text-gray-700 text-[10px] md:text-base font-medium">Total Price:</span>
-                        <span className="text-lg md:text-2xl font-bold text-gray-900">₹{totalPrice}</span>
+                        <span className="text-lg md:text-2xl font-bold text-gray-900">₹{(artwork.price * quantity).toFixed(2)}</span>
                       </div>
                       <p className="text-[10px] md:text-sm text-gray-600">
-                        <span className="font-medium">{quantity} × ₹{artwork.price} = ₹{totalPrice}</span>
+                        <span className="font-medium">{quantity} × ₹{artwork.price} = ₹{(artwork.price * quantity).toFixed(2)}</span>
                       </p>
                     </div>
 
@@ -1150,7 +1146,7 @@ export default function ArtworkDetailsPage() {
                       <div className="border-t border-gray-300 pt-2 mt-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-bold">Total:</span>
-                          <span className="text-base font-bold text-orange-600">₹{totalPrice}</span>
+                          <span className="text-base font-bold text-orange-600">₹{(artwork.price * quantity).toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
