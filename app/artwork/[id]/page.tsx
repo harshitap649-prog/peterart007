@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtworkById } from '@/lib/artworks'
@@ -684,7 +684,9 @@ export default function ArtworkDetailsPage() {
     return null
   }
 
-  const totalPrice = (artwork.price * quantity).toFixed(2)
+  const totalPrice = useMemo(() => {
+    return (artwork.price * quantity).toFixed(2)
+  }, [artwork.price, quantity])
 
   return (
     <div className="min-h-screen bg-white">
