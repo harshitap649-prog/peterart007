@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
-import { getArtistByUserId } from '@/lib/artists'
 import toast from 'react-hot-toast'
 import { FiArrowLeft, FiSend, FiUser, FiMessageCircle, FiCheck, FiMoreVertical, FiX } from 'react-icons/fi'
 
@@ -56,23 +55,12 @@ export default function ChatPage() {
           profileImage: userData.profileImage || null
         })
       } else {
-        // Try to get artist info
-        const artist = await getArtistByUserId(conversationId)
-        if (artist) {
-          setOtherUser({
-            id: artist.userId,
-            name: artist.artistName,
-            email: artist.email || null,
-            profileImage: artist.profileImage || null
-          })
-        } else {
-          setOtherUser({
-            id: conversationId,
-            name: 'User',
-            email: null,
-            profileImage: null
-          })
-        }
+        setOtherUser({
+          id: conversationId,
+          name: 'User',
+          email: null,
+          profileImage: null
+        })
       }
     } catch (error) {
       console.error('Error loading other user:', error)

@@ -6,7 +6,6 @@ import { getAllArtworks, addArtwork, updateArtwork, deleteArtwork } from '@/lib/
 import { getAllOrders, updateOrderStatus, getOrdersByStatus, deleteOrder } from '@/lib/orders'
 import { getAllUsers, disableUser, deleteUser } from '@/lib/users'
 import { getAllSupportMessages, updateSupportMessage, deleteSupportMessage } from '@/lib/support'
-import { getAllArtists, updateArtistProfile, getArtistArtworks, deleteArtist } from '@/lib/artists'
 import { logout } from '@/lib/auth'
 import toast from 'react-hot-toast'
 import { FiPlus, FiEdit, FiTrash2, FiHome, FiShoppingBag, FiUsers, FiUser, FiPackage, FiMessageSquare, FiCheck, FiX, FiSearch, FiImage, FiEye, FiMail, FiMenu, FiLogOut, FiDollarSign } from 'react-icons/fi'
@@ -23,10 +22,7 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [supportMessages, setSupportMessages] = useState<any[]>([])
-  const [artists, setArtists] = useState<any[]>([])
-  const [artistStatusFilter, setArtistStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending')
   const [loading, setLoading] = useState(true)
-  const [artistsMap, setArtistsMap] = useState<Map<string, any>>(new Map())
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const [adminResponse, setAdminResponse] = useState('')
   const [showArtworkForm, setShowArtworkForm] = useState(false)
@@ -39,13 +35,7 @@ export default function AdminDashboard() {
   const [orderToDelete, setOrderToDelete] = useState<string | null>(null)
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set())
   const [trackingData, setTrackingData] = useState<{ [key: string]: { trackingNumber: string; trackingProvider: string; trackingUrl: string } }>({})
-  const [showArtistArtworks, setShowArtistArtworks] = useState(false)
-  const [selectedArtistForArtworks, setSelectedArtistForArtworks] = useState<any>(null)
-  const [artistArtworks, setArtistArtworks] = useState<any[]>([])
   const [loadingArtworks, setLoadingArtworks] = useState(false)
-  const [showArtistDeleteConfirm, setShowArtistDeleteConfirm] = useState(false)
-  const [artistToDelete, setArtistToDelete] = useState<any>(null)
-  const [deletingArtist, setDeletingArtist] = useState(false)
   const [commissions, setCommissions] = useState<any[]>([])
   const [payouts, setPayouts] = useState<any[]>([])
   const [payoutsSubTab, setPayoutsSubTab] = useState<'pending' | 'completed'>('pending')
@@ -54,7 +44,6 @@ export default function AdminDashboard() {
     description: '',
     price: '',
     category: '',
-    artistId: '',
     images: [] as File[]
   })
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -130,16 +119,6 @@ export default function AdminDashboard() {
       if (activeTab === 'support' || activeTab === 'home') {
         const messages = await getAllSupportMessages()
         setSupportMessages(messages)
-      }
-      if (activeTab === 'artists' || activeTab === 'artworks' || activeTab === 'home') {
-        const artistList = await getAllArtists()
-        setArtists(artistList)
-        // Create a map for quick artist lookup
-        const map = new Map()
-        artistList.forEach((artist: any) => {
-          map.set(artist.id, artist)
-        })
-        setArtistsMap(map)
       }
       if (activeTab === 'commissions' || activeTab === 'home') {
         // Load all commissions
@@ -330,58 +309,6 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleArtistStatusChange = async (artistId: string, status: 'approved' | 'rejected') => {
-    try {
-      await updateArtistProfile(artistId, {
-        status,
-        verificationStatus: status === 'approved' ? 'verified' : 'rejected'
-      })
-      toast.success(`Artist ${status === 'approved' ? 'approved' : 'rejected'} successfully`)
-      await loadData()
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update artist')
-    }
-  }
-
-  const handleViewArtistArtworks = async (artist: any) => {
-    setSelectedArtistForArtworks(artist)
-    setLoadingArtworks(true)
-    setShowArtistArtworks(true)
-    try {
-      const artworks = await getArtistArtworks(artist.id)
-      setArtistArtworks(artworks)
-    } catch (error: any) {
-      console.error('Error loading artist artworks:', error)
-      toast.error('Failed to load artist artworks')
-      setArtistArtworks([])
-    } finally {
-      setLoadingArtworks(false)
-    }
-  }
-
-  const handleDeleteArtist = (artist: any) => {
-    setArtistToDelete(artist)
-    setShowArtistDeleteConfirm(true)
-  }
-
-  const confirmDeleteArtist = async () => {
-    if (!artistToDelete) return
-    
-    setDeletingArtist(true)
-    try {
-      const result = await deleteArtist(artistToDelete.id)
-      toast.success(`Artist removed successfully. ${result.deletedArtworksCount || 0} artwork(s) also removed.`)
-      setShowArtistDeleteConfirm(false)
-      setArtistToDelete(null)
-      await loadData()
-    } catch (error: any) {
-      console.error('Error deleting artist:', error)
-      toast.error(error.message || 'Failed to delete artist')
-    } finally {
-      setDeletingArtist(false)
-    }
-  }
-
   const handleDeleteOrder = (orderId: string) => {
     setOrderToDelete(orderId)
     setShowOrderDeleteConfirm(true)
@@ -455,12 +382,6 @@ export default function AdminDashboard() {
   const deliveredOrders = orders.filter(o => o.status === 'delivered')
   const leftOrders = orders.filter(o => o.status === 'left')
   const deletedOrders = orders.filter(o => o.status === 'cancelled' || o.status === 'deleted')
-  const filteredArtists = artists.filter((artist: any) =>
-    artistStatusFilter === 'all' ? true : artist.status === artistStatusFilter
-  )
-  const pendingArtists = artists.filter((artist: any) => artist.status === 'pending')
-  const approvedArtists = artists.filter((artist: any) => artist.status === 'approved')
-  const rejectedArtists = artists.filter((artist: any) => artist.status === 'rejected')
 
   const pendingPayouts = payouts.filter((p: any) => p.status === 'pending' || p.status === 'processing')
   
@@ -469,7 +390,6 @@ export default function AdminDashboard() {
     { id: 'artworks', label: 'All Artworks', icon: FiShoppingBag },
     { id: 'orders', label: 'All Orders', icon: FiPackage },
     { id: 'users', label: 'Users', icon: FiUsers },
-    { id: 'artists', label: 'Artists', icon: FiUser },
     { id: 'commissions', label: 'Commissions & Payouts', icon: FiDollarSign, badge: pendingPayouts.length },
     { id: 'deletedOrders', label: 'Deleted Orders', icon: FiTrash2, badge: deletedOrders.length },
     { id: 'support', label: 'Support Messages', icon: FiMessageSquare, badge: supportMessages.filter((m: any) => m.status === 'pending').length },
@@ -1228,182 +1148,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Artists Tab */}
-      {activeTab === 'artists' && (
-        <div className="px-2 md:px-0">
-          <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-4">Artists</h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-2 md:mb-4">
-            <div className="card p-2 md:p-4 bg-gradient-to-br from-purple-50 via-white to-orange-50 border border-purple-100">
-              <p className="text-xs text-gray-500 mb-1">Total Artists</p>
-              <p className="text-2xl md:text-3xl font-bold text-purple-600">{artists.length}</p>
-            </div>
-            <div className="card p-2 md:p-4 border border-yellow-100 bg-yellow-50/50">
-              <p className="text-xs text-gray-500 mb-1">Pending</p>
-              <p className="text-2xl md:text-3xl font-bold text-yellow-600">{pendingArtists.length}</p>
-            </div>
-            <div className="card p-2 md:p-4 border border-green-100 bg-green-50/50">
-              <p className="text-xs text-gray-500 mb-1">Approved</p>
-              <p className="text-2xl md:text-3xl font-bold text-green-600">{approvedArtists.length}</p>
-            </div>
-            <div className="card p-2 md:p-4 border border-red-100 bg-red-50/50">
-              <p className="text-xs text-gray-500 mb-1">Rejected</p>
-              <p className="text-2xl md:text-3xl font-bold text-red-600">{rejectedArtists.length}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2 md:gap-3 mb-4">
-            {['all', 'pending', 'approved', 'rejected'].map((status) => (
-              <button
-                key={status}
-                onClick={() => setArtistStatusFilter(status as 'all' | 'pending' | 'approved' | 'rejected')}
-                className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold border transition-all ${
-                  artistStatusFilter === status
-                    ? 'bg-purple-600 text-white border-transparent'
-                    : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                }`}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-400">Loading artists...</p>
-            </div>
-          ) : filteredArtists.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-4">
-              {filteredArtists.map((artist: any) => (
-                <div key={artist.id} className="card p-2 md:p-5 border-l-4 border-l-purple-500">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="font-bold text-base md:text-lg text-gray-900">{artist.artistName}</p>
-                      <p className="text-xs text-gray-500">{artist.email}</p>
-                      <p className="text-xs text-gray-400">
-                        Joined: {new Date(artist.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        artist.status === 'approved'
-                          ? 'bg-green-100 text-green-700'
-                          : artist.status === 'rejected'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}
-                    >
-                      {artist.status.charAt(0).toUpperCase() + artist.status.slice(1)}
-                    </span>
-                  </div>
-
-                  {artist.bio && (
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-3">{artist.bio}</p>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-3 text-xs text-gray-500 mb-3">
-                    <div>
-                      <p className="text-gray-400">Commission</p>
-                      <p className="font-semibold text-gray-900">{artist.commissionRate || 70}%</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400">Verification</p>
-                      <p className="font-semibold text-gray-900">
-                        {artist.verificationStatus?.charAt(0).toUpperCase() + artist.verificationStatus?.slice(1)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {artist.portfolio && artist.portfolio.length > 0 && (
-                    <div className="mb-3">
-                      <p className="text-xs text-gray-400 mb-1">Portfolio</p>
-                      <div className="flex flex-wrap gap-2">
-                        {artist.portfolio.slice(0, 3).map((link: string, idx: number) => (
-                          <a
-                            key={idx}
-                            href={link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-purple-600 hover:text-purple-700 underline"
-                          >
-                            Link {idx + 1}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => handleViewArtistArtworks(artist)}
-                      className="w-full btn-secondary text-xs py-2 flex items-center justify-center gap-2"
-                    >
-                      <FiEye className="text-sm" />
-                      View Artworks ({artist.totalArtworks || 0})
-                    </button>
-                    <div className="flex flex-wrap gap-2">
-                      {artist.status === 'pending' && (
-                        <>
-                          <button
-                            onClick={() => handleArtistStatusChange(artist.id, 'approved')}
-                            className="flex-1 btn-primary text-xs py-2"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleArtistStatusChange(artist.id, 'rejected')}
-                            className="flex-1 btn-secondary text-xs py-2 text-red-600 hover:text-red-700"
-                          >
-                            Reject
-                          </button>
-                        </>
-                      )}
-                      {artist.status === 'approved' && (
-                        <>
-                          <button
-                            onClick={() => handleArtistStatusChange(artist.id, 'rejected')}
-                            className="flex-1 btn-secondary text-xs py-2 text-gray-900 hover:text-orange-700"
-                          >
-                            Disable
-                          </button>
-                          <button
-                            onClick={() => handleDeleteArtist(artist)}
-                            className="flex-1 btn-secondary text-xs py-2 text-red-600 hover:text-red-700 border-red-300"
-                          >
-                            Remove
-                          </button>
-                        </>
-                      )}
-                      {artist.status === 'rejected' && (
-                        <>
-                          <button
-                            onClick={() => handleArtistStatusChange(artist.id, 'approved')}
-                            className="flex-1 btn-primary text-xs py-2"
-                          >
-                            Re-approve
-                          </button>
-                          <button
-                            onClick={() => handleDeleteArtist(artist)}
-                            className="flex-1 btn-secondary text-xs py-2 text-red-600 hover:text-red-700 border-red-300"
-                          >
-                            Remove
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-400 text-sm md:text-base">No artists found for this filter.</p>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Commissions & Payouts Tab */}
       {activeTab === 'commissions' && (
         <div className="px-2 md:px-0">
@@ -1444,14 +1188,13 @@ export default function AdminDashboard() {
                 payouts
                   .filter((p: any) => p.status === 'pending' || p.status === 'processing')
                   .map((payout: any) => {
-                    const artist = artists.find((a: any) => a.id === payout.artistId)
                     const payoutCommissions = commissions.filter((c: any) => payout.commissionIds.includes(c.id))
                     return (
                       <div key={payout.id} className="card p-4 md:p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4">
                           <div>
                             <h3 className="font-bold text-base md:text-lg mb-1">
-                              {artist?.artistName || 'Unknown Artist'}
+                              {payout.userName || 'User'}
                             </h3>
                             <p className="text-gray-500 text-xs md:text-sm">
                               Payout ID: #{payout.id.slice(-8)} | Requested: {new Date(payout.requestedAt).toLocaleDateString()}
@@ -1486,18 +1229,6 @@ export default function AdminDashboard() {
                             ))}
                           </div>
                         </div>
-
-                        {artist?.bankDetails && (
-                          <div className="border-t border-gray-200 pt-3 md:pt-4 mt-3 md:mt-4">
-                            <p className="text-xs md:text-sm font-medium text-gray-700 mb-2">Bank Details:</p>
-                            <div className="text-xs md:text-sm text-gray-600 space-y-1">
-                              <p><strong>Account Name:</strong> {artist.bankDetails.accountName}</p>
-                              <p><strong>Account Number:</strong> {artist.bankDetails.accountNumber}</p>
-                              <p><strong>IFSC:</strong> {artist.bankDetails.ifscCode}</p>
-                              <p><strong>Bank:</strong> {artist.bankDetails.bankName}</p>
-                            </div>
-                          </div>
-                        )}
 
                         <div className="flex gap-2 mt-4">
                           {payout.status === 'pending' && (
@@ -1592,13 +1323,12 @@ export default function AdminDashboard() {
                 payouts
                   .filter((p: any) => p.status === 'completed')
                   .map((payout: any) => {
-                    const artist = artists.find((a: any) => a.id === payout.artistId)
                     return (
                       <div key={payout.id} className="card p-4 md:p-6">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                           <div>
                             <h3 className="font-bold text-base md:text-lg mb-1">
-                              {artist?.artistName || 'Unknown Artist'}
+                              {payout.userName || 'User'}
                             </h3>
                             <p className="text-gray-500 text-xs md:text-sm">
                               Payout ID: #{payout.id.slice(-8)} | Completed: {payout.completedAt ? new Date(payout.completedAt).toLocaleDateString() : 'N/A'}
@@ -1919,27 +1649,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs md:text-sm font-medium mb-1.5 flex items-center gap-2">
-                  <FiUser className="text-base" />
-                  Artist (Optional)
-                </label>
-                <select
-                  value={formData.artistId}
-                  onChange={(e) => setFormData({ ...formData, artistId: e.target.value })}
-                  className="input-field text-sm py-2"
-                >
-                  <option value="">No Artist / Platform Artwork</option>
-                  {artists.filter((a: any) => a.status === 'approved').map((artist: any) => (
-                    <option key={artist.id} value={artist.id}>
-                      {artist.artistName} ({artist.commissionRate}% commission)
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Select an approved artist to link this artwork. Commission will be calculated automatically.
-                </p>
-              </div>
-              <div>
                 <label className="block text-xs md:text-sm font-medium mb-1.5">
                   Images (up to 6) *
                 </label>
@@ -2060,78 +1769,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Artist Artworks View Modal */}
-      {showArtistArtworks && selectedArtistForArtworks && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="card p-4 md:p-6 max-w-5xl w-full bg-white max-h-[90vh] overflow-y-auto my-4">
-            <div className="flex items-center justify-between mb-4 md:mb-6">
-              <div>
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900">
-                  Artworks by {selectedArtistForArtworks.artistName}
-                </h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  {selectedArtistForArtworks.email} • {artistArtworks.length} {artistArtworks.length === 1 ? 'artwork' : 'artworks'}
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setShowArtistArtworks(false)
-                  setSelectedArtistForArtworks(null)
-                  setArtistArtworks([])
-                }}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <FiX className="text-xl text-gray-600" />
-              </button>
-            </div>
-
-            {loadingArtworks ? (
-              <div className="text-center py-12">
-                <div className="w-12 h-12 border-4 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading artworks...</p>
-              </div>
-            ) : artistArtworks.length === 0 ? (
-              <div className="text-center py-12">
-                <FiImage className="text-6xl text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg mb-2">No artworks found</p>
-                <p className="text-gray-500 text-sm">This artist hasn't uploaded any artworks yet.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {artistArtworks.map((artwork: any) => (
-                  <div key={artwork.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                    {/* Artwork Images */}
-                    {artwork.images && artwork.images.length > 0 && (
-                      <div className="relative">
-                        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-                          {artwork.images.map((image: string, idx: number) => (
-                            <img
-                              key={idx}
-                              src={image}
-                              alt={`${artwork.title} - Image ${idx + 1}`}
-                              className="w-full h-64 object-cover snap-center"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder-artwork.jpg'
-                              }}
-                            />
-                          ))}
-                        </div>
-                        {artwork.images.length > 1 && (
-                          <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-                            {artwork.images.length} images
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Artwork Details */}
-                    <div className="p-4 md:p-5">
-                      <h4 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2">
-                        {artwork.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                        {artwork.description}
-                      </p>
                       
                       <div className="flex items-center justify-between mb-3">
                         <div>
@@ -2164,63 +1801,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-
-      {/* Artist Delete Confirmation Modal */}
-      {showArtistDeleteConfirm && artistToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="card p-4 md:p-6 max-w-md w-full bg-white">
-            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">
-              Confirm Remove Artist
-            </h3>
-            <div className="mb-4 md:mb-6 space-y-3">
-              <p className="text-gray-700 text-sm md:text-base">
-                Are you sure you want to permanently remove <strong>{artistToDelete.artistName}</strong>?
-              </p>
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4">
-                <p className="text-red-800 text-sm font-semibold mb-2">⚠️ Warning:</p>
-                <ul className="text-red-700 text-xs md:text-sm space-y-1 list-disc list-inside">
-                  <li>This action cannot be undone</li>
-                  <li>All artworks by this artist will be permanently deleted</li>
-                  <li>The artist profile will be completely removed from the system</li>
-                  <li>Any pending commissions will be cancelled</li>
-                </ul>
-              </div>
-              {artistToDelete.totalArtworks > 0 && (
-                <p className="text-gray-600 text-sm">
-                  This will delete <strong>{artistToDelete.totalArtworks}</strong> artwork(s) associated with this artist.
-                </p>
-              )}
-            </div>
-            <div className="flex gap-3 md:gap-4">
-              <button
-                onClick={confirmDeleteArtist}
-                disabled={deletingArtist}
-                className="btn-primary flex-1 text-sm md:text-base py-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {deletingArtist ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Removing...
-                  </span>
-                ) : (
-                  'Yes, Remove Artist'
-                )}
-              </button>
-              <button
-                onClick={() => {
-                  setShowArtistDeleteConfirm(false)
-                  setArtistToDelete(null)
-                }}
-                disabled={deletingArtist}
-                className="btn-secondary flex-1 text-sm md:text-base py-2 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Order Delete Confirmation Modal */}
       {showOrderDeleteConfirm && (() => {
         const order = orders.find(o => o.id === orderToDelete)

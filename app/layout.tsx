@@ -9,10 +9,19 @@ import SiteFooter from '@/components/SiteFooter'
 import MobileDock from '@/components/MobileDock'
 import BannerAd from '@/components/BannerAd'
 import ConditionalLayout from '@/components/ConditionalLayout'
+import PWAInstallButton from '@/components/PWAInstallButton'
+import useServiceWorker from '@/hooks/useServiceWorker'
 
 export const metadata: Metadata = {
   title: 'Peter Art - Artwork Shop',
   description: 'Buy and sell beautiful artworks',
+  manifest: '/manifest.json',
+  themeColor: '#f97316',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Peter Art',
+  },
 }
 
 export default function RootLayout({
@@ -20,9 +29,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  useServiceWorker()
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Peter Art" />
+        <meta name="application-name" content="Peter Art" />
+        <meta name="msapplication-TileColor" content="#f97316" />
+        <meta name="theme-color" content="#f97316" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -50,6 +67,7 @@ export default function RootLayout({
             </CartProvider>
           </LanguageProvider>
         </ThemeProvider>
+        <PWAInstallButton />
         <Toaster
           position="top-center"
           toastOptions={{

@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
-import { getArtistByUserId } from '@/lib/artists'
 import toast from 'react-hot-toast'
 import { FiMessageCircle, FiUser, FiSearch, FiArrowLeft, FiX } from 'react-icons/fi'
 
@@ -12,7 +11,6 @@ export const dynamic = 'force-dynamic'
 export default function MessagesPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [artist, setArtist] = useState<any>(null)
   const [conversations, setConversations] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -31,12 +29,6 @@ export default function MessagesPage() {
         return
       }
       setUser(currentUser)
-      
-      // Check if user is an artist
-      const artistData = await getArtistByUserId(currentUser.uid)
-      if (artistData) {
-        setArtist(artistData)
-      }
     } catch (error) {
       console.error('Error loading user:', error)
       toast.error('Failed to load user')
@@ -143,16 +135,7 @@ export default function MessagesPage() {
                     profileImage: userData.profileImage || null
                   }
                 } else {
-                  // Try to get artist info
-                  const artistData = await getArtistByUserId(conv.userId)
-                  if (artistData) {
-                    return {
-                      ...conv,
-                      userName: artistData.artistName,
-                      userEmail: artistData.email || null,
-                      profileImage: artistData.profileImage || null
-                    }
-                  }
+                  // User not found, keep default values
                 }
               } catch (error) {
                 console.error('Error loading user info:', error)

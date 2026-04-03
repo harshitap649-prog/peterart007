@@ -11,7 +11,6 @@ import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiT
 import LoginModal from '@/components/LoginModal'
 import Cart from '@/components/Cart'
 import RecommendationSection from '@/components/RecommendationSection'
-import ArtistBadge from '@/components/ArtistBadge'
 import BannerAd from '@/components/BannerAd'
 import { likeArtwork } from '@/lib/comments'
 import { useCart } from '@/contexts/CartContext'
@@ -878,11 +877,6 @@ export default function ArtworkDetailsPage() {
             <div className="bg-white rounded-none md:rounded-2xl p-3 md:p-6 lg:p-8">
               <div className="flex items-start justify-between mb-2 md:mb-4">
                 <div className="flex-1 min-w-0">
-                  {artwork.artistId && (
-                    <div className="mb-2 md:mb-3">
-                      <ArtistBadge artistId={artwork.artistId} />
-                    </div>
-                  )}
                   <h1 className="text-base md:text-2xl lg:text-3xl font-bold mb-1.5 md:mb-3 text-gray-900 leading-tight">{artwork.title}</h1>
                   <p className="text-xs md:text-base text-gray-600 mb-2 md:mb-4 whitespace-pre-wrap leading-relaxed">{artwork.description}</p>
                 </div>
