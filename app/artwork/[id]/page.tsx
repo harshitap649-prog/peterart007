@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getArtworkById } from '@/lib/artworks'
@@ -680,7 +680,7 @@ export default function ArtworkDetailsPage() {
   }
 
   if (!artwork) {
-    return null
+    return null;
   }
 
   return (
@@ -698,6 +698,7 @@ export default function ArtworkDetailsPage() {
           <Cart />
         </div>
       </div>
+      
 
       <div className="w-full md:max-w-6xl md:mx-auto md:px-4 py-4 md:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
@@ -862,7 +863,8 @@ export default function ArtworkDetailsPage() {
                     <span className="text-sm font-medium">Share</span>
                   </button>
                 </div>
-              </>
+              </div>
+            </>
             ) : (
               <div className="card p-4">
                 <div className="relative w-full h-96 rounded-lg overflow-hidden mb-4 bg-gray-200 flex items-center justify-center">
@@ -870,7 +872,6 @@ export default function ArtworkDetailsPage() {
                 </div>
               </div>
             )}
-          </div>
 
           {/* Artwork Details */}
           <div className="space-y-4 md:space-y-6 px-3 md:px-0">
@@ -1106,6 +1107,7 @@ export default function ArtworkDetailsPage() {
                             <label className="block text-sm font-medium mb-2 text-gray-600">
                               State
                             </label>
+
                             <input
                               type="text"
                               value={formData.state}
@@ -1567,7 +1569,7 @@ export default function ArtworkDetailsPage() {
           </div>
         </div>
       )}
-
+      
       {/* Profile Image Modal */}
       {showProfileModal && (
         <div 
@@ -1693,7 +1695,7 @@ export default function ArtworkDetailsPage() {
             {/* Large Image */}
             <div className="text-center w-full">
               <img
-                src={reviewImageModalSrc}
+                src={reviewImageModalSrc || ''}
                 alt={`Review image ${reviewImageModalIndex + 1}`}
                 className="max-w-full max-h-[70vh] md:max-h-[80vh] w-auto h-auto object-contain rounded-lg shadow-2xl mx-auto"
                 onError={(e) => {
@@ -1729,6 +1731,7 @@ export default function ArtworkDetailsPage() {
         </div>
       )}
     </div>
-  )
+  </div>
+  );
 }
 

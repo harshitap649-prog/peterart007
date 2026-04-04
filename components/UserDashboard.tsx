@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getAllArtworks, searchArtworks } from '@/lib/artworks'
 import { getUserOrders, createOrder, cancelOrder, returnOrder } from '@/lib/orders'
@@ -398,27 +398,17 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-      // Reset popunder flag on logout so it can trigger again in new session
-      resetPopunderAd()
-      toast.success('Logged out successfully')
-      if (onUserUpdate) {
-        onUserUpdate(null)
-      }
-      router.push('/')
-    } catch (error: any) {
-      toast.error(error.message || 'Logout failed')
-    }
-  }
-
-  const confirmLogout = async () => {
-    setShowLogoutConfirm(false)
-    // Load popunder ad before logout (only triggers once per session)
-    loadPopunderAd('logout')
-    await handleLogout()
-  }
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout()
+  //     // Reset popunder flag on logout so it can trigger again in new session
+  //     resetPopunderAd()
+  //     toast.success('Logged out successfully')
+  //     if (onUserUpdate) {
+  //       onUserUpdate(null)
+  //     }
+  //     router.push('/')
+  //   } catch (error: any) {
 
   const handleNavClick = (tab: string) => {
     if (tab === 'wishlist' || tab === 'orders' || tab === 'reviews' || tab === 'support' || tab === 'following') {
@@ -440,6 +430,21 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
     }
     // Reload data after login
     await loadData()
+  }
+
+  const confirmLogout = async () => {
+    try {
+      // If you are using Firebase or a similar auth provider:
+      // await auth.signOut(); 
+      
+      // Reset your local state
+      setShowLogoutConfirm(false);
+      
+      // Optional: Redirect or reload
+      window.location.href = '/'; 
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   }
 
   const handleBuyClick = (artworkId: string) => {
@@ -653,6 +658,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         />
         <h1 className="text-sm md:text-lg font-bold text-gray-700 mt-1">{t.peterArt}</h1>
       </div>
+      
 
       {/* Sidebar */}
       {sidebarOpen && (
@@ -1518,11 +1524,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               </div>
               <div className="flex flex-col gap-2 md:gap-3 sm:flex-row">
               <button
-                onClick={confirmLogout}
-                  className="flex-1 rounded-lg md:rounded-2xl bg-gray-900 py-2 md:py-3 text-xs md:text-sm font-semibold text-white shadow-lg shadow-gray-900/40 transition hover:-translate-y-0.5 hover:bg-black"
-              >
-                {t.yesLogout}
-              </button>
+  onClick={confirmLogout}
+  className="flex-1 rounded-lg md:rounded-2xl bg-gray-900 py-2 md:py-3 text-xs md:text-sm font-semibold text-white"
+>
+  {t.yesLogout}
+</button>
               <button
                 onClick={() => setShowLogoutConfirm(false)}
                   className="flex-1 rounded-lg md:rounded-2xl border border-gray-200 py-2 md:py-3 text-xs md:text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
@@ -1553,5 +1559,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
         </div>
       )}
     </div>
+    </div>
   )
 }
+
