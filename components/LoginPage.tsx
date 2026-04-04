@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { loginWithEmail, signUpWithEmail, loginWithGoogle, isAdmin } from '@/lib/auth'
-import { getArtistByUserId } from '@/lib/artists'
 import toast from 'react-hot-toast'
 import { FcGoogle } from 'react-icons/fc'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
@@ -74,22 +73,7 @@ export default function LoginPage() {
       if (admin) {
         window.location.href = '/admin'
       } else {
-        // Check if user is already an artist
-        try {
-          const artist = await getArtistByUserId(user.uid)
-          if (artist) {
-            // User is an artist, redirect to artist dashboard
-            window.location.href = '/user?tab=artist'
-          } else if (isFromArtist) {
-            // User came from artist page but not registered, redirect to registration
-            window.location.href = '/artist/apply'
-          } else {
-            window.location.href = '/user'
-          }
-        } catch (error) {
-          // If error checking artist, just go to user dashboard
-          window.location.href = '/user'
-        }
+        window.location.href = '/user'
       }
     } catch (error: any) {
       console.error('Login error:', error)
@@ -115,22 +99,7 @@ export default function LoginPage() {
       if (admin) {
         window.location.href = '/admin'
       } else {
-        // Check if user is already an artist
-        try {
-          const artist = await getArtistByUserId(user.uid)
-          if (artist) {
-            // User is an artist, redirect to artist dashboard
-            window.location.href = '/user?tab=artist'
-          } else if (isFromArtist) {
-            // User came from artist page but not registered, redirect to registration
-            window.location.href = '/artist/apply'
-          } else {
-            window.location.href = '/user'
-          }
-        } catch (error) {
-          // If error checking artist, just go to user dashboard
-          window.location.href = '/user'
-        }
+        window.location.href = '/user'
       }
     } catch (error: any) {
       console.error('Google login error:', error)

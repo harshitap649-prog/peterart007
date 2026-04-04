@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { getAllArtworks, addArtwork, updateArtwork, deleteArtwork } from '@/lib/artworks'
 import { getAllOrders, updateOrderStatus, getOrdersByStatus, deleteOrder } from '@/lib/orders'
@@ -44,6 +44,7 @@ export default function AdminDashboard() {
     description: '',
     price: '',
     category: '',
+    artistId: '',
     images: [] as File[]
   })
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
@@ -377,7 +378,6 @@ export default function AdminDashboard() {
       toast.error(error.message || 'Logout failed')
     }
   }
-
   const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'confirmed')
   const deliveredOrders = orders.filter(o => o.status === 'delivered')
   const leftOrders = orders.filter(o => o.status === 'left')
@@ -1769,73 +1769,41 @@ export default function AdminDashboard() {
         </div>
       )}
 
-                      
-                      <div className="flex items-center justify-between mb-3">
-                        <div>
-                          <span className="text-xs text-gray-500">Price</span>
-                          <p className="font-bold text-lg text-orange-600">₹{artwork.price?.toFixed(2) || '0.00'}</p>
-                        </div>
-                        {artwork.category && (
-                          <div>
-                            <span className="text-xs text-gray-500">Category</span>
-                            <p className="font-semibold text-sm text-gray-700">{artwork.category}</p>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2 text-xs text-gray-500 pt-3 border-t border-gray-200">
-                        <FiImage className="text-sm" />
-                        <span>Created: {new Date(artwork.createdAt).toLocaleDateString()}</span>
-                        {artwork.likes > 0 && (
-                          <>
-                            <span>•</span>
-                            <span>{artwork.likes} likes</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
       {/* Order Delete Confirmation Modal */}
       {showOrderDeleteConfirm && (() => {
         const order = orders.find(o => o.id === orderToDelete)
         const isHardDelete = order?.status === 'deleted' || order?.status === 'cancelled'
         return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="card p-4 md:p-6 max-w-md w-full bg-white">
-            <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">
-              {isHardDelete ? 'Confirm Permanent Delete' : 'Confirm Delete Order'}
-            </h3>
-            <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
-              {isHardDelete 
-                ? 'Are you sure you want to permanently delete this order? This action cannot be undone and the order will be completely removed from the system.'
-                : 'Are you sure you want to delete this delivered order? It will be moved to the Deleted Orders section where you can permanently delete it later.'}
-            </p>
-            <div className="flex gap-3 md:gap-4">
-              <button
-                onClick={confirmDeleteOrder}
-                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-red-600 text-white hover:bg-red-700"
-              >
-                <FiTrash2 className="inline" />
-                {isHardDelete ? 'Yes, Delete Permanently' : 'Yes, Move to Deleted'}
-              </button>
-              <button
-                onClick={() => {
-                  setShowOrderDeleteConfirm(false)
-                  setOrderToDelete(null)
-                }}
-                className="btn-secondary flex-1 text-sm md:text-base py-2"
-              >
-                Cancel
-              </button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="card p-4 md:p-6 max-w-md w-full bg-white">
+              <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-gray-900">
+                {isHardDelete ? 'Confirm Permanent Delete' : 'Confirm Delete Order'}
+              </h3>
+              <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
+                {isHardDelete 
+                  ? 'Are you sure you want to permanently delete this order? This action cannot be undone and the order will be completely removed from the system.'
+                  : 'Are you sure you want to delete this delivered order? It will be moved to the Deleted Orders section where you can permanently delete it later.'}
+              </p>
+              <div className="flex gap-3 md:gap-4">
+                <button
+                  onClick={confirmDeleteOrder}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 text-sm md:text-base font-medium rounded-lg transition-all bg-red-600 text-white hover:bg-red-700"
+                >
+                  <FiTrash2 className="inline" />
+                  {isHardDelete ? 'Yes, Delete Permanently' : 'Yes, Move to Deleted'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowOrderDeleteConfirm(false)
+                    setOrderToDelete(null)
+                  }}
+                  className="btn-secondary flex-1 text-sm md:text-base py-2"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
         )
       })()}
 

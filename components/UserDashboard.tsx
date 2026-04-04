@@ -7,7 +7,6 @@ import { getUserOrders, createOrder, cancelOrder, returnOrder } from '@/lib/orde
 import { getUserWishlist, addToWishlist, removeFromWishlist, isInWishlist } from '@/lib/wishlist'
 import { addComment, likeArtwork, isLiked } from '@/lib/comments'
 import { logout } from '@/lib/auth'
-import { loadPopunderAd, resetPopunderAd } from '@/lib/popunderAd'
 import toast from 'react-hot-toast'
 import { FiSearch, FiHeart, FiShoppingCart, FiShare2, FiMessageCircle, FiThumbsUp, FiHelpCircle, FiMenu, FiX, FiSettings, FiLogOut, FiUser, FiStar, FiPackage, FiTrendingUp, FiCalendar, FiDollarSign, FiArrowRight, FiCheckCircle } from 'react-icons/fi'
 import { FaHeart, FaSearch, FaShoppingCart, FaUser, FaStar, FaBox, FaQuestionCircle, FaCog, FaDollarSign, FaChartLine, FaComments } from 'react-icons/fa'
@@ -19,14 +18,8 @@ import SearchFilters from './SearchFilters'
 import OrderTracking from './OrderTracking'
 import UserProfile from './UserProfile'
 import RecommendationSection from './RecommendationSection'
-import ArtistDashboard from './ArtistDashboard'
-import ArtistBadge from './ArtistBadge'
-import ArtistFeed from './ArtistFeed'
-import FollowButton from './FollowButton'
 import BannerAd from './BannerAd'
 import { getCurrentUser } from '@/lib/auth'
-import { getArtistByUserId, getArtistById } from '@/lib/artists'
-import { getUserFollowing } from '@/lib/follows'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 interface UserDashboardProps {
@@ -53,15 +46,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [selectedOrderForTracking, setSelectedOrderForTracking] = useState<any>(null)
-  const [isArtist, setIsArtist] = useState(false)
-  const [artistProfile, setArtistProfile] = useState<any>(null)
-  const [previousArtistStatus, setPreviousArtistStatus] = useState<string | null>(null)
   const [showCongratulations, setShowCongratulations] = useState(false)
-  const [followingArtists, setFollowingArtists] = useState<any[]>([])
   const [isMobileView, setIsMobileView] = useState(false)
-  const [expandedArtistId, setExpandedArtistId] = useState<string | null>(null)
-  const [artistArtworks, setArtistArtworks] = useState<Record<string, any[]>>({})
-  const [loadingArtworks, setLoadingArtworks] = useState<Record<string, boolean>>({})
 
   const { language, setLanguage } = useLanguage()
 
@@ -83,7 +69,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       myReviews: 'My Reviews',
       helpSupport: 'Help & Support',
       myProfile: 'My Profile',
-      artistDashboard: 'Artist Dashboard',
       buy: 'Buy',
       buyNow: 'Buy Now',
       loading: 'Loading...',
@@ -151,17 +136,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       returnTimeExpired: 'Order can only be returned within 3 days of delivery',
       returned: 'Returned',
       congratulations: 'Congratulations!',
-      artistApproved: 'You Got Approved!',
-      artistApprovedMessage: 'Great news! Your artist registration has been approved. You can now start selling your artworks and earning money.',
-      viewDashboard: 'Go to Artist Dashboard',
       close: 'Close',
       following: 'Following',
-      followingArtists: 'Following Artists',
-      noFollowing: 'You are not following any artists yet',
-      startFollowing: 'Start Following Artists',
-      viewProfile: 'View Profile',
-      message: 'Message',
-      artworksFromFollowing: 'Artworks from Artists You Follow',
     },
     hi: {
       changeLanguage: 'भाषा बदलें',
@@ -179,7 +155,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       myReviews: 'मेरी समीक्षाएं',
       helpSupport: 'सहायता और समर्थन',
       myProfile: 'मेरी प्रोफ़ाइल',
-      artistDashboard: 'कलाकार डैशबोर्ड',
       buy: 'खरीदें',
       buyNow: 'अभी खरीदें',
       loading: 'लोड हो रहा है...',
@@ -247,17 +222,8 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       returnTimeExpired: 'ऑर्डर केवल डिलीवरी के 3 दिनों के भीतर वापस किया जा सकता है',
       returned: 'वापस किया गया',
       congratulations: 'बधाई हो!',
-      artistApproved: 'आपको मंजूरी मिल गई!',
-      artistApprovedMessage: 'बढ़िया खबर! आपके कलाकार पंजीकरण को मंजूरी मिल गई है। अब आप अपनी कलाकृतियां बेचना और पैसा कमाना शुरू कर सकते हैं।',
-      viewDashboard: 'कलाकार डैशबोर्ड पर जाएं',
       close: 'बंद करें',
       following: 'फॉलो किए गए',
-      followingArtists: 'फॉलो किए गए कलाकार',
-      noFollowing: 'आप अभी किसी कलाकार को फॉलो नहीं कर रहे हैं',
-      startFollowing: 'कलाकारों को फॉलो करना शुरू करें',
-      viewProfile: 'प्रोफ़ाइल देखें',
-      message: 'संदेश',
-      artworksFromFollowing: 'आपके फॉलो किए गए कलाकारों की कलाकृतियां',
     },
   } as const
 
@@ -271,7 +237,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   useEffect(() => {
     const tab = searchParams.get('tab')
-    if (tab && ['artworks', 'wishlist', 'orders', 'reviews', 'support', 'profile', 'artist', 'following'].includes(tab)) {
+    if (tab && ['artworks', 'wishlist', 'orders', 'reviews', 'support', 'profile'].includes(tab)) {
       setActiveTab(tab)
       // Scroll to top instantly when tab changes for faster navigation
       window.scrollTo({ top: 0, behavior: 'instant' })
@@ -281,43 +247,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   useEffect(() => {
     loadData()
   }, [user])
-
-  // Check for artist approval status change
-  useEffect(() => {
-    if (artistProfile && user) {
-      const currentStatus = artistProfile.status
-      const storageKey = `artist_approval_shown_${user.uid}_${artistProfile.id}`
-      const lastKnownStatusKey = `artist_last_status_${user.uid}_${artistProfile.id}`
-      
-      // Get last known status from localStorage
-      const lastKnownStatus = localStorage.getItem(lastKnownStatusKey)
-      
-      // Check if status changed from pending to approved
-      if (currentStatus === 'approved') {
-        // Check if we've already shown this congratulations
-        const alreadyShown = localStorage.getItem(storageKey)
-        
-        // Show congratulations if:
-        // 1. Status is approved AND
-        // 2. Previous status was pending (either from state or localStorage) AND
-        // 3. We haven't shown it before
-        if (!alreadyShown && (previousArtistStatus === 'pending' || lastKnownStatus === 'pending')) {
-          setShowCongratulations(true)
-          localStorage.setItem(storageKey, 'true')
-        }
-      }
-      
-      // Update previous status and localStorage
-      if (currentStatus !== previousArtistStatus) {
-        setPreviousArtistStatus(currentStatus)
-        localStorage.setItem(lastKnownStatusKey, currentStatus)
-      } else if (previousArtistStatus === null && currentStatus) {
-        // First time loading, set initial status
-        setPreviousArtistStatus(currentStatus)
-        localStorage.setItem(lastKnownStatusKey, currentStatus)
-      }
-    }
-  }, [artistProfile, previousArtistStatus, user])
 
   // Track viewport for responsive overlays
   useEffect(() => {
@@ -383,24 +312,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           }
         })
         setMyReviews(reviews)
-        
-        // Check if user is an artist
-        const artistData = await getArtistByUserId(user.uid)
-        if (artistData) {
-          setIsArtist(true)
-          // Set previous status if not set yet
-          if (previousArtistStatus === null) {
-            setPreviousArtistStatus(artistData.status)
-          }
-          setArtistProfile(artistData)
-        } else {
-          setIsArtist(false)
-          setArtistProfile(null)
-          setPreviousArtistStatus(null)
-        }
-        
-        // Load following artists
-        await loadFollowingArtists(user.uid)
       }
     } catch (error) {
       toast.error(t.failedToLoad)
@@ -534,45 +445,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
   const handleBuyClick = (artworkId: string) => {
     // Always open artwork detail; inside the detail page protected actions will prompt login
     router.push(`/artwork/${artworkId}`)
-  }
-
-  const loadFollowingArtists = async (userId: string) => {
-    try {
-      const following = await getUserFollowing(userId)
-      const artistPromises = following.map((f: any) => getArtistById(f.artistId))
-      const artists = await Promise.all(artistPromises)
-      setFollowingArtists(artists.filter(a => a !== null))
-    } catch (error) {
-      console.error('Error loading following artists:', error)
-    }
-  }
-
-  const loadArtistArtworks = async (artistId: string) => {
-    if (artistArtworks[artistId]) {
-      // Already loaded, just toggle
-      return
-    }
-
-    setLoadingArtworks(prev => ({ ...prev, [artistId]: true }))
-    try {
-      const allArts = await getAllArtworks()
-      const filtered = allArts.filter((art: any) => art.artistId === artistId)
-      setArtistArtworks(prev => ({ ...prev, [artistId]: filtered }))
-    } catch (error) {
-      console.error('Error loading artist artworks:', error)
-      toast.error('Failed to load artworks')
-    } finally {
-      setLoadingArtworks(prev => ({ ...prev, [artistId]: false }))
-    }
-  }
-
-  const handleArtistClick = (artistId: string) => {
-    if (expandedArtistId === artistId) {
-      setExpandedArtistId(null)
-    } else {
-      setExpandedArtistId(artistId)
-      loadArtistArtworks(artistId)
-    }
   }
 
   const handleCancelOrder = async (orderId: string, e: React.MouseEvent) => {
@@ -750,28 +622,15 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
       accent: 'from-violet-500 to-purple-500',
       icon: FiHelpCircle
     },
-    ...(isArtist
-      ? [
-          {
-            id: 'artist' as const,
-            title: t.artistDashboard,
-            description: t.viewDashboard,
-            accent: 'from-emerald-500 to-teal-500',
-            icon: FiTrendingUp
-          }
-        ]
-      : [])
   ]
 
   const navTabs = [
     { id: 'artworks', label: t.artworks, icon: FiSearch },
     { id: 'wishlist', label: t.wishlist, icon: FiHeart },
-    { id: 'following', label: t.following, icon: FiUser, hidden: !user },
     { id: 'orders', label: t.myOrders, icon: FiShoppingCart },
     { id: 'reviews', label: t.myReviews, icon: FiStar },
     { id: 'support', label: t.helpSupport, icon: FiHelpCircle },
     { id: 'profile', label: t.myProfile, icon: FiSettings, hidden: !user },
-    { id: 'artist', label: t.artistDashboard, icon: FiTrendingUp, hidden: !isArtist },
   ].filter(tab => !tab.hidden)
 
   const heroGreeting = user?.displayName || user?.email?.split('@')[0] || (language === 'hi' ? 'मित्र' : 'Collector')
@@ -1617,165 +1476,7 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           </div>
         )}
 
-        {/* Profile Tab */}
-        {activeTab === 'profile' && (
-          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
-            <UserProfile user={user} onProfileUpdate={onUserUpdate} language={language} />
-          </div>
-        )}
-
-
-        {/* Artist Dashboard Tab */}
-        {activeTab === 'artist' && isArtist && user && (
-          <div className="rounded-3xl bg-white/95 p-4 shadow-lg sm:p-6">
-          <ArtistDashboard userId={user.uid} language={language} />
-          </div>
-        )}
-
-        {/* Following Tab - Clean Vertical List */}
-        {activeTab === 'following' && user && (
-          <div className="space-y-3 md:space-y-4">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900 px-0 md:px-0">{t.followingArtists}</h2>
-            
-            {followingArtists.length === 0 ? (
-              <div className="card p-6 md:p-8 text-center bg-gradient-to-br from-gray-50 to-gray-100 mx-0 md:mx-0">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mb-4">
-                  <FiUser className="text-4xl text-white" />
-                </div>
-                <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">{t.noFollowing}</h3>
-                <p className="text-sm text-gray-600 mb-4">{t.startFollowing}</p>
-                <button
-                  onClick={() => handleNavClick('artworks')}
-                  className="btn-primary flex items-center gap-2 mx-auto text-sm py-2.5 px-6"
-                >
-                  <FiArrowRight className="text-sm" />
-                  {t.browseArtworks}
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-2 md:space-y-3 px-0 md:px-0">
-                {followingArtists.map((artist: any) => {
-                  const isExpanded = expandedArtistId === artist.id
-                  const artworks = artistArtworks[artist.id] || []
-                  const isLoading = loadingArtworks[artist.id] || false
-
-                  return (
-                    <div key={artist.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                      {/* Artist Card - Clickable */}
-                      <button
-                        onClick={() => handleArtistClick(artist.id)}
-                        className="w-full p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors"
-                      >
-                        {/* Avatar */}
-                        {artist.profileImage ? (
-                          <img
-                            src={artist.profileImage}
-                            alt={artist.artistName}
-                            className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center flex-shrink-0">
-                            <FiUser className="text-gray-500 text-lg" />
-                          </div>
-                        )}
-                        
-                        {/* Artist Info */}
-                        <div className="flex-1 min-w-0 text-left">
-                          <h3 className="font-semibold text-sm md:text-base text-gray-900 truncate">{artist.artistName}</h3>
-                          <p className="text-xs text-gray-500 truncate">{artist.email}</p>
-                        </div>
-
-                        {/* Expand/Collapse Icon */}
-                        <div className={`flex-shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                          <FiArrowRight className="text-gray-400 text-lg" />
-                        </div>
-                      </button>
-
-                      {/* Expanded Artworks Section */}
-                      {isExpanded && (
-                        <div className="border-t border-gray-100 bg-gray-50/50">
-                          {isLoading ? (
-                            <div className="p-6 text-center">
-                              <div className="w-8 h-8 border-3 border-gray-300 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                              <p className="text-xs text-gray-500">{t.loadingArtworks}</p>
-                            </div>
-                          ) : artworks.length === 0 ? (
-                            <div className="p-6 text-center">
-                              <p className="text-sm text-gray-500">No artworks available</p>
-                            </div>
-                          ) : (
-                            <div className="p-4 space-y-3">
-                              <div className="grid grid-cols-2 gap-2 md:gap-3">
-                                {artworks.map((artwork: any) => (
-                                  <div
-                                    key={artwork.id}
-                                    onClick={() => router.push(`/artwork/${artwork.id}`)}
-                                    className="group bg-white rounded-lg border border-gray-200 p-2 md:p-3 shadow-sm hover:shadow-md hover:border-gray-300 transition-all cursor-pointer"
-                                  >
-                                    {artwork.images && artwork.images[0] ? (
-                                      <div className="relative mb-2 h-32 md:h-40 w-full overflow-hidden rounded-lg bg-gray-100">
-                                        <img
-                                          src={artwork.images[0]}
-                                          alt={artwork.title}
-                                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                          onError={(e) => {
-                                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23e5e7eb" width="200" height="200"/%3E%3Ctext fill="%239ca3af" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="14"%3EImage not found%3C/text%3E%3C/svg%3E'
-                                          }}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="w-full h-32 md:h-40 mb-2 rounded-lg bg-gray-100 flex items-center justify-center">
-                                        <span className="text-gray-400 text-[10px]">{t.noImage}</span>
-                                      </div>
-                                    )}
-                                    <h4 className="font-semibold text-xs md:text-sm mb-1 line-clamp-1 text-gray-900">{artwork.title}</h4>
-                                    <div className="flex items-center justify-between">
-                                      <p className="text-gray-900 font-bold text-xs md:text-sm">₹{artwork.price}</p>
-                                      <div className="flex items-center gap-1">
-                                        <FiThumbsUp className={`text-xs ${artwork.likedBy?.includes(user?.uid) ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
-                                        <span className="text-[10px] text-gray-500">{artwork.likes || 0}</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                              
-                              {/* View Profile and Message Buttons */}
-                              <div className="flex gap-2 pt-2 border-t border-gray-200">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    router.push(`/artist/${artist.id}`)
-                                  }}
-                                  className="flex-1 bg-white border border-gray-300 text-gray-700 rounded-lg py-2.5 text-xs md:text-sm font-semibold hover:bg-gray-50 transition-colors"
-                                >
-                                  {t.viewProfile}
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    router.push(`/chat/${artist.userId}`)
-                                  }}
-                                  className="flex-1 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-lg py-2.5 text-xs md:text-sm font-semibold hover:from-orange-600 hover:to-amber-700 transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-1.5"
-                                >
-                                  <FiMessageCircle className="text-sm" />
-                                  {t.message}
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Login Modal */}
+        {/* Congratulations Modal */}
       <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
@@ -1848,65 +1549,6 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               </button>
             </div>
             <OrderTracking order={selectedOrderForTracking} language={language} />
-          </div>
-        </div>
-      )}
-
-
-      {/* Congratulations Modal - Artist Approved */}
-      {showCongratulations && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative animate-fadeIn">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowCongratulations(false)}
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <FiX className="text-xl text-gray-600" />
-            </button>
-
-            {/* Success Icon */}
-            <div className="flex justify-center mb-6">
-              <div className="relative">
-                <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                  <FiCheckCircle className="text-white text-5xl md:text-6xl" />
-                </div>
-                <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
-              </div>
-            </div>
-
-            {/* Congratulations Message */}
-            <div className="text-center space-y-4">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                {(t as any).congratulations}
-              </h2>
-              <h3 className="text-xl md:text-2xl font-semibold text-green-600">
-                {(t as any).artistApproved}
-              </h3>
-              <p className="text-gray-600 text-base md:text-lg leading-relaxed">
-                {(t as any).artistApprovedMessage}
-              </p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-8">
-              <button
-                onClick={() => {
-                  setShowCongratulations(false)
-                  setActiveTab('artist')
-                  setSidebarOpen(false)
-                }}
-                className="btn-primary flex-1 py-3 text-base font-semibold"
-              >
-                {(t as any).viewDashboard}
-              </button>
-              <button
-                onClick={() => setShowCongratulations(false)}
-                className="btn-secondary flex-1 py-3 text-base font-semibold"
-              >
-                {(t as any).close}
-              </button>
-            </div>
           </div>
         </div>
       )}
