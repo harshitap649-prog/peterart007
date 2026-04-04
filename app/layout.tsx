@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: 'Peter Art - Artwork Shop',
   description: 'Buy and sell beautiful artworks',
   manifest: '/manifest.json',
-  themeColor: '#f97316',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
