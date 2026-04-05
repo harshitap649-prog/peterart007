@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { getCurrentUser, isAdmin } from '@/lib/auth'
 import AdminDashboard from '@/components/AdminDashboard'
 
+// Test import
+import '@/lib/test-auth'
+
 export const dynamic = 'force-dynamic'
 
 export default function AdminPage() {
