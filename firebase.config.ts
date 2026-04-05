@@ -28,7 +28,7 @@ if (getApps().length === 0) {
   try {
     app = initializeApp(firebaseConfig);
     console.log('Firebase initialized successfully');
-  } catch (error) {
+  } catch (error: any) {
     console.error('Firebase initialization error:', error);
     console.error('Firebase Config:', {
       apiKey: firebaseConfig.apiKey ? `${firebaseConfig.apiKey.substring(0, 10)}...` : 'MISSING',
@@ -57,4 +57,3 @@ if (typeof window !== 'undefined') {
     console.warn('Analytics initialization warning:', error);
   }
 }
-
