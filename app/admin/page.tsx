@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser, isAdmin } from '@/lib/auth'
-import AdminDashboard from '@/components/AdminDashboard'
+// import { getCurrentUser, isAdmin } from '@/lib/auth'
+// import AdminDashboard from '@/components/AdminDashboard'
+
+// Temporary placeholder
+const AdminDashboard = () => <div>Admin Dashboard Placeholder</div>
+const getCurrentUser = () => Promise.resolve(null)
+const isAdmin = () => Promise.resolve(false)
 
 export const dynamic = 'force-dynamic'
 
