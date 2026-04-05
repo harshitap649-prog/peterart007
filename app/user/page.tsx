@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import UserDashboard from '@/components/UserDashboard'
+import AuthGuard from '@/components/AuthGuard'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,20 +50,22 @@ export default function UserPage() {
   }
 
   return (
-    <div className="min-h-screen py-0 md:py-4 text-[var(--text-primary)] md:px-4">
-      <div className="w-full md:container md:mx-auto">
-        <Suspense
-          fallback={
-            <div className="py-12 text-center text-[var(--text-secondary)]">
-              <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-black/10 border-t-transparent"></div>
-              <p>Loading...</p>
-            </div>
-          }
-        >
-          <UserDashboard user={user} onUserUpdate={setUser} />
-        </Suspense>
+    <AuthGuard>
+      <div className="min-h-screen py-0 md:py-4 text-[var(--text-primary)] md:px-4">
+        <div className="w-full md:container md:mx-auto">
+          <Suspense
+            fallback={
+              <div className="py-12 text-center text-[var(--text-secondary)]">
+                <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-black/10 border-t-transparent"></div>
+                <p>Loading...</p>
+              </div>
+            }
+          >
+            <UserDashboard user={user} onUserUpdate={setUser} />
+          </Suspense>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   )
 }
 

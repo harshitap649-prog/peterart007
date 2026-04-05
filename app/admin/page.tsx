@@ -24,7 +24,7 @@ export default function AdminPage() {
       const currentUser = await getCurrentUser()
       if (!currentUser) {
         console.log('No user found, redirecting to login')
-        router.push('/')
+        router.push('/login')
         return
       }
       
@@ -43,7 +43,7 @@ export default function AdminPage() {
       setLoading(false)
       // Only redirect if it's a clear auth error
       setTimeout(() => {
-        router.push('/')
+        router.push('/login')
       }, 2000)
     }
   }

@@ -9,8 +9,7 @@ import SiteFooter from '@/components/SiteFooter'
 import MobileDock from '@/components/MobileDock'
 import BannerAd from '@/components/BannerAd'
 import ConditionalLayout from '@/components/ConditionalLayout'
-import PWAInstallButton from '@/components/PWAInstallButton'
-import useServiceWorker from '@/hooks/useServiceWorker'
+import ClientOnlyWrapper from '@/components/ClientOnlyWrapper'
 
 export const metadata: Metadata = {
   title: 'Peter Art - Artwork Shop',
@@ -28,7 +27,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  useServiceWorker()
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -66,31 +64,32 @@ export default function RootLayout({
             </CartProvider>
           </LanguageProvider>
         </ThemeProvider>
-        <PWAInstallButton />
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            style: {
-              background: '#0b0f1c',
-              color: '#f8fafc',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: '28px',
-              padding: '16px 18px',
-            },
-            success: {
-              iconTheme: {
-                primary: '#f97316',
-                secondary: '#0b0f1c',
+        <ClientOnlyWrapper>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              style: {
+                background: '#0b0f1c',
+                color: '#f8fafc',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '28px',
+                padding: '16px 18px',
               },
-            },
-            error: {
-              iconTheme: {
-                primary: '#ff6b00',
-                secondary: '#fff',
+              success: {
+                iconTheme: {
+                  primary: '#f97316',
+                  secondary: '#0b0f1c',
+                },
               },
-            },
-          }}
-        />
+              error: {
+                iconTheme: {
+                  primary: '#ff6b00',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+        </ClientOnlyWrapper>
       </body>
     </html>
   )

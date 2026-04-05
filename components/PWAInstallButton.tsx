@@ -16,6 +16,7 @@ export default function PWAInstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
     // Only run on client side
@@ -71,13 +72,32 @@ export default function PWAInstallButton() {
   }
 
   const handleDismiss = () => {
+    setDismissed(true)
     setShowInstallButton(false)
-    // Store dismissal in localStorage to not show again for a while
+    // Store dismissal in localStorage to not show again for 24 hours
     localStorage.setItem('pwa-install-dismissed', Date.now().toString())
   }
 
-  // Don't show if already installed or no install prompt available
-  if (isInstalled || !showInstallButton || !deferredPrompt) {
+  useEffect(() => {
+    const dismissedTime = localStorage.getItem('pwa-install-dismissed')
+    if (dismissedTime) {
+      const timeDiff = Date.now() - parseInt(dismissedTime)
+      // Show again after 24 hours
+      if (timeDiff < 24 * 60 * 60 * 1000) {
+        setDismissed(true)
+      } else {
+        localStorage.removeItem('pwa-install-dismissed')
+        setDismissed(false)
+      }
+    }
+  }, [])
+
+  // Don't show if already installed
+  if (isInstalled) {
+    return null
+  }
+
+  if (dismissed || !showInstallButton || !deferredPrompt) {
     return null
   }
 

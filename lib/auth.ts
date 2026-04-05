@@ -15,11 +15,11 @@ export const ADMIN_EMAILS = ['peterchoudhary8963@gmail.com'];
 // Admin password for the admin email
 export const ADMIN_PASSWORD = 'adminpass';
 
-export const isAdminEmail = (email) => {
+export const isAdminEmail = (email: string): boolean => {
   return ADMIN_EMAILS.includes(email);
 };
 
-export const signUpWithEmail = async (email, password, name) => {
+export const signUpWithEmail = async (email: string, password: string, name?: string) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -29,11 +29,11 @@ export const signUpWithEmail = async (email, password, name) => {
       email: user.email,
       name: name || email.split('@')[0],
       createdAt: new Date().toISOString(),
-      isAdmin: isAdminEmail(user.email)
+      isAdmin: isAdminEmail(user.email || '')
     });
     
     return user;
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === 'auth/email-already-in-use') {
       throw new Error('This email is already registered. Please sign in instead.');
     } else if (error.code === 'auth/invalid-email') {
@@ -46,7 +46,7 @@ export const signUpWithEmail = async (email, password, name) => {
   }
 };
 
-export const loginWithEmail = async (email, password) => {
+export const loginWithEmail = async (email: string, password: string) => {
   try {
     // Check if this is the admin email and password
     if (isAdminEmail(email) && password === ADMIN_PASSWORD) {
@@ -65,7 +65,7 @@ export const loginWithEmail = async (email, password) => {
         }, { merge: true });
         
         return user;
-      } catch (firebaseError) {
+      } catch (firebaseError: any) {
         // If user doesn't exist in Firebase Auth, create it
         if (firebaseError.code === 'auth/user-not-found') {
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -97,12 +97,12 @@ export const loginWithEmail = async (email, password) => {
         email: user.email,
         name: user.displayName || email.split('@')[0],
         createdAt: new Date().toISOString(),
-        isAdmin: isAdminEmail(user.email)
+        isAdmin: isAdminEmail(user.email || '')
       });
     } else {
       // Update existing user's admin status if email is in admin list
       const currentData = userDoc.data();
-      if (isAdminEmail(user.email) && !currentData.isAdmin) {
+      if (isAdminEmail(user.email || '') && !currentData.isAdmin) {
         await setDoc(doc(db, 'users', user.uid), {
           ...currentData,
           isAdmin: true
@@ -111,7 +111,7 @@ export const loginWithEmail = async (email, password) => {
     }
     
     return user;
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === 'auth/user-not-found') {
       throw new Error('This account is not registered. Please sign up first.');
     } else if (error.code === 'auth/wrong-password') {
@@ -138,12 +138,12 @@ export const loginWithGoogle = async () => {
         email: user.email,
         name: user.displayName,
         createdAt: new Date().toISOString(),
-        isAdmin: isAdminEmail(user.email)
+        isAdmin: isAdminEmail(user.email || '')
       });
     } else {
       // Update existing user's admin status if email is in admin list
       const currentData = userDoc.data();
-      if (isAdminEmail(user.email) && !currentData.isAdmin) {
+      if (isAdminEmail(user.email || '') && !currentData.isAdmin) {
         await setDoc(doc(db, 'users', user.uid), {
           ...currentData,
           isAdmin: true
@@ -152,7 +152,7 @@ export const loginWithGoogle = async () => {
     }
     
     return user;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Google login failed. Please try again.');
   }
 };
@@ -160,12 +160,12 @@ export const loginWithGoogle = async () => {
 export const logout = async () => {
   try {
     await signOut(auth);
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(error.message || 'Logout failed.');
   }
 };
 
-export const getCurrentUser = () => {
+export const getCurrentUser = (): Promise<any> => {
   return new Promise((resolve, reject) => {
     // Check if auth is already initialized and user is available
     if (auth && auth.currentUser) {
@@ -204,14 +204,13 @@ export const getCurrentUser = () => {
   });
 };
 
-export const isAdmin = async (user) => {
+export const isAdmin = async (user: any): Promise<boolean> => {
   if (!user) return false;
   // First check if email is in admin list
-  if (isAdminEmail(user.email)) {
+  if (isAdminEmail(user.email || '')) {
     return true;
   }
   // Then check Firestore
   const userDoc = await getDoc(doc(db, 'users', user.uid));
   return userDoc.data()?.isAdmin === true;
 };
-

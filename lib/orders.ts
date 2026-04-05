@@ -1,6 +1,28 @@
 // Local storage implementation for orders
 
-export const createOrder = async (orderData) => {
+export interface OrderData {
+  userId: string;
+  userEmail: string;
+  userName: string;
+  artworkId: string;
+  artworkTitle: string;
+  artworkImage?: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+  paymentMethod: string;
+  fullName?: string;
+  phone?: string;
+  email?: string;
+  address1?: string;
+  address2?: string;
+  pincode?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+}
+
+export const createOrder = async (orderData: OrderData): Promise<string> => {
   try {
     const response = await fetch('/api/orders', {
       method: 'POST',
@@ -23,7 +45,7 @@ export const createOrder = async (orderData) => {
   }
 };
 
-export const getUserOrders = async (userId) => {
+export const getUserOrders = async (userId: string): Promise<any[]> => {
   try {
     const response = await fetch(`/api/orders?userId=${userId}`);
     if (!response.ok) {
@@ -36,7 +58,7 @@ export const getUserOrders = async (userId) => {
   }
 };
 
-export const getAllOrders = async () => {
+export const getAllOrders = async (): Promise<any[]> => {
   try {
     const response = await fetch('/api/orders');
     if (!response.ok) {
@@ -49,7 +71,7 @@ export const getAllOrders = async () => {
   }
 };
 
-export const updateOrderStatus = async (orderId, status) => {
+export const updateOrderStatus = async (orderId: string, status: string): Promise<any> => {
   try {
     const response = await fetch('/api/orders', {
       method: 'PUT',
@@ -71,17 +93,17 @@ export const updateOrderStatus = async (orderId, status) => {
   }
 };
 
-export const getOrdersByStatus = async (status) => {
+export const getOrdersByStatus = async (status: string): Promise<any[]> => {
   try {
     const orders = await getAllOrders();
-    return orders.filter((order) => order.status === status);
+    return orders.filter((order: any) => order.status === status);
   } catch (error) {
     console.error('Error fetching orders by status:', error);
     throw error;
   }
 };
 
-export const cancelOrder = async (orderId) => {
+export const cancelOrder = async (orderId: string): Promise<any> => {
   try {
     const response = await fetch(`/api/orders?id=${orderId}`, {
       method: 'DELETE',
@@ -102,7 +124,7 @@ export const cancelOrder = async (orderId) => {
   }
 };
 
-export const deleteOrder = async (orderId, hardDelete = false) => {
+export const deleteOrder = async (orderId: string, hardDelete = false): Promise<any> => {
   try {
     const url = hardDelete 
       ? `/api/orders?id=${orderId}&permanent=true&hard=true`
@@ -127,7 +149,7 @@ export const deleteOrder = async (orderId, hardDelete = false) => {
   }
 };
 
-export const returnOrder = async (orderId) => {
+export const returnOrder = async (orderId: string): Promise<any> => {
   try {
     const response = await fetch('/api/orders', {
       method: 'PUT',
@@ -148,4 +170,3 @@ export const returnOrder = async (orderId) => {
     throw error;
   }
 };
-

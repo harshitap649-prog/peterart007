@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { FcGoogle } from 'react-icons/fc'
 import { FiEye, FiEyeOff } from 'react-icons/fi'
 import BannerAd from '@/components/BannerAd'
+import InstallButton from '@/components/InstallButton'
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin')
@@ -282,6 +283,11 @@ export default function LoginPage() {
             <FcGoogle className="text-lg md:text-xl" />
             Continue with Google
           </button>
+
+          {/* PWA Install Button */}
+          <div className="mb-3 md:mb-4">
+            <InstallButton />
+          </div>
 
           <div className="rounded-2xl md:rounded-3xl border border-black/5 bg-white p-3 md:p-4 text-xs md:text-sm text-[var(--text-secondary)] shadow-inner">
             <p className="font-semibold text-[var(--text-primary)] text-sm md:text-base">Creator or gallery?</p>

@@ -19,6 +19,10 @@ import OrderTracking from './OrderTracking'
 import UserProfile from './UserProfile'
 import RecommendationSection from './RecommendationSection'
 import BannerAd from './BannerAd'
+import Banner300x250 from './Banner300x250'
+import NativeBanner from './NativeBanner'
+import Banner728x90 from './Banner728x90'
+import SocialBar from './SocialBar'
 import { getCurrentUser } from '@/lib/auth'
 import { useLanguage } from '@/contexts/LanguageContext'
 
@@ -642,6 +646,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
 
   return (
     <div className="space-y-4 md:space-y-6 pb-24">
+      {/* 728x90 Banner - Top of dashboard */}
+      <div className="hidden md:block">
+        <Banner728x90 />
+      </div>
+      
       {/* Centered Logo Image - Only show on artworks/home screen on mobile, show on all tabs on desktop */}
       <div className={`flex flex-col justify-center items-center pt-2 pb-1 md:pt-3 md:pb-3 ${
         // On mobile: only show on artworks tab (or when no tab is selected, which defaults to artworks)
@@ -954,8 +963,9 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4 px-0 md:px-0">
-                {filteredArtworks.map((artwork: any) => (
-                  <div key={artwork.id} className="group bg-white rounded-lg md:rounded-2xl border border-gray-100 p-1.5 md:p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
+                {filteredArtworks.map((artwork: any, index: number) => (
+                  <React.Fragment key={artwork.id}>
+                    <div className="group bg-white rounded-lg md:rounded-2xl border border-gray-100 p-1.5 md:p-3 shadow-sm hover:shadow-lg hover:border-gray-200 transition-all duration-300">
                     {artwork.images && artwork.images[0] ? (
                       <div className="relative mb-2 md:mb-3 h-24 md:h-40 w-full overflow-hidden rounded-lg md:rounded-xl bg-gray-100">
                         <img
@@ -1004,7 +1014,21 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                     </div>
 
                   </div>
+                  {/* Add Native Banner after every 6 artworks */}
+                  {(index + 1) % 6 === 0 && index < filteredArtworks.length - 1 && (
+                    <div className="col-span-full">
+                      <NativeBanner className="my-6" />
+                    </div>
+                  )}
+                  </React.Fragment>
                 ))}
+                 </div>
+               )}
+
+               {/* Native Banner at the end of artwork grid */}
+               {filteredArtworks.length > 0 && (
+                 <div className="mt-6">
+                   <NativeBanner />
                  </div>
                )}
 
@@ -1018,6 +1042,10 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
                          limit={10}
                          language={language}
                        />
+                       {/* 300x250 Banner between recommendations */}
+                       <div className="hidden lg:block">
+                         <Banner300x250 className="my-6" />
+                       </div>
                        {/* Banner Ad between For You and Because You Liked sections */}
                        <BannerAd inline={true} />
                        <RecommendationSection
@@ -1558,6 +1586,11 @@ export default function UserDashboard({ user, onUserUpdate }: UserDashboardProps
           </div>
         </div>
       )}
+      
+      {/* Social Bar - Only show on mobile */}
+      <div className="md:hidden">
+        <SocialBar />
+      </div>
     </div>
     </div>
   )

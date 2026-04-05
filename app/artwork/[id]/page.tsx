@@ -12,6 +12,8 @@ import LoginModal from '@/components/LoginModal'
 import Cart from '@/components/Cart'
 import RecommendationSection from '@/components/RecommendationSection'
 import BannerAd from '@/components/BannerAd'
+import Banner300x250 from '@/components/Banner300x250'
+import NativeBanner from '@/components/NativeBanner'
 import { likeArtwork } from '@/lib/comments'
 import { useCart } from '@/contexts/CartContext'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -1168,6 +1170,11 @@ export default function ArtworkDetailsPage() {
               </div>
             </div>
 
+            {/* 300x250 Banner - Between purchase and reviews */}
+            <div className="hidden lg:block mt-6">
+              <Banner300x250 />
+            </div>
+
             {/* Reviews Section */}
             <div className="bg-white rounded-none md:rounded-2xl p-4 md:p-6 lg:p-8 mt-4 md:mt-6">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6 text-gray-900">
@@ -1715,6 +1722,11 @@ export default function ArtworkDetailsPage() {
       {/* Banner Ad before Similar Artworks */}
       <div className="w-full md:max-w-6xl md:mx-auto md:px-4 py-4 md:py-6">
         <BannerAd inline={true} />
+      </div>
+
+      {/* Native Banner - Before Similar Artworks */}
+      <div className="w-full md:max-w-6xl md:mx-auto md:px-4 py-4">
+        <NativeBanner />
       </div>
 
       {/* Similar Artworks Section */}

@@ -1,6 +1,15 @@
 // Local storage implementation - no Firebase Storage needed
 
-export const getAllArtworks = async (includePending = false) => {
+export interface ArtworkData {
+  title: string;
+  description: string;
+  price: number;
+  category?: string;
+  artistId?: string;
+  imagesToKeep?: string[];
+}
+
+export const getAllArtworks = async (includePending = false): Promise<any[]> => {
   try {
     const url = includePending ? '/api/artworks?includePending=true' : '/api/artworks';
     const response = await fetch(url);
@@ -9,7 +18,7 @@ export const getAllArtworks = async (includePending = false) => {
     }
     const artworks = await response.json();
     // Sort by createdAt descending
-    return artworks.sort((a, b) => 
+    return artworks.sort((a: any, b: any) => 
       new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
     );
   } catch (error) {
@@ -18,7 +27,7 @@ export const getAllArtworks = async (includePending = false) => {
   }
 };
 
-export const getArtworkById = async (id) => {
+export const getArtworkById = async (id: string): Promise<any> => {
   try {
     const response = await fetch(`/api/artworks/${id}`);
     if (!response.ok) {
@@ -32,7 +41,7 @@ export const getArtworkById = async (id) => {
   }
 };
 
-export const addArtwork = async (artworkData, images) => {
+export const addArtwork = async (artworkData: ArtworkData, images: File[]): Promise<string> => {
   try {
     const formData = new FormData();
     formData.append('title', artworkData.title);
@@ -66,7 +75,7 @@ export const addArtwork = async (artworkData, images) => {
   }
 };
 
-export const updateArtwork = async (id, artworkData, newImages = []) => {
+export const updateArtwork = async (id: string, artworkData: ArtworkData, newImages: File[] = []): Promise<any> => {
   try {
     const formData = new FormData();
     formData.append('id', id);
@@ -105,7 +114,7 @@ export const updateArtwork = async (id, artworkData, newImages = []) => {
   }
 };
 
-export const deleteArtwork = async (id) => {
+export const deleteArtwork = async (id: string): Promise<any> => {
   try {
     const response = await fetch(`/api/artworks?id=${id}`, {
       method: 'DELETE'
@@ -123,7 +132,7 @@ export const deleteArtwork = async (id) => {
   }
 };
 
-export const searchArtworks = async (searchTerm) => {
+export const searchArtworks = async (searchTerm: string): Promise<any[]> => {
   try {
     const artworks = await getAllArtworks();
     const term = searchTerm.toLowerCase();
@@ -137,4 +146,3 @@ export const searchArtworks = async (searchTerm) => {
     throw error;
   }
 };
-

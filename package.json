@@ -9,7 +9,8 @@
     "lint": "next lint",
     "deploy": "npx vercel --prod",
     "deploy:vercel": "npx vercel --prod",
-    "deploy:preview": "npx vercel"
+    "deploy:preview": "npx vercel",
+    "deploy:safe": "chmod +x deploy-vercel.sh && ./deploy-vercel.sh"
   },
   "engines": {
     "node": ">=18.0.0"
