@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
-import { 
-  getPersonalizedRecommendations, 
-  getTrendingArtworks, 
-  getSimilarArtworks,
-  getBecauseYouLiked 
-} from '@/lib/recommendations'
+// import { 
+//   getPersonalizedRecommendations, 
+//   getTrendingArtworks, 
+//   getSimilarArtworks,
+//   // getBecauseYouLiked 
+// } from '@/lib/recommendations'
+
+// Placeholders
+const getPersonalizedRecommendations = (userId: string, artworks: any, userWishlist: any, userOrders: any, views: any, limit: number) => []
+const getTrendingArtworks = (artworks: any, limit: number) => []
+const getSimilarArtworks = (artworkId: string, artworks: any, limit: number) => []
+const getBecauseYouLiked = (userId: string, artworks: any, userWishlist: any, userOrders: any, limit: number) => []
 
 export const dynamic = 'force-dynamic'
 

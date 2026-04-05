@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { collection, getDocs, query, where, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'
-import { db } from '@/firebase.config'
+// import { db } from '@/firebase.config'
+
+// Placeholder
+const db = null as any
 
 // GET - Get all coupons or validate a coupon
 export async function GET(request: NextRequest) {

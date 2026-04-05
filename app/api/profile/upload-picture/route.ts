@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { doc, updateDoc } from 'firebase/firestore'
-import { db } from '@/firebase.config'
+// import { db } from '@/firebase.config'
+
+// Placeholder
+const db = null as any
 
 export async function POST(request: NextRequest) {
   try {
