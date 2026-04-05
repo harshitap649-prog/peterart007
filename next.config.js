@@ -14,7 +14,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // Don't ignore build errors - we want to catch them
   },
   async headers() {
     return [
@@ -37,6 +37,9 @@ const nextConfig = {
     ]
   },
   webpack: (config, { isServer, webpack }) => {
+    // Add TypeScript file resolution
+    config.resolve.extensions = ['.ts', '.tsx', '.js', '.jsx', '.json'];
+    
     // Fix for undici package parsing issue
     if (!isServer) {
       config.resolve.fallback = {
