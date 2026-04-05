@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser, isAdmin } from '@/lib/auth'
-import AdminDashboard from '@/components/AdminDashboard'
+import { getCurrentUser, isAdmin } from '@/lib/auth.ts'
+import AdminDashboard from '@/components/AdminDashboard.tsx'
 
 export const dynamic = 'force-dynamic'
 

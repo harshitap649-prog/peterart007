@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { getCurrentUser } from '@/lib/auth'
-import { getArtworkById } from '@/lib/artworks'
-import { createOrder } from '@/lib/orders'
+import { getCurrentUser } from '@/lib/auth.ts'
+import { getArtworkById } from '@/lib/artworks.ts'
+import { createOrder } from '@/lib/orders.ts'
 import { loadPopunderAd } from '@/lib/popunderAd'
 import toast from 'react-hot-toast'
 import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiThumbsUp, FiTrash2, FiMessageCircle, FiChevronLeft, FiChevronRight, FiShare2, FiUser } from 'react-icons/fi'
