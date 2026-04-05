@@ -2,18 +2,37 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useCart } from '@/contexts/CartContext'
-import { getCurrentUser } from '@/lib/auth'
-import { createOrder } from '@/lib/orders'
-import { loadPopunderAd } from '@/lib/popunderAd'
+// import { useCart } from '@/contexts/CartContext'
+// import { getCurrentUser } from '@/lib/auth'
+// import { createOrder } from '@/lib/orders'
+// import { loadPopunderAd } from '@/lib/popunderAd'
+// import LoginModal from '@/components/LoginModal'
+// import PaymentMethods from '@/components/PaymentMethods'
+// import { updateOrderStatus } from '@/lib/orders'
+// import { getSavedAddresses } from '@/lib/profile'
+// import CouponInput from '@/components/CouponInput'
+// import { calculateBulkDiscount } from '@/lib/coupons'
+
+// Placeholders
+const useCart = () => ({ 
+  cart: [], 
+  cartTotal: 0, 
+  removeFromCart: () => {}, 
+  updateQuantity: () => {}, 
+  clearCart: () => {} 
+})
+const getCurrentUser = () => Promise.resolve(null)
+const createOrder = (data: any) => Promise.resolve('order-id')
+const loadPopunderAd = (type: string) => console.log('Loading ad:', type)
+const LoginModal = ({ children, isOpen, onClose }: any) => isOpen ? <div>{children}</div> : null
+const PaymentMethods = ({ selectedMethod, onMethodChange }: any) => <div>Payment Methods Placeholder</div>
+const updateOrderStatus = (id: string, status: string) => Promise.resolve({})
+const getSavedAddresses = (userId: string) => Promise.resolve([])
+const CouponInput = ({ onApply }: any) => <div>Coupon Input Placeholder</div>
+const calculateBulkDiscount = (items: any[]) => 0
+
 import toast from 'react-hot-toast'
 import { FiShoppingCart, FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiUser, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
-import LoginModal from '@/components/LoginModal'
-import PaymentMethods from '@/components/PaymentMethods'
-import { updateOrderStatus } from '@/lib/orders'
-import { getSavedAddresses } from '@/lib/profile'
-import CouponInput from '@/components/CouponInput'
-import { calculateBulkDiscount } from '@/lib/coupons'
 
 export default function CartPage() {
   const { cart, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart()
