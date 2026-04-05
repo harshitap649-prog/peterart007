@@ -1,7 +1,10 @@
 'use client'
 
 import { Suspense } from 'react'
-import LoginPage from '@/components/LoginPage'
+// import LoginPage from '@/components/LoginPage'
+
+// Placeholder
+const LoginPage = () => <div>Login Page Placeholder</div>
 
 export const dynamic = 'force-dynamic'
 

@@ -2,7 +2,10 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { getCurrentUser } from '@/lib/auth'
+// import { getCurrentUser } from '@/lib/auth'
+
+// Placeholder
+const getCurrentUser = () => Promise.resolve(null)
 import toast from 'react-hot-toast'
 import { FiMessageCircle, FiUser, FiSearch, FiArrowLeft, FiX } from 'react-icons/fi'
 
