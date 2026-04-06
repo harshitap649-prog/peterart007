@@ -48,6 +48,16 @@ export const signUpWithEmail = async (email: string, password: string, name?: st
 
 export const loginWithEmail = async (email: string, password: string) => {
   try {
+    // Ensure auth is initialized
+    if (!auth) {
+      throw new Error('Firebase Auth not initialized');
+    }
+
+    // Validate inputs
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+
     // Check if this is the admin email and password
     if (isAdminEmail(email) && password === ADMIN_PASSWORD) {
       // Try to sign in with Firebase
@@ -89,6 +99,10 @@ export const loginWithEmail = async (email: string, password: string) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     
+    if (!user) {
+      throw new Error('Login failed: No user returned');
+    }
+    
     // Check if user exists in Firestore
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     if (!userDoc.exists()) {
@@ -112,6 +126,9 @@ export const loginWithEmail = async (email: string, password: string) => {
     
     return user;
   } catch (error: any) {
+    console.error('Email login error:', error);
+    
+    // Handle specific Firebase errors
     if (error.code === 'auth/user-not-found') {
       throw new Error('This account is not registered. Please sign up first.');
     } else if (error.code === 'auth/wrong-password') {
@@ -120,6 +137,10 @@ export const loginWithEmail = async (email: string, password: string) => {
       throw new Error('Invalid email address.');
     } else if (error.code === 'auth/invalid-credential') {
       throw new Error('Invalid email or password. Please try again.');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Too many failed login attempts. Please try again later.');
+    } else if (error.code === 'auth/user-disabled') {
+      throw new Error('This account has been disabled. Please contact support.');
     } else {
       throw new Error(error.message || 'Login failed. Please try again.');
     }
@@ -128,15 +149,24 @@ export const loginWithEmail = async (email: string, password: string) => {
 
 export const loginWithGoogle = async () => {
   try {
+    // Ensure auth is initialized
+    if (!auth) {
+      throw new Error('Firebase Auth not initialized');
+    }
+
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
+    
+    if (!user) {
+      throw new Error('No user returned from Google sign-in');
+    }
     
     // Check if user exists in Firestore, if not create one
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     if (!userDoc.exists()) {
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
-        name: user.displayName,
+        name: user.displayName || user.email?.split('@')[0] || 'User',
         createdAt: new Date().toISOString(),
         isAdmin: isAdminEmail(user.email || '')
       });
@@ -153,7 +183,20 @@ export const loginWithGoogle = async () => {
     
     return user;
   } catch (error: any) {
-    throw new Error(error.message || 'Google login failed. Please try again.');
+    console.error('Google login error:', error);
+    
+    // Handle specific Firebase errors
+    if (error.code === 'auth/popup-closed-by-user') {
+      throw new Error('Sign-in popup was closed before completion');
+    } else if (error.code === 'auth/popup-blocked') {
+      throw new Error('Sign-in popup was blocked by the browser. Please allow popups and try again.');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+      throw new Error('Sign-in was cancelled');
+    } else if (error.code === 'auth/unauthorized-domain') {
+      throw new Error('This domain is not authorized for Firebase Auth. Please contact support.');
+    } else {
+      throw new Error(error.message || 'Google login failed. Please try again.');
+    }
   }
 };
 

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 // import { getCurrentUser } from '@/lib/auth'
 // import { getArtworkById } from '@/lib/artworks'
 // import { createOrder } from '@/lib/orders'
@@ -34,14 +34,17 @@ const likeArtwork = (id: string, userId: string) => Promise.resolve()
 // import { useLanguage } from '@/contexts/LanguageContext'
 
 // Context placeholders
-const useCart = () => ({ addToCart: () => {} })
+const useCart = () => ({ addToCart: (item: any) => {} })
 const useLanguage = () => ({ language: 'en' })
 
 export default function ArtworkDetailsPage() {
-  const params = useParams()
+  const pathname = usePathname()
   const router = useRouter()
   const { addToCart } = useCart()
   const { language } = useLanguage()
+  
+  // Extract ID from pathname
+  const id = pathname.split('/').pop() || ''
   const [user, setUser] = useState<any>(null)
   const [artwork, setArtwork] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -133,7 +136,7 @@ export default function ArtworkDetailsPage() {
   useEffect(() => {
     checkAuth()
     loadArtwork()
-  }, [params.id])
+  }, [id])
 
   // Load profile images for review authors
   useEffect(() => {
@@ -188,7 +191,7 @@ export default function ArtworkDetailsPage() {
 
   const loadArtwork = async () => {
     try {
-      const art = await getArtworkById(params.id as string)
+      const art = await getArtworkById(id)
       if (!art) {
         toast.error('Artwork not found')
         router.push('/user')

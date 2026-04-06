@@ -47,6 +47,13 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
 
+// Configure Google Provider
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
+
 
 // Initialize Analytics (only on client side)
 if (typeof window !== 'undefined') {
