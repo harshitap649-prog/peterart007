@@ -8,7 +8,7 @@ import { useRouter, useParams } from 'next/navigation'
 // import { loadPopunderAd } from '@/lib/popunderAd'
 
 // Temporary placeholders
-const getCurrentUser = () => Promise.resolve(null)
+const getCurrentUser = () => Promise.resolve({ email: '', displayName: '' })
 const getArtworkById = (id: string) => Promise.resolve(null)
 const createOrder = (data: any) => Promise.resolve('order-id')
 const loadPopunderAd = (type: string) => console.log('Loading ad:', type)
