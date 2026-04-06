@@ -1,26 +1,23 @@
 'use client'
 
-import { Suspense } from 'react'
-import LoginPage from '@/components/LoginPage'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
-export const dynamic = 'force-dynamic'
+export default function LoginRedirect() {
+  const router = useRouter()
 
-function LoginPageWrapper() {
-  return <LoginPage />
-}
+  useEffect(() => {
+    // Redirect to the new modern login page
+    router.replace('/welcome/login')
+  }, [router])
 
-export default function LoginRoute() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
+    <div className="min-h-screen bg-welcome-gradient flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-brand-pink border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-text-primary font-semibold text-lg">Redirecting...</p>
       </div>
-    }>
-      <LoginPageWrapper />
-    </Suspense>
+    </div>
   )
 }
 
