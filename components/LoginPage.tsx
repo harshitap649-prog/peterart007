@@ -288,26 +288,6 @@ export default function LoginPage() {
           <div className="mb-3 md:mb-4">
             <InstallButton />
           </div>
-
-          <div className="rounded-2xl md:rounded-3xl border border-black/5 bg-white p-3 md:p-4 text-xs md:text-sm text-[var(--text-secondary)] shadow-inner">
-            <p className="font-semibold text-[var(--text-primary)] text-sm md:text-base">Creator or gallery?</p>
-            <p className="mb-2 md:mb-3 text-xs md:text-sm">
-              Launch your storefront, manage commissions, and access premium marketing tools.
-            </p>
-            <button
-              onClick={() => router.push('/artist/apply')}
-              className="flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl bg-black px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm font-bold text-white shadow-lg shadow-black/30 transition-all hover:shadow-xl hover:shadow-black/40 hover:bg-gray-900"
-            >
-              Become an artist partner
-            </button>
-          </div>
-
-          <p className="mt-3 text-center text-xs text-[var(--text-secondary)]">
-            Already selling?{' '}
-            <button onClick={() => router.push('/artist/apply')} className="font-semibold text-[var(--text-primary)] hover:underline">
-              Go to artist portal
-            </button>
-          </p>
         </div>
         
         {/* Banner Ad after sign in box */}
