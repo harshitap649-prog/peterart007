@@ -2,21 +2,14 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-// import { getCurrentUser } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
+import UserDashboard from '@/components/UserDashboard'
+import AuthGuard from '@/components/AuthGuard'
 
-// Placeholder
 interface User {
   email: string;
   [key: string]: any;
 }
-
-const getCurrentUser = (): Promise<User | null> => Promise.resolve(null)
-// import UserDashboard from '@/components/UserDashboard'
-// import AuthGuard from '@/components/AuthGuard'
-
-// Placeholders
-const UserDashboard = ({ user, onUserUpdate }: { user: User | null; onUserUpdate: (user: User | null) => void }) => <div>User Dashboard Placeholder</div>
-const AuthGuard = ({ children }: any) => <div>{children}</div>
 
 export const dynamic = 'force-dynamic'
 

@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-// import { getCurrentUser } from '@/lib/auth'
-
-// Placeholder
-const getCurrentUser = () => Promise.resolve(null)
+import { getCurrentUser } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 

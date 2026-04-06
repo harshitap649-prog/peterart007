@@ -2,73 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-// import { useCart } from '@/contexts/CartContext'
-// import { getCurrentUser } from '@/lib/auth'
-// import { createOrder } from '@/lib/orders'
-// import { loadPopunderAd } from '@/lib/popunderAd'
-// import LoginModal from '@/components/LoginModal'
-// import PaymentMethods from '@/components/PaymentMethods'
-// import { updateOrderStatus } from '@/lib/orders'
-// import { getSavedAddresses } from '@/lib/profile'
-// import CouponInput from '@/components/CouponInput'
-// import { calculateBulkDiscount } from '@/lib/coupons'
-
-// Placeholders
-interface CartItem {
-  id: string;
-  artworkId: string;
-  artworkTitle: string;
-  artworkImage: string;
-  quantity: number;
-  unitPrice: number;
-  price: number;
-  [key: string]: any;
-}
-
-interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-  fullName?: string;
-  phone?: string;
-  address1?: string;
-  address2?: string;
-  pincode?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  [key: string]: any;
-}
-
-interface Address {
-  fullName: string;
-  phone: string;
-  email: string;
-  address1: string;
-  address2?: string;
-  pincode: string;
-  city: string;
-  state: string;
-  country: string;
-  [key: string]: any;
-}
-
-const useCart = () => ({ 
-  cart: [] as CartItem[], 
-  cartTotal: 0, 
-  removeFromCart: (id: string) => {}, 
-  updateQuantity: (id: string, quantity: number) => {}, 
-  clearCart: () => {} 
-})
-const getCurrentUser = (): Promise<User | null> => Promise.resolve(null)
-const createOrder = (data: any) => Promise.resolve('order-id')
-const loadPopunderAd = (type: string) => console.log('Loading ad:', type)
-const LoginModal = ({ children, isOpen, onClose }: any) => isOpen ? <div>{children}</div> : null
-const PaymentMethods = ({ selectedMethod, onMethodChange, amount, orderId, userDetails, onPaymentSuccess, onPaymentError }: any) => <div>Payment Methods Placeholder</div>
-const updateOrderStatus = (id: string, status: string) => Promise.resolve({})
-const getSavedAddresses = (userId: string) => Promise.resolve([] as Address[])
-const CouponInput = ({ onCouponApplied, onCouponRemoved, cartTotal, userId }: any) => <div>Coupon Input Placeholder</div>
-const calculateBulkDiscount = (items: CartItem[]) => ({ discount: 0 })
+import { useCart } from '@/contexts/CartContext'
+import { getCurrentUser } from '@/lib/auth'
+import { createOrder } from '@/lib/orders'
+import { loadPopunderAd } from '@/lib/popunderAd'
+import LoginModal from '@/components/LoginModal'
+import PaymentMethods from '@/components/PaymentMethods'
+import { updateOrderStatus } from '@/lib/orders'
+import { getSavedAddresses } from '@/lib/profile'
+import CouponInput from '@/components/CouponInput'
+import { calculateBulkDiscount } from '@/lib/coupons'
 
 import toast from 'react-hot-toast'
 import { FiShoppingCart, FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiUser, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
