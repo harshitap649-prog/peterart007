@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 // Temporary placeholder
 const AdminDashboard = () => <div>Admin Dashboard Placeholder</div>
 const getCurrentUser = () => Promise.resolve(null)
-const isAdmin = () => Promise.resolve(false)
+const isAdmin = (user?: any) => Promise.resolve(false)
 
 export const dynamic = 'force-dynamic'
 
