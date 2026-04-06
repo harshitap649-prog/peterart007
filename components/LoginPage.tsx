@@ -143,7 +143,7 @@ export default function LoginPage() {
       <div className="flex-1 relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4 z-10">
 
         <div className="grid gap-4 md:gap-6">
-        <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-6 md:p-8 lg:p-10 shadow-lift text-[var(--text-primary)] max-w-sm mx-auto aspect-square flex flex-col justify-center">
+        <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 sm:p-6 md:p-8 lg:p-10 shadow-lift text-[var(--text-primary)] max-w-xs sm:max-w-sm mx-auto aspect-[4/3] sm:aspect-square flex flex-col justify-center">
           <div className="mb-4 md:mb-6 flex rounded-lg border border-black/10 bg-white p-0.5 md:p-1 text-xs md:text-sm font-semibold text-[var(--text-secondary)] shadow">
             <button
               onClick={() => setActiveTab('signin')}
