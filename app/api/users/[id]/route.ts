@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore'
-import { db } from '@/firebase.config'
+// import { db } from '@/firebase.config'
+
+// Placeholder
+const db = null as any
 
 // GET - Get user by ID
 export async function GET(

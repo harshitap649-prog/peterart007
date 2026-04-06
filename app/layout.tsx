@@ -1,15 +1,26 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
-import { CartProvider } from '@/contexts/CartContext'
-import { LanguageProvider } from '@/contexts/LanguageContext'
-import { ThemeProvider } from '@/contexts/ThemeContext'
-import SiteHeader from '@/components/SiteHeader'
-import SiteFooter from '@/components/SiteFooter'
-import MobileDock from '@/components/MobileDock'
-import BannerAd from '@/components/BannerAd'
-import ConditionalLayout from '@/components/ConditionalLayout'
-import ClientOnlyWrapper from '@/components/ClientOnlyWrapper'
+// import { CartProvider } from '@/contexts/CartContext'
+// import { LanguageProvider } from '@/contexts/LanguageContext'
+// import { ThemeProvider } from '@/contexts/ThemeContext'
+// import SiteHeader from '@/components/SiteHeader'
+// import SiteFooter from '@/components/SiteFooter'
+// import MobileDock from '@/components/MobileDock'
+// import BannerAd from '@/components/BannerAd'
+// import ConditionalLayout from '@/components/ConditionalLayout'
+// import ClientOnlyWrapper from '@/components/ClientOnlyWrapper'
+
+// Placeholders
+const CartProvider = ({ children }: any) => <div>{children}</div>
+const LanguageProvider = ({ children }: any) => <div>{children}</div>
+const ThemeProvider = ({ children }: any) => <div>{children}</div>
+const SiteHeader = () => <div>Header Placeholder</div>
+const SiteFooter = () => <div>Footer Placeholder</div>
+const MobileDock = () => <div>Mobile Dock Placeholder</div>
+const BannerAd = ({ inline }: any) => <div>Banner Ad Placeholder</div>
+const ConditionalLayout = ({ children }: any) => <div>{children}</div>
+const ClientOnlyWrapper = ({ children }: any) => <div>{children}</div>
 
 export const metadata: Metadata = {
   title: 'Peter Art - Artwork Shop',
