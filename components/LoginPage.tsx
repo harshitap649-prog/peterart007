@@ -143,11 +143,11 @@ export default function LoginPage() {
       <div className="flex-1 relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4 z-10">
 
         <div className="grid gap-4 md:gap-6">
-        <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 shadow-lift sm:p-6 md:p-8 text-[var(--text-primary)] max-w-md mx-auto">
-          <div className="mb-4 md:mb-6 flex rounded-lg border border-black/10 bg-white p-0.5 md:p-1 text-xs md:text-sm font-semibold text-[var(--text-secondary)] shadow">
+        <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-6 md:p-10 lg:p-12 shadow-lift text-[var(--text-primary)] max-w-md mx-auto">
+          <div className="mb-6 md:mb-8 flex rounded-lg border border-black/10 bg-white p-1 md:p-1.5 text-sm md:text-base font-semibold text-[var(--text-secondary)] shadow">
             <button
               onClick={() => setActiveTab('signin')}
-              className={`flex-1 rounded px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
+              className={`flex-1 rounded px-4 py-2.5 md:px-6 md:py-3 transition text-sm md:text-base font-bold ${
                 activeTab === 'signin' 
                   ? 'bg-black text-white shadow-lg shadow-black/30' 
                   : 'text-gray-600 hover:text-gray-900'
@@ -158,7 +158,7 @@ export default function LoginPage() {
             </button>
             <button
               onClick={() => setActiveTab('signup')}
-              className={`flex-1 rounded px-3 py-1.5 md:px-4 md:py-2 transition text-xs md:text-sm font-bold ${
+              className={`flex-1 rounded px-4 py-2.5 md:px-6 md:py-3 transition text-sm md:text-base font-bold ${
                 activeTab === 'signup' 
                   ? 'bg-black text-white shadow-lg shadow-black/30' 
                   : 'text-gray-600 hover:text-gray-900'
@@ -169,22 +169,22 @@ export default function LoginPage() {
           </div>
 
           {activeTab === 'signin' ? (
-            <form onSubmit={handleSignIn} className="space-y-3 md:space-y-4">
+            <form onSubmit={handleSignIn} className="space-y-4 md:space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-base md:text-lg font-medium text-gray-700 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input-field rounded-2xl text-sm"
+                  className="input-field rounded-2xl text-base md:text-lg py-3 md:py-4 px-4"
                   placeholder="Enter your email"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-base md:text-lg font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -192,54 +192,54 @@ export default function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="input-field rounded-2xl text-sm pr-10"
+                    className="input-field rounded-2xl text-base md:text-lg py-3 md:py-4 px-4 pr-12"
                     placeholder="Enter your password"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
+                    {showPassword ? <FiEyeOff className="text-xl md:text-2xl" /> : <FiEye className="text-xl md:text-2xl" />}
                   </button>
                 </div>
               </div>
-              <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-base md:text-lg font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+              <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-lg md:text-xl font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-4 md:py-5 disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
           ) : (
-            <form onSubmit={handleSignUp} className="space-y-3 md:space-y-4">
+            <form onSubmit={handleSignUp} className="space-y-4 md:space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-base md:text-lg font-medium text-gray-700 mb-2">
                   Full Name
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="input-field rounded-2xl text-sm"
+                  className="input-field rounded-2xl text-base md:text-lg py-3 md:py-4 px-4"
                   placeholder="Enter your full name"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-base md:text-lg font-medium text-gray-700 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="input-field rounded-2xl text-sm"
+                  className="input-field rounded-2xl text-base md:text-lg py-3 md:py-4 px-4"
                   placeholder="Enter your email"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-base md:text-lg font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <div className="relative">
@@ -247,7 +247,7 @@ export default function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="input-field rounded-2xl text-sm pr-10"
+                    className="input-field rounded-2xl text-base md:text-lg py-3 md:py-4 px-4 pr-12"
                     placeholder="Create a password (min 6 characters)"
                     required
                     minLength={6}
@@ -255,22 +255,22 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors p-1"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <FiEyeOff className="text-lg" /> : <FiEye className="text-lg" />}
+                    {showPassword ? <FiEyeOff className="text-xl md:text-2xl" /> : <FiEye className="text-xl md:text-2xl" />}
                   </button>
                 </div>
               </div>
-              <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-base md:text-lg font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+              <button type="submit" disabled={loading} className="w-full justify-center rounded-2xl bg-black text-white text-lg md:text-xl font-bold shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/40 transition-all py-4 md:py-5 disabled:opacity-50 disabled:cursor-not-allowed">
                 {loading ? 'Creating account...' : 'Sign Up'}
               </button>
             </form>
           )}
 
-          <div className="relative py-3 md:py-5">
+          <div className="relative py-6 md:py-8">
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t border-black/5" />
-            <div className="relative mx-auto w-max rounded-full border border-black/10 bg-white px-2 md:px-3 text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.3em] md:tracking-[0.4em] text-[var(--text-secondary)]">
+            <div className="relative mx-auto w-max rounded-full border border-black/10 bg-white px-4 md:px-6 text-xs md:text-sm font-semibold uppercase tracking-[0.3em] md:tracking-[0.4em] text-[var(--text-secondary)]">
               Or
             </div>
           </div>
@@ -278,14 +278,14 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="mb-3 md:mb-4 flex w-full items-center justify-center gap-2 rounded-xl md:rounded-2xl border border-black/10 bg-white py-2 md:py-3 text-xs md:text-sm font-semibold text-[var(--text-primary)] transition hover:border-black/20"
+            className="mb-6 md:mb-8 flex w-full items-center justify-center gap-3 rounded-xl md:rounded-2xl border border-black/10 bg-white py-3 md:py-4 text-sm md:text-base font-semibold text-[var(--text-primary)] transition hover:border-black/20 hover:shadow-md"
           >
-            <FcGoogle className="text-lg md:text-xl" />
+            <FcGoogle className="text-xl md:text-2xl" />
             Continue with Google
           </button>
 
           {/* PWA Install Button */}
-          <div className="mb-3 md:mb-4">
+          <div className="mb-4 md:mb-6">
             <InstallButton />
           </div>
         </div>
