@@ -14,22 +14,61 @@ import { useRouter } from 'next/navigation'
 // import { calculateBulkDiscount } from '@/lib/coupons'
 
 // Placeholders
+interface CartItem {
+  id: string;
+  artworkId: string;
+  artworkTitle: string;
+  artworkImage: string;
+  quantity: number;
+  unitPrice: number;
+  price: number;
+  [key: string]: any;
+}
+
+interface User {
+  uid: string;
+  email: string;
+  displayName: string;
+  fullName?: string;
+  phone?: string;
+  address1?: string;
+  address2?: string;
+  pincode?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  [key: string]: any;
+}
+
+interface Address {
+  fullName: string;
+  phone: string;
+  email: string;
+  address1: string;
+  address2?: string;
+  pincode: string;
+  city: string;
+  state: string;
+  country: string;
+  [key: string]: any;
+}
+
 const useCart = () => ({ 
-  cart: [], 
+  cart: [] as CartItem[], 
   cartTotal: 0, 
-  removeFromCart: () => {}, 
-  updateQuantity: () => {}, 
+  removeFromCart: (id: string) => {}, 
+  updateQuantity: (id: string, quantity: number) => {}, 
   clearCart: () => {} 
 })
-const getCurrentUser = () => Promise.resolve(null)
+const getCurrentUser = (): Promise<User | null> => Promise.resolve(null)
 const createOrder = (data: any) => Promise.resolve('order-id')
 const loadPopunderAd = (type: string) => console.log('Loading ad:', type)
 const LoginModal = ({ children, isOpen, onClose }: any) => isOpen ? <div>{children}</div> : null
-const PaymentMethods = ({ selectedMethod, onMethodChange }: any) => <div>Payment Methods Placeholder</div>
+const PaymentMethods = ({ selectedMethod, onMethodChange, amount, orderId, userDetails, onPaymentSuccess, onPaymentError }: any) => <div>Payment Methods Placeholder</div>
 const updateOrderStatus = (id: string, status: string) => Promise.resolve({})
-const getSavedAddresses = (userId: string) => Promise.resolve([])
-const CouponInput = ({ onApply }: any) => <div>Coupon Input Placeholder</div>
-const calculateBulkDiscount = (items: any[]) => 0
+const getSavedAddresses = (userId: string) => Promise.resolve([] as Address[])
+const CouponInput = ({ onCouponApplied, onCouponRemoved, cartTotal, userId }: any) => <div>Coupon Input Placeholder</div>
+const calculateBulkDiscount = (items: CartItem[]) => ({ discount: 0 })
 
 import toast from 'react-hot-toast'
 import { FiShoppingCart, FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiUser, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
@@ -44,13 +83,13 @@ export default function CartPage() {
       const total = cart.reduce((sum, item) => {
         return sum + ((item.unitPrice || item.price || 0) * item.quantity)
       }, 0)
-      const bulk = calculateBulkDiscount(totalQuantity, total / totalQuantity)
+      const bulk = calculateBulkDiscount(cart)
       setBulkDiscount(bulk.discount)
     } else {
       setBulkDiscount(0)
     }
   }, [cart])
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [showCheckout, setShowCheckout] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -58,7 +97,7 @@ export default function CartPage() {
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [orderIds, setOrderIds] = useState<string[]>([])
   const [showPayment, setShowPayment] = useState(false)
-  const [savedAddresses, setSavedAddresses] = useState<any[]>([])
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [useSavedAddress, setUseSavedAddress] = useState(false)
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
@@ -187,9 +226,9 @@ export default function CartPage() {
       // Create orders for each cart item
       const orderPromises = cart.map((item) =>
         createOrder({
-          userId: user.uid,
-          userEmail: user.email,
-          userName: formData.fullName || user.displayName || user.email.split('@')[0],
+          userId: user?.uid || '',
+          userEmail: user?.email || '',
+          userName: formData.fullName || user?.displayName || user?.email?.split('@')[0] || '',
           artworkId: item.artworkId,
           artworkTitle: item.artworkTitle,
           artworkImage: item.artworkImage,
@@ -388,7 +427,7 @@ export default function CartPage() {
                 {user && (
                   <div className="space-y-2 md:space-y-4 mb-3 md:mb-4">
                     <CouponInput
-                      onCouponApplied={(coupon, discount) => {
+                      onCouponApplied={(coupon: any, discount: any) => {
                         setAppliedCoupon(coupon)
                         setCouponDiscount(discount)
                       }}
@@ -473,7 +512,7 @@ export default function CartPage() {
                                   setFormData({
                                     fullName: address.fullName,
                                     phone: address.phone,
-                                    email: address.email || user.email || '',
+                                    email: address.email || user?.email || '',
                                     address1: address.address1,
                                     address2: address.address2 || '',
                                     pincode: address.pincode,
@@ -600,11 +639,11 @@ export default function CartPage() {
                         amount={cartTotal}
                         orderId={orderIds[0]}
                         userDetails={{
-                          name: formData.fullName || user.displayName || '',
-                          email: formData.email || user.email || '',
+                          name: formData.fullName || user?.displayName || '',
+                          email: formData.email || user?.email || '',
                           phone: formData.phone || ''
                         }}
-                        onPaymentSuccess={(paymentData) => handlePaymentSuccess(paymentData, orderIds)}
+                        onPaymentSuccess={(paymentData: any) => handlePaymentSuccess(paymentData, orderIds)}
                         onPaymentError={handlePaymentError}
                       />
                     )}
@@ -768,7 +807,7 @@ export default function CartPage() {
         <LoginModal
           isOpen={loginModalOpen}
           onClose={() => setLoginModalOpen(false)}
-          onSuccess={(user) => {
+          onSuccess={(user: User) => {
             setUser(user)
             setLoginModalOpen(false)
             setFormData(prev => ({

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore/lite'
 // import { db } from '@/firebase.config'
 
 // Placeholder

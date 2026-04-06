@@ -111,7 +111,7 @@ export default function AdminDashboard() {
       }
       if (activeTab === 'users') {
         const usrs = await getAllUsers()
-        setUsers(usrs.filter(u => !u.isAdmin))
+        setUsers(usrs.filter((u: any) => !u.isAdmin))
       }
       if (activeTab === 'deletedOrders' || activeTab === 'home') {
         const ords = await getAllOrders()
@@ -201,7 +201,7 @@ export default function AdminDashboard() {
           description: formData.description.trim(),
           price: parseFloat(formData.price),
           category: formData.category.trim(),
-          artistId: formData.artistId || null
+          artistId: formData.artistId || undefined
         }, formData.images)
         toast.success('Artwork updated successfully')
       } else {
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
           description: formData.description.trim(),
           price: parseFloat(formData.price),
           category: formData.category.trim(),
-          artistId: formData.artistId || null
+          artistId: formData.artistId || undefined
         }, formData.images)
         toast.success('Artwork added successfully')
       }

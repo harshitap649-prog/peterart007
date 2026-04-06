@@ -5,19 +5,24 @@ import { useRouter } from 'next/navigation'
 // import { getCurrentUser } from '@/lib/auth'
 
 // Placeholder
-const getCurrentUser = () => Promise.resolve(null)
+interface User {
+  email: string;
+  [key: string]: any;
+}
+
+const getCurrentUser = (): Promise<User | null> => Promise.resolve(null)
 // import UserDashboard from '@/components/UserDashboard'
 // import AuthGuard from '@/components/AuthGuard'
 
 // Placeholders
-const UserDashboard = () => <div>User Dashboard Placeholder</div>
+const UserDashboard = ({ user, onUserUpdate }: { user: User | null; onUserUpdate: (user: User | null) => void }) => <div>User Dashboard Placeholder</div>
 const AuthGuard = ({ children }: any) => <div>{children}</div>
 
 export const dynamic = 'force-dynamic'
 
 export default function UserPage() {
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
 
   useEffect(() => {

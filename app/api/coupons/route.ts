@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { collection, getDocs, query, where, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'
+import { collection, getDocs, query, where, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore/lite'
 // import { db } from '@/firebase.config'
 
 // Placeholder
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
     // Get all active coupons
     const couponsRef = collection(db, 'coupons')
     const snapshot = await getDocs(couponsRef)
-    const coupons = snapshot.docs.map(doc => ({
+    const coupons = snapshot.docs.map((doc: any) => ({
       id: doc.id,
       ...doc.data()
     })) as any[]
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Create coupon document
-    const couponRef = doc(collection(db, 'coupons'))
+    const couponRef = doc(db, 'coupons', Date.now().toString())
     await setDoc(couponRef, newCoupon)
     
     return NextResponse.json({ id: couponRef.id, ...newCoupon })
