@@ -26,39 +26,41 @@ export default function Home() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-blue-600 flex flex-col">
-      {/* Logo at Top Left */}
-      <div className="absolute top-6 left-6">
-        <h1 className="text-2xl font-bold text-white">Peter Art</h1>
-      </div>
-
-      {/* Center Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* Centered Text */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Welcome to Peter Art
-          </h2>
-          <p className="text-xl text-white/90 max-w-md">
-            Discover and buy beautiful artworks from talented artists
-          </p>
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-8">
+        {/* Logo at Top */}
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Peter Art</h1>
         </div>
 
-        {/* Stacked Buttons */}
-        <div className="w-full max-w-sm space-y-4">
-          <button
-            onClick={() => router.push('/login')}
-            className="w-full bg-black text-white py-4 rounded-xl font-semibold text-lg hover:bg-gray-800 transition-all duration-200"
-          >
-            Login
-          </button>
-          
-          <button
-            onClick={() => router.push('/login?mode=register')}
-            className="w-full bg-transparent border-2 border-black text-black py-4 rounded-xl font-semibold text-lg hover:bg-black hover:text-white transition-all duration-200"
-          >
-            Register
-          </button>
+        {/* Center Content */}
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+          {/* Centered Text */}
+          <div className="text-center mb-12 max-w-2xl">
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Welcome to Peter Art
+            </h2>
+            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed">
+              Discover and buy beautiful artworks from talented artists
+            </p>
+          </div>
+
+          {/* Stacked Buttons */}
+          <div className="w-full max-w-md space-y-4">
+            <button
+              onClick={() => router.push('/login')}
+              className="btn-primary w-full py-4 rounded-xl font-semibold text-lg"
+            >
+              Login
+            </button>
+            
+            <button
+              onClick={() => router.push('/login?mode=register')}
+              className="btn-secondary w-full py-4 rounded-xl font-semibold text-lg"
+            >
+              Register
+            </button>
+          </div>
         </div>
       </div>
     </div>
