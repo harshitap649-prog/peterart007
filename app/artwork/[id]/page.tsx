@@ -22,13 +22,13 @@ import { FiArrowLeft, FiShoppingCart, FiMinus, FiPlus, FiStar, FiImage, FiX, FiT
 // import NativeBanner from '@/components/NativeBanner'
 // import { likeArtwork } from '@/lib/comments'
 
-// Component placeholders
-const LoginModal = ({ children, isOpen, onClose }: any) => isOpen ? <div>{children}</div> : null
-const Cart = () => <div>Cart Placeholder</div>
-const RecommendationSection = ({ artworkId }: any) => <div>Recommendations Placeholder</div>
-const BannerAd = ({ size }: any) => <div>Banner Ad Placeholder</div>
-const Banner300x250 = () => <div>Banner 300x250 Placeholder</div>
-const NativeBanner = () => <div>Native Banner Placeholder</div>
+// Component imports
+import LoginModal from '@/components/LoginModal'
+import Cart from '@/components/Cart'
+import RecommendationSection from '@/components/RecommendationSection'
+import BannerAd from '@/components/BannerAd'
+import Banner300x250 from '@/components/Banner300x250'
+import NativeBanner from '@/components/NativeBanner'
 const likeArtwork = (id: string, userId: string) => Promise.resolve()
 // import { useCart } from '@/contexts/CartContext'
 // import { useLanguage } from '@/contexts/LanguageContext'

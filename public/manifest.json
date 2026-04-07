@@ -1,11 +1,11 @@
 {
-  "name": "Peter Art - Artwork Shop",
-  "short_name": "Peter Art",
+  "name": "Peter Art",
+  "short_name": "PeterArt",
   "description": "Buy and sell beautiful artworks",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#f97316",
+  "theme_color": "#007BFF",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [

@@ -35,8 +35,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Peter Art" />
         <meta name="application-name" content="Peter Art" />
-        <meta name="msapplication-TileColor" content="#f97316" />
-        <meta name="theme-color" content="#f97316" />
+        <meta name="msapplication-TileColor" content="#007BFF" />
+        <meta name="theme-color" content="#007BFF" />
+        <meta name="description" content="Buy and sell beautiful artworks" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
+        <link rel="icon" href="/favicon.ico" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -11,6 +11,13 @@ export interface OrderData {
   unitPrice: number;
   total: number;
   paymentMethod: string;
+  paymentStatus?: string;
+  couponCode?: string | null;
+  couponDiscount?: number;
+  bulkDiscount?: number;
+  isGift?: boolean;
+  giftMessage?: string | null;
+  scheduledDeliveryDate?: string | null;
   fullName?: string;
   phone?: string;
   email?: string;

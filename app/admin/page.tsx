@@ -3,10 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 // import { getCurrentUser, isAdmin } from '@/lib/auth'
-// import AdminDashboard from '@/components/AdminDashboard'
-
-// Temporary placeholder
-const AdminDashboard = () => <div>Admin Dashboard Placeholder</div>
+import AdminDashboard from '@/components/AdminDashboard'
 const getCurrentUser = () => Promise.resolve(null)
 const isAdmin = (user?: any) => Promise.resolve(false)
 

@@ -46,7 +46,7 @@ export default function LoginPage() {
         // Redirect to artist registration form
         window.location.href = '/artist/apply'
       } else {
-        window.location.href = '/user'
+        window.location.href = '/'
       }
     } catch (error: any) {
       console.error('Sign up error:', error)
@@ -74,7 +74,7 @@ export default function LoginPage() {
       if (admin) {
         window.location.href = '/admin'
       } else {
-        window.location.href = '/user'
+        window.location.href = '/'
       }
     } catch (error: any) {
       console.error('Login error:', error)
@@ -100,7 +100,7 @@ export default function LoginPage() {
       if (admin) {
         window.location.href = '/admin'
       } else {
-        window.location.href = '/user'
+        window.location.href = '/'
       }
     } catch (error: any) {
       console.error('Google login error:', error)
@@ -111,9 +111,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-white">
+    <div 
+      className="min-h-screen flex flex-col relative overflow-hidden bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url('https://i.pinimg.com/originals/fe/45/95/fe45957a255442718f566ba9942384a8.png')`
+      }}
+    >
+      {/* Semi-transparent overlay for better readability */}
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm"></div>
       {/* Hero Section with Image and Quote */}
-      <div className="relative w-full py-12 md:py-16 px-4 z-10">
+      <div className="relative w-full py-12 md:py-16 px-4 z-20">
         <div className="mx-auto max-w-4xl text-center">
           {/* Image */}
           <div className="mb-6 flex justify-center">
@@ -140,7 +147,7 @@ export default function LoginPage() {
       </div>
 
       {/* Login Form Section */}
-      <div className="flex-1 relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4 z-10">
+      <div className="flex-1 relative mx-auto w-full max-w-6xl px-3 py-10 sm:px-4 z-20">
 
         <div className="grid gap-4 md:gap-6">
         <div className="surface-card rounded-2xl md:rounded-[32px] border border-black/5 p-4 sm:p-6 md:p-8 lg:p-10 shadow-lift text-[var(--text-primary)] max-w-xs sm:max-w-sm mx-auto aspect-[4/3] sm:aspect-square flex flex-col justify-center">
