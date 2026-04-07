@@ -16,6 +16,29 @@ import { calculateBulkDiscount } from '@/lib/coupons'
 import toast from 'react-hot-toast'
 import { FiShoppingCart, FiMinus, FiPlus, FiTrash2, FiArrowLeft, FiUser, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
 
+interface User {
+  uid: string;
+  email: string;
+  displayName?: string;
+  [key: string]: any;
+}
+
+interface Address {
+  id: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  address1: string;
+  address2?: string;
+  pincode: string;
+  city: string;
+  state?: string;
+  country?: string;
+  isDefault?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export default function CartPage() {
   const { cart, cartTotal, removeFromCart, updateQuantity, clearCart } = useCart()
   
