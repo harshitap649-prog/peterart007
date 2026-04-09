@@ -26,37 +26,41 @@ export default function Home() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
-        {/* Logo at Top */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Peter Art</h1>
-        </div>
-
-        {/* Center Content */}
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
-          {/* Centered Text */}
-          <div className="text-center mb-12 max-w-2xl">
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Welcome to Peter Art
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-600 leading-relaxed">
-              Discover and buy beautiful artworks from talented artists
-            </p>
-          </div>
-
-          {/* Stacked Buttons */}
-          <div className="w-full max-w-md space-y-4">
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background Image */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
+        style={{ backgroundImage: "url('/hero.webp')" }}
+      />
+      
+      {/* Dark Overlay */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-10" />
+      
+      {/* Content Container */}
+      <div className="relative z-20 min-h-screen flex items-center justify-center px-4">
+        <div className="text-center max-w-4xl w-full">
+          {/* Main Title */}
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+            Peter Art
+          </h1>
+          
+          {/* Subtitle */}
+          <p className="text-xl md:text-2xl text-white mb-12 max-w-2xl mx-auto leading-relaxed">
+            Discover and buy beautiful artworks from talented artists
+          </p>
+          
+          {/* Buttons Container */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
             <button
               onClick={() => router.push('/login')}
-              className="btn-primary w-full py-4 rounded-xl font-semibold text-lg"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold text-lg rounded-xl hover:bg-gray-100 transition-colors duration-200 min-w-[160px]"
             >
               Login
             </button>
             
             <button
               onClick={() => router.push('/login?mode=register')}
-              className="btn-secondary w-full py-4 rounded-xl font-semibold text-lg"
+              className="w-full sm:w-auto px-8 py-4 bg-transparent text-white font-semibold text-lg rounded-xl border-2 border-white hover:bg-white hover:text-black transition-all duration-200 min-w-[160px]"
             >
               Register
             </button>
