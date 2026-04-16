@@ -8,6 +8,8 @@ import { FaFacebook, FaApple } from 'react-icons/fa'
 import Link from 'next/link'
 import { loginWithEmail, signUpWithEmail, loginWithGoogle, isAdmin } from '@/lib/auth'
 import toast from 'react-hot-toast'
+import AuthDebug from '@/components/AuthDebug'
+import FirebaseTest from '@/components/FirebaseTest'
 
 export default function ModernLoginPage() {
   const [email, setEmail] = useState('')
@@ -91,6 +93,8 @@ export default function ModernLoginPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
+        <FirebaseTest />
+        <AuthDebug />
         {/* Back Button */}
         <button
           onClick={() => router.push('/')}
